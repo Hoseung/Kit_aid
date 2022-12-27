@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/examineHistoryButton"
+        android:layout_width="123dp"
+        android:layout_height="41.5dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/bg_green_btn"
+        android:drawableStart="@drawable/history_icon"
+        android:drawablePadding="-15sp"
+        android:gravity="center"
+        android:paddingStart="18sp"
+        android:text="Result"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/kitListButton"
+        android:layout_width="123dp"
+        android:layout_height="41.5dp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/bg_green_btn"
+        android:drawableStart="@drawable/list_white_icon"
+        android:drawablePadding="-15sp"
+        android:gravity="center"
+        android:paddingStart="18sp"
+        android:text="Kit List"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@id/examineHistoryButton"
+        app:layout_constraintStart_toEndOf="@id/examineHistoryButton"
+        app:layout_constraintTop_toTopOf="@id/examineHistoryButton" />
+
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_round_image"
+        android:src="@drawable/ic_profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/kitListButton" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_login_layout"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintBottom_toTopOf="@id/infoLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/examineHistoryButton">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/black"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/view_finder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:scaleType="fillStart" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+    <!--        <TextView-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginTop="20dp"-->
+    <!--            android:drawableStart="@drawable/question_icon"-->
+    <!--            android:text=" 사용방법"-->
+    <!--            android:textColor="#007dff"-->
+    <!--            android:textSize="25sp" />-->
+
+    <!--        <HorizontalScrollView-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content">-->
+
+    <!--            <LinearLayout-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="120dp"-->
+    <!--                android:background="@drawable/bg_gray_radius"-->
+    <!--                android:orientation="horizontal">-->
+
+    <!--                <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--                    android:layout_width="130dp"-->
+    <!--                    android:layout_height="105dp"-->
+    <!--                    android:layout_gravity="center_vertical"-->
+    <!--                    android:layout_marginStart="10dp"-->
+    <!--                    android:background="@drawable/bg_white_radius">-->
+
+    <!--                    <ImageView-->
+    <!--                        android:layout_width="53dp"-->
+    <!--                        android:layout_height="44dp"-->
+    <!--                        android:layout_marginTop="10dp"-->
+    <!--                        android:src="@drawable/step_1_icon"-->
+    <!--                        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent"-->
+    <!--                        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:id="@+id/step1Text"-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="1"-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="30sp"-->
+    <!--                        android:textStyle="bold"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="검사에 사용하시는\n키트 제품정보를 확인하세요."-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="9sp"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toEndOf="@id/step1Text" />-->
+
+    <!--                </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+
+    <!--                <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--                    android:layout_width="130dp"-->
+    <!--                    android:layout_height="105dp"-->
+    <!--                    android:layout_gravity="center_vertical"-->
+    <!--                    android:layout_marginStart="10dp"-->
+    <!--                    android:background="@drawable/bg_white_radius">-->
+
+    <!--                    <ImageView-->
+    <!--                        android:layout_width="53dp"-->
+    <!--                        android:layout_height="44dp"-->
+    <!--                        android:layout_marginTop="10dp"-->
+    <!--                        android:src="@drawable/step_2_icon"-->
+    <!--                        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent"-->
+    <!--                        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:id="@+id/step2Text"-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="2"-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="30sp"-->
+    <!--                        android:textStyle="bold"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="검사 키트의 QR코드 또는\n바코드를 촬영하세요."-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="9sp"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toEndOf="@id/step2Text" />-->
+
+    <!--                </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <!--                <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--                    android:layout_width="130dp"-->
+    <!--                    android:layout_height="105dp"-->
+    <!--                    android:layout_gravity="center_vertical"-->
+    <!--                    android:layout_marginStart="10dp"-->
+    <!--                    android:layout_marginEnd="10dp"-->
+    <!--                    android:background="@drawable/bg_white_radius">-->
+
+    <!--                    <ImageView-->
+    <!--                        android:layout_width="53dp"-->
+    <!--                        android:layout_height="44dp"-->
+    <!--                        android:layout_marginTop="10dp"-->
+    <!--                        android:src="@drawable/step_3_icon"-->
+    <!--                        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent"-->
+    <!--                        app:layout_constraintTop_toTopOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:id="@+id/step3Text"-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="3"-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="30sp"-->
+    <!--                        android:textStyle="bold"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toStartOf="parent" />-->
+
+    <!--                    <TextView-->
+    <!--                        android:layout_width="wrap_content"-->
+    <!--                        android:layout_height="wrap_content"-->
+    <!--                        android:text="검사기록 메뉴에서\n기록을 확인할 수 있습니다."-->
+    <!--                        android:textColor="@color/black"-->
+    <!--                        android:textSize="9sp"-->
+    <!--                        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--                        app:layout_constraintStart_toEndOf="@id/step3Text" />-->
+
+    <!--                </androidx.constraintlayout.widget.ConstraintLayout>-->
+    <!--            </LinearLayout>-->
+    <!--        </HorizontalScrollView>-->
+
+
+    <LinearLayout
+        android:id="@+id/infoLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        app:layout_constraintBottom_toTopOf="@id/memberBottomLayout">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/question_icon"
+            android:text=" Information"
+            android:textColor="#007dff"
+            android:textSize="25sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_gray_radius"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingVertical="15dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/bg_edittext"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:text="Peter" />
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/bg_edittext"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:text="Covid 19" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/memberBottomLayout"
+        android:layout_width="0dp"
+        android:layout_height="51dp"
+        android:background="#f0f3fa"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:src="@drawable/info_icon" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="About Proteome Tech" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
