@@ -15,46 +15,55 @@
  */
 package org.tensorflow.lite.examples.objectdetection.fragments
 
+//import android.media.MediaScannerConnection
+//import android.os.Handler
+//import android.os.Looper
+//import androidx.camera.core.ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG
+//import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
+//import org.tensorflow.lite.examples.objectdetection.new.Main2Activity
+//import java.io.FileNotFoundException
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.media.MediaScannerConnection
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.graphics.RectF
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.Surface.ROTATION_0
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
-import androidx.camera.core.ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY
+import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import org.tensorflow.lite.examples.objectdetection.HistoryActivity
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper
+//import org.tensorflow.lite.examples.objectdetection.RegressionHelper
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.SelectActivity
 import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
-import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
-import org.tensorflow.lite.examples.objectdetection.new.Main2Activity
 import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
+import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 import java.io.File
-import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.lang.Math.ceil
+import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
@@ -66,6 +75,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         get() = binding!!
 
     private lateinit var objectDetectorHelper: ObjectDetectorHelper
+    //private lateinit var regressionHelper: RegressionHelper
     private lateinit var bitmapBuffer: Bitmap
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
@@ -135,103 +145,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         )
 
         // Attach listeners to UI control widgets
-        initBottomSheetControls()
-
-    }
-
-    private fun initBottomSheetControls() {
-        // When clicked, lower detection score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.thresholdMinus.setOnClickListener {
-            if (objectDetectorHelper.threshold >= 0.1) {
-                objectDetectorHelper.threshold -= 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise detection score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.thresholdPlus.setOnClickListener {
-            if (objectDetectorHelper.threshold <= 0.8) {
-                objectDetectorHelper.threshold += 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, reduce the number of objects that can be detected at a time
-        fragmentCameraBinding.bottomSheetLayout.maxResultsMinus.setOnClickListener {
-            if (objectDetectorHelper.maxResults > 1) {
-                objectDetectorHelper.maxResults--
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, increase the number of objects that can be detected at a time
-        fragmentCameraBinding.bottomSheetLayout.maxResultsPlus.setOnClickListener {
-            if (objectDetectorHelper.maxResults < 5) {
-                objectDetectorHelper.maxResults++
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, decrease the number of threads used for detection
-        fragmentCameraBinding.bottomSheetLayout.threadsMinus.setOnClickListener {
-            if (objectDetectorHelper.numThreads > 1) {
-                objectDetectorHelper.numThreads--
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, increase the number of threads used for detection
-        fragmentCameraBinding.bottomSheetLayout.threadsPlus.setOnClickListener {
-            if (objectDetectorHelper.numThreads < 4) {
-                objectDetectorHelper.numThreads++
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, change the underlying hardware used for inference. Current options are CPU
-        // GPU, and NNAPI
-        fragmentCameraBinding.bottomSheetLayout.spinnerDelegate.setSelection(0, false)
-        fragmentCameraBinding.bottomSheetLayout.spinnerDelegate.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    objectDetectorHelper.currentDelegate = p2
-                    updateControlsUi()
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-                    /* no op */
-                }
-            }
-
-        // When clicked, change the underlying model used for object detection
-        fragmentCameraBinding.bottomSheetLayout.spinnerModel.setSelection(0, false)
-        fragmentCameraBinding.bottomSheetLayout.spinnerModel.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                    objectDetectorHelper.currentModel = p2
-                    updateControlsUi()
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-                    /* no op */
-                }
-            }
-    }
-
-    // Update the values displayed in the bottom sheet. Reset detector.
-    private fun updateControlsUi() {
-        fragmentCameraBinding.bottomSheetLayout.maxResultsValue.text =
-            objectDetectorHelper.maxResults.toString()
-        fragmentCameraBinding.bottomSheetLayout.thresholdValue.text =
-            String.format("%.2f", objectDetectorHelper.threshold)
-        println(String.format("%.2f", objectDetectorHelper.threshold))
-        fragmentCameraBinding.bottomSheetLayout.threadsValue.text =
-            objectDetectorHelper.numThreads.toString()
-
-        // Needs to be cleared instead of reinitialized because the GPU
-        // delegate needs to be initialized on the thread using it when applicable
-        objectDetectorHelper.clearObjectDetector()
-        fragmentCameraBinding.overlay.clear()
+        //initBottomSheetControls()
     }
 
     // Initialize CameraX, and prepare to bind the camera use cases
@@ -268,7 +182,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .build()
 
-        val builder = ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MINIMIZE_LATENCY)
+        val builder = ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY)//CAPTURE_MODE_ZERO_SHUTTER_LAG)
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
             .setTargetRotation(ROTATION_0)
 
@@ -277,7 +191,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         // ImageAnalysis. Using RGBA 8888 to match how our models work
         imageAnalyzer =
             ImageAnalysis.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                //.setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                .setTargetResolution(Size(1920,1080)) // 1440 1080 max?
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -311,7 +226,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 imageAnalyzer,
                 imageCapture
             )
-            bindCaptureListener()
+            //bindCaptureListener() // No Capture button
             // Attach the viewfinder's surface provider to preview use case
             preview?.setSurfaceProvider(fragmentCameraBinding.viewFinder.surfaceProvider)
         } catch (exc: Exception) {
@@ -326,16 +241,123 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         cap = true
     }
 
-    private fun bindCaptureListener() = with(binding!!) {
-        captureBtn.setOnClickListener {
-//            Toast.makeText(requireContext(), "Analyzing...", Toast.LENGTH_SHORT).show()
-//            if (cap) {
-//                captureCamera()
-//            }
-//            cap = false
+//    private fun bindCaptureListener() = with(binding!!) {
+//        captureBtn.setOnClickListener {
+////            Toast.makeText(requireContext(), "Analyzing...", Toast.LENGTH_SHORT).show()
+////            if (cap) {
+////                captureCamera()
+////            }
+////            cap = false
+//        }
+//    }
+
+    private fun savePictureToMemory() {
+        // 2
+        //var cx: Int
+        //var cy: Int
+        var width: Float
+        var height: Float
+        var result: Detection?
+        var bbox: RectF
+
+        if (!::imageCapture.isInitialized) return
+        imageCapture.takePicture(cameraExecutor,
+            object :  ImageCapture.OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    //get bitmap from image
+                    var bitmap = imageProxyToBitmap(image)
+                    bitmap = rotate(bitmap, 90f)
+//                    objectDetectorHelper.detect(bitmap, 0)
+//
+//                    result = objectDetectorHelper.detect2(bitmap, 0)
+//                    if(result != null){
+//                        bbox = result?.boundingBox!!
+//                        width = bbox.width()
+//                        height = bbox.height()
+//                        println("WIDTH and HEIGHT ${width} ${height}")
+//                        println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
+//                        bitmap = Bitmap.createBitmap(bitmap,
+//                            (ceil(bbox.centerX() - 0.525 * width)*6.3f).toInt(),
+//                            (ceil(bbox.centerY() - 0.525 * height)*6.3f).toInt(),
+//                            ceil(6.3*1.05*width).toInt(),
+//                            ceil(6.3*height).toInt())
+                    //}
+                    //contentUri = imageSaver(bitmap)
+                    println("FILE SAVED ${contentUri?.path}")
+
+                    super.onCaptureSuccess(image)
+                    image.close()
+
+                    // Move to Result screen
+                    contentUri?.let {
+                        val resultIntent = Intent(requireContext(), ResultActivity::class.java)
+                        resultIntent.putExtra("imageUri", it)
+                        startActivity(resultIntent)
+                    }
+                }
+                override fun onError(exception: ImageCaptureException) {
+                    super.onError(exception)
+                }
+            }
+        )
+    }
+
+    private fun cutBbox(bitmap: Bitmap, bbox: RectF): Bitmap {
+        val width = bbox.width()
+        val height = bbox.height()
+        println("WIDTH and HEIGHT ${width} ${height}")
+        println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
+        var bitmap = Bitmap.createBitmap(bitmap,
+            ceil(bbox.centerX() - 0.525 * width).toInt(),
+            ceil(bbox.centerY() - 0.525 * height).toInt(),
+            ceil(1.05*width).toInt(),
+            height.toInt())
+        return bitmap
+    }
+
+    private fun rotate(bitmap: Bitmap, degrees: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(degrees)
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun imageSaver(bitmap: Bitmap): String{
+        val photoFile = File(
+            getOutputDirectory(requireActivity()),
+            SimpleDateFormat(
+                FILENAME_FORMAT, Locale.KOREA
+            ).format(System.currentTimeMillis()) + ".png"
+        )
+
+        val fileOutputStream = FileOutputStream(photoFile) //location of the image
+        val uri = Uri.fromFile(photoFile)
+
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        //bitmap.recycle() //
+        return photoFile.absolutePath
+    }
+
+    private fun carryOn(bitmap: Bitmap, bbox: RectF){
+        //var bitmap =
+        var cropped: Bitmap = cutBbox(rotate(bitmap, 90f), bbox)
+        //contentUri = imageSaver(cropped)
+        val absolutePath = imageSaver(cropped)
+        //println("zzzzzzzzzzzzzzzzzzzzzzzzzzz~~~~~~~~~~~~~~")
+        absolutePath.let {
+            val resultIntent = Intent(requireContext(), ResultActivity::class.java)
+            resultIntent.putExtra("imagePath", it)
+            startActivity(resultIntent)
         }
     }
 
+
+    private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+        val planeProxy = image.planes[0]
+        val buffer: ByteBuffer = planeProxy.buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+    }
 
     private var contentUri: Uri? = null
     private fun captureCamera() {
@@ -354,7 +376,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val savedUri = outputFileResults.savedUri ?: Uri.fromFile(photoFile)
-                    val rotation = binding!!.viewFinder.display.rotation // 회전 값 설정
+                    //val rotation = binding!!.viewFinder.display.rotation // 회전 값 설정
                     contentUri = savedUri
                     println("@@@@@ $savedUri $contentUri")
                     contentUri?.let {
@@ -367,8 +389,10 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 override fun onError(e: ImageCaptureException) {
                     e.printStackTrace()
                 }
-            })
+            }
+        )
     }
+
 
     private fun getOutputDirectory(activity: Activity): File = with(activity) {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -396,11 +420,13 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     // Update UI after objects have been detected. Extracts original image height/width
     // to scale and place bounding boxes properly through OverlayView
     override fun onResults(
+        image: Bitmap,
         results: MutableList<Detection>?,
         inferenceTime: Long,
         imageHeight: Int,
         imageWidth: Int
     ) {
+        //var uri: Uri
         activity?.runOnUiThread {
             fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
                 String.format("%d ms", inferenceTime)
@@ -414,11 +440,18 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
             if (results != null) {
                 for (i in results) {
+//                    cx = .centerX()
+//                    cy = i.boundingBox.centerY()
+//                    width = i.boundingBox.width()
+//                    height = i.boundingBox.height()
                     println(i.categories[0].score)
-                    if (i.categories[0].score > 0.75) {
+                    if (i.categories[0].score > 0.8) {
                         if (cap) {
-                            Toast.makeText(requireContext(), "Analyzing...", Toast.LENGTH_SHORT).show()
-                            captureCamera()
+                            Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()
+                            //captureCamera()
+                            //savePictureToMemory()
+                            //ObjectDetectorHelper.clearObjectDetector()
+                            carryOn(image, i.boundingBox!!)
                         }
                         cap = false
                     }

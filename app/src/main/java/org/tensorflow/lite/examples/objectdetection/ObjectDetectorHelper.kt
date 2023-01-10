@@ -30,9 +30,9 @@ import org.tensorflow.lite.task.gms.vision.detector.Detection
 import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 
 class ObjectDetectorHelper(
-    var threshold: Float = 0.5f,
+    var threshold: Float = 0.6f, // to show bounding box
     var numThreads: Int = 2,
-    var maxResults: Int = 3,
+    var maxResults: Int = 1,
     var currentDelegate: Int = 0,
     var currentModel: Int = 0,
     val context: Context,
@@ -151,16 +151,43 @@ class ObjectDetectorHelper(
         val results = objectDetector?.detect(tensorImage)
         inferenceTime = SystemClock.uptimeMillis() - inferenceTime
         objectDetectorListener.onResults(
+            image,
             results,
             inferenceTime,
             tensorImage.height,
             tensorImage.width)
+    }
+    fun detect2(image: Bitmap, imageRotation: Int):Detection? {
+//        if (!TfLiteVision.isInitialized()) {
+//            Log.e(TAG, "detect: TfLiteVision is not initialized yet")
+//            return
+//        }
+
+        if (objectDetector == null) {
+            setupObjectDetector()
+        }
+
+        // Inference time is the difference between the system time at the start and finish of the
+        // process
+        var inferenceTime = SystemClock.uptimeMillis()
+
+        // Create preprocessor for the image.
+        // See https://www.tensorflow.org/lite/inference_with_metadata/
+        //            lite_support#imageprocessor_architecture
+        val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
+
+        // Preprocess the image and convert it into a TensorImage for detection.
+        val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image))
+
+        val results = objectDetector?.detect(tensorImage)?.get(0)
+        return results
     }
 
     interface DetectorListener {
         fun onInitialized()
         fun onError(error: String)
         fun onResults(
+            image: Bitmap,
             results: MutableList<Detection>?,
             inferenceTime: Long,
             imageHeight: Int,
