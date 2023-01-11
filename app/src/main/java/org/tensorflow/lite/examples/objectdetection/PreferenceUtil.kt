@@ -14,4 +14,12 @@ class PreferenceUtil(context: Context) {
     fun setString(key: String, str: String) {
         prefs.edit().putString(key, str).apply()
     }
+
+    fun getCnt(): Int{
+        return prefs.getInt("cnt", 0)
+    }
+
+    fun setCnt(cnt: Int) {
+        prefs.edit().putInt("cnt", cnt).apply()
+    }
 }

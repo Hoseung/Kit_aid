@@ -243,14 +243,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     }
 
     private fun savePictureToMemory() {
-        // 2
-        //var cx: Int
-        //var cy: Int
-        var width: Float
-        var height: Float
-        var result: Detection?
-        var bbox: RectF
-
         if (!::imageCapture.isInitialized) return
         imageCapture.takePicture(cameraExecutor,
             object :  ImageCapture.OnImageCapturedCallback() {
@@ -398,11 +390,12 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     override fun onResults(
         image: Bitmap,
         results: MutableList<Detection>?,
-        inferenceTime: Long,
         imageHeight: Int,
         imageWidth: Int
     ) {
         //var uri: Uri
+        val cnt = MyEntryPoint.prefs.getCnt()
+
         activity?.runOnUiThread {
 //            fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
 //                String.format("%d ms", inferenceTime)
@@ -414,24 +407,28 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 imageWidth
             )
 
-            if (results != null) {
-                for (i in results) {
-//                    cx = .centerX()
-//                    cy = i.boundingBox.centerY()
-//                    width = i.boundingBox.width()
-//                    height = i.boundingBox.height()
+            if (results != null && results.size > 0 ) {
+                //for (i in results) {
+                val i = results[0]
                     println(i.categories[0].score)
-                    if (i.categories[0].score > 0.98) {
-                        if (cap) {
-                            Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()
-                            //captureCamera()
-                            //savePictureToMemory()
-                            //ObjectDetectorHelper.clearObjectDetector()
-                            carryOn(image, i.boundingBox!!)
+                    if (i.categories[0].score > 0.97) {
+                        if (cnt > 3) {
+                            if (cap) {
+                                Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()
+                                //captureCamera()
+                                //savePictureToMemory()
+                                //ObjectDetectorHelper.clearObjectDetector()
+                                carryOn(image, i.boundingBox!!)
+                            }
+                            cap = false
+                        } else {
+                            MyEntryPoint.prefs.setCnt(cnt+1)
                         }
-                        cap = false
+                    } else {
+                        MyEntryPoint.prefs.setCnt(0)
                     }
-                }
+                    //println("CURRENT CNT $cnt")
+                //}
             }
             fragmentCameraBinding.overlay.invalidate()
         }

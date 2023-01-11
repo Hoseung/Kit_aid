@@ -127,10 +127,6 @@ class ObjectDetectorHelper(
             setupObjectDetector()
         }
 
-        // Inference time is the difference between the system time at the start and finish of the
-        // process
-        var inferenceTime = SystemClock.uptimeMillis()
-
         // Create preprocessor for the image.
         // See https://www.tensorflow.org/lite/inference_with_metadata/
         //            lite_support#imageprocessor_architecture
@@ -140,11 +136,10 @@ class ObjectDetectorHelper(
         val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image))
 
         val results = objectDetector?.detect(tensorImage)
-        inferenceTime = SystemClock.uptimeMillis() - inferenceTime
+        //inferenceTime = SystemClock.uptimeMillis() - inferenceTime
         objectDetectorListener.onResults(
             image,
             results,
-            inferenceTime,
             tensorImage.height,
             tensorImage.width)
     }
@@ -155,7 +150,6 @@ class ObjectDetectorHelper(
         fun onResults(
             image: Bitmap,
             results: MutableList<Detection>?,
-            inferenceTime: Long,
             imageHeight: Int,
             imageWidth: Int
         )
