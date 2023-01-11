@@ -15,7 +15,7 @@ import java.io.FileInputStream
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
-    private lateinit var regressionHelper: RegressionHelper
+    //private lateinit var regressionHelper: RegressionHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,13 +26,11 @@ class ResultActivity : AppCompatActivity() {
         //binding.resultImageView.setImageURI(uri)
         setImageFromPath(imgPath, binding.resultImageView)
 
-        regressionHelper.setupRegression()
+        //regressionHelper.setupRegression()
 
-        println("AJAJAAJAJAJAJ")
         val img = pathToBitmap(imgPath)!!
-        println("<MVM<VOCVYXCZOVYUOSADUFDS")
 
-        regressionHelper.predict(img, 0)
+        //regressionHelper.predict(img, 0)
         /*
         * 여기에서 Regression 모델이 돌아가면 될 것 같은데.
         *

@@ -110,7 +110,7 @@ class ObjectDetectorHelper(
 //                MODEL_EFFICIENTDETV0 -> "efficientdet-lite0.tflite"
 //                MODEL_EFFICIENTDETV1 -> "efficientdet-lite1.tflite"
 //                MODEL_EFFICIENTDETV2 -> "efficientdet-lite2.tflite"
-                else -> "model.tflite"
+                else -> "detection0106.tflite"
 //                else -> "box.tflite"
 //                else -> "t2concent_with_meta.tflite"
             }

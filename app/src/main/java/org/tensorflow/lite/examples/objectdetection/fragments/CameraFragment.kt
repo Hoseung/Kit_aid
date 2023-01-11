@@ -192,7 +192,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         imageAnalyzer =
             ImageAnalysis.Builder()
                 //.setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                .setTargetResolution(Size(1920,1080)) // 1440 1080 max?
+                .setTargetResolution(Size(2400,1800)) // 1440 1080 max?
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -240,16 +240,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         super.onStart()
         cap = true
     }
-
-//    private fun bindCaptureListener() = with(binding!!) {
-//        captureBtn.setOnClickListener {
-////            Toast.makeText(requireContext(), "Analyzing...", Toast.LENGTH_SHORT).show()
-////            if (cap) {
-////                captureCamera()
-////            }
-////            cap = false
-//        }
-//    }
 
     private fun savePictureToMemory() {
         // 2
@@ -342,14 +332,12 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         var cropped: Bitmap = cutBbox(rotate(bitmap, 90f), bbox)
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
-        //println("zzzzzzzzzzzzzzzzzzzzzzzzzzz~~~~~~~~~~~~~~")
         absolutePath.let {
             val resultIntent = Intent(requireContext(), ResultActivity::class.java)
             resultIntent.putExtra("imagePath", it)
             startActivity(resultIntent)
         }
     }
-
 
     private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
         val planeProxy = image.planes[0]
@@ -360,6 +348,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     }
 
     private var contentUri: Uri? = null
+
     private fun captureCamera() {
         if (!::imageCapture.isInitialized) return
         val photoFile = File(
@@ -392,7 +381,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             }
         )
     }
-
 
     private fun getOutputDirectory(activity: Activity): File = with(activity) {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -445,7 +433,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 //                    width = i.boundingBox.width()
 //                    height = i.boundingBox.height()
                     println(i.categories[0].score)
-                    if (i.categories[0].score > 0.8) {
+                    if (i.categories[0].score > 0.98) {
                         if (cap) {
                             Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()
                             //captureCamera()
