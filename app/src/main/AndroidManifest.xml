@@ -57,9 +57,9 @@ xmlns:tools="http://schemas.android.com/tools">
 <!--                <category android:name="android.intent.category.LAUNCHER" />-->
 <!--            </intent-filter>-->
         </activity>
-        <activity
-            android:name=".new.Main2Activity"
-            android:exported="true"></activity>
+<!--        <activity-->
+<!--            android:name=".new.Main2Activity"-->
+<!--            android:exported="true"></activity>-->
         <activity android:name=".HistoryActivity" />
     </application>
 

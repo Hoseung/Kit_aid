@@ -15,9 +15,7 @@
 -->
 <resources>
     <string name="app_name">Ai-D Reader</string>
-
     <string name="alt_bottom_sheet_chevron">Bottom sheet expandable indicator</string>
-
     <string name="alt_bottom_sheet_max_results_button_minus">Decreasing maxium detected results
         button</string>
     <string name="alt_bottom_sheet_max_results_button_plus">Increasing maxium detected results
@@ -36,6 +34,9 @@
     <string name="label_threads">Number of Threads</string>
     <string name="label_delegate">Delegate</string>
     <string name="label_models">ML Model</string>
+    <string name="detection_model1">detection_kit.tflite</string>
+    <string name="detection_model2">detection_box.tflite"</string>
+    <string name="regression_model">regression_bovine.tflite"</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>
@@ -43,10 +44,10 @@
         <item>NNAPI</item>
     </string-array>
 
-    <string-array name="models_spinner_titles">
-        <item>MobileNet V1</item>
-        <item>EfficientDet Lite0</item>
-        <item>EfficientDet Lite1</item>
-        <item>EfficientDet Lite2</item>
-    </string-array>
+<!--    <string-array name="models_spinner_titles">-->
+<!--        <item>MobileNet V1</item>-->
+<!--        <item>EfficientDet Lite0</item>-->
+<!--        <item>EfficientDet Lite1</item>-->
+<!--        <item>EfficientDet Lite2</item>-->
+<!--    </string-array>-->
 </resources>

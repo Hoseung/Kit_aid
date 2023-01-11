@@ -2,11 +2,11 @@ package org.tensorflow.lite.examples.objectdetection
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
-import org.tensorflow.lite.examples.objectdetection.R
-import org.tensorflow.lite.examples.objectdetection.databinding.ActivityLoginBinding
+//import android.widget.CheckBox
+//import android.widget.ImageView
+//import android.widget.TextView
+//import org.tensorflow.lite.examples.objectdetection.R
+//import org.tensorflow.lite.examples.objectdetection.databinding.ActivityLoginBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivitySelectBinding
 
 class SelectActivity : AppCompatActivity() {
@@ -59,6 +59,4 @@ class SelectActivity : AppCompatActivity() {
             }
         }
     }
-
-
 }

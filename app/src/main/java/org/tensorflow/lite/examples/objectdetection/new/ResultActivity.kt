@@ -15,7 +15,7 @@ import java.io.FileInputStream
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
-    //private lateinit var regressionHelper: RegressionHelper
+    private lateinit var regressionHelper: RegressionHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +55,7 @@ fun setImageFromPath(imagePath: String, imageView: ImageView){
     }
 }
 
-fun pathToBitmap(path: String?): Bitmap? {
+fun pathToBitmap(path: String): Bitmap? {
     return try {
         val f = File(path)
         val options = BitmapFactory.Options()

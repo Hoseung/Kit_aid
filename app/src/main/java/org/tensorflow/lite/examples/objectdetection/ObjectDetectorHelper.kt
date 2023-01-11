@@ -104,16 +104,7 @@ class ObjectDetectorHelper(
 
         optionsBuilder.setBaseOptions(baseOptionsBuilder.build())
 
-        val modelName =
-            when (currentModel) {
-//                MODEL_MOBILENETV1 -> "t2concent_with_meta.tflite"
-//                MODEL_EFFICIENTDETV0 -> "efficientdet-lite0.tflite"
-//                MODEL_EFFICIENTDETV1 -> "efficientdet-lite1.tflite"
-//                MODEL_EFFICIENTDETV2 -> "efficientdet-lite2.tflite"
-                else -> "detection0106.tflite"
-//                else -> "box.tflite"
-//                else -> "t2concent_with_meta.tflite"
-            }
+        val modelName ="detection_kit.tflite"
 
         try {
             objectDetector =
@@ -157,31 +148,6 @@ class ObjectDetectorHelper(
             tensorImage.height,
             tensorImage.width)
     }
-    fun detect2(image: Bitmap, imageRotation: Int):Detection? {
-//        if (!TfLiteVision.isInitialized()) {
-//            Log.e(TAG, "detect: TfLiteVision is not initialized yet")
-//            return
-//        }
-
-        if (objectDetector == null) {
-            setupObjectDetector()
-        }
-
-        // Inference time is the difference between the system time at the start and finish of the
-        // process
-        var inferenceTime = SystemClock.uptimeMillis()
-
-        // Create preprocessor for the image.
-        // See https://www.tensorflow.org/lite/inference_with_metadata/
-        //            lite_support#imageprocessor_architecture
-        val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
-
-        // Preprocess the image and convert it into a TensorImage for detection.
-        val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image))
-
-        val results = objectDetector?.detect(tensorImage)?.get(0)
-        return results
-    }
 
     interface DetectorListener {
         fun onInitialized()
@@ -199,9 +165,9 @@ class ObjectDetectorHelper(
         const val DELEGATE_CPU = 0
         const val DELEGATE_GPU = 1
         const val DELEGATE_NNAPI = 2
-        const val MODEL_MOBILENETV1 = 0
-        const val MODEL_EFFICIENTDETV0 = 1
-        const val MODEL_EFFICIENTDETV1 = 2
-        const val MODEL_EFFICIENTDETV2 = 3
+//        const val MODEL_MOBILENETV1 = 0
+//        const val MODEL_EFFICIENTDETV0 = 1
+//        const val MODEL_EFFICIENTDETV1 = 2
+//        const val MODEL_EFFICIENTDETV2 = 3
     }
 }

@@ -2,16 +2,13 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.SystemClock
 import android.util.Log
-import com.google.android.gms.common.Feature
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.nnapi.NnApiDelegate
 import org.tensorflow.lite.support.common.FileUtil
-import org.tensorflow.lite.support.common.ops.DequantizeOp
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -65,7 +62,7 @@ class RegressionHelper (
             }
         }
         val modelTransfer: String
-        val modelPredict = "221123_regression.tflite"
+        val modelPredict = "regression_bovine.tflite"
 
         try {
             interpreterPredict = Interpreter(
@@ -139,6 +136,6 @@ class RegressionHelper (
         const val DELEGATE_NNAPI = 2
         const val MODEL_INT8 = 0
 
-        private const val TAG = "Style Transfer Helper"
+        private const val TAG = "Regression Helper"
     }
 }
