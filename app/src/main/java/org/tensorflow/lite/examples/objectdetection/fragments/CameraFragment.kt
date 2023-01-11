@@ -15,13 +15,6 @@
  */
 package org.tensorflow.lite.examples.objectdetection.fragments
 
-//import android.media.MediaScannerConnection
-//import android.os.Handler
-//import android.os.Looper
-//import androidx.camera.core.ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG
-//import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
-//import org.tensorflow.lite.examples.objectdetection.new.Main2Activity
-//import java.io.FileNotFoundException
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -96,6 +89,16 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             Navigation.findNavController(requireActivity(), R.id.fragment_container)
                 .navigate(CameraFragmentDirections.actionCameraToPermissions())
         }
+
+        // update Product name
+        val productName = view?.findViewById<TextView>(R.id.productNameInfo)
+        val myPrdName = String.format("Product: %s", MyEntryPoint.prefs.getString("prodName", "Bovine IgG"))
+        productName?.text = myPrdName
+
+        val lotNum = view?.findViewById<TextView>(R.id.lotNumber)
+        lotNum?.text = String.format("LOT #: %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
+
+
     }
 
     override fun onDestroyView() {
@@ -136,11 +139,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // update Product name
-        //val view = inflater.inflate(R.layout.fragment, container, false)
-        //val myTextView = view.findViewById<TextView>(R.id.resultText)
-        //myTextView.text = MyEntryPoint.prefs.getString("prodName", "Bovine IgG")
 
         objectDetectorHelper = ObjectDetectorHelper(
             context = requireContext(),
@@ -260,20 +258,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                     //get bitmap from image
                     var bitmap = imageProxyToBitmap(image)
                     bitmap = rotate(bitmap, 90f)
-//                    objectDetectorHelper.detect(bitmap, 0)
-//
-//                    result = objectDetectorHelper.detect2(bitmap, 0)
-//                    if(result != null){
-//                        bbox = result?.boundingBox!!
-//                        width = bbox.width()
-//                        height = bbox.height()
-//                        println("WIDTH and HEIGHT ${width} ${height}")
-//                        println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
-//                        bitmap = Bitmap.createBitmap(bitmap,
-//                            (ceil(bbox.centerX() - 0.525 * width)*6.3f).toInt(),
-//                            (ceil(bbox.centerY() - 0.525 * height)*6.3f).toInt(),
-//                            ceil(6.3*1.05*width).toInt(),
-//                            ceil(6.3*height).toInt())
+
                     //}
                     //contentUri = imageSaver(bitmap)
                     println("FILE SAVED ${contentUri?.path}")
@@ -468,7 +453,5 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             // Set up the camera and its use cases
             setUpCamera()
         }
-
-        fragmentCameraBinding.progressCircular.visibility = View.GONE
     }
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/camera_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -54,26 +55,27 @@
             app:layout_constraintTop_toTopOf="@id/examineHistoryButton" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="413dp"
+            android:layout_height="458dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/bg_login_layout"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
             app:layout_constraintBottom_toTopOf="@id/infoLayout"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/examineHistoryButton">
+            app:layout_constraintTop_toBottomOf="@id/examineHistoryButton"
+            app:layout_constraintVertical_bias="0.0">
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:background="@color/black"
                 android:orientation="vertical"
-                app:layout_constraintBottom_toTopOf="@id/captureBtn"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -83,39 +85,29 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
-                    app:scaleType="fillStart" />
+                    app:scaleType="fillStart"/>
 
                 <org.tensorflow.lite.examples.objectdetection.OverlayView
                     android:id="@+id/overlay"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_gravity="center" />
+                    android:layout_gravity="center"
+                    android:alpha="0.99" />
+
 
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-            <Button
-                android:visibility="gone"
-                android:id="@+id/captureBtn"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_login_button"
-                android:text="capture"
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/infoLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_height="191dp"
             android:background="@color/white"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            app:layout_constraintBottom_toTopOf="@id/memberBottomLayout">
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:layout_editor_absoluteX="-3dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -127,87 +119,42 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="147dp"
                 android:background="@drawable/bg_gray_radius"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
                 android:paddingVertical="15dp">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="15dp"
-                    android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/productNameInfo"
+                    android:layout_width="262dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/bg_edittext"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:text="Product:  AniCheck"
+                    android:textColor="@color/black" />
 
-                    <TextView
-                        android:id="@+id/peter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="38dp"
-                        android:layout_marginEnd="30dp"
-                        android:background="@drawable/bg_edittext"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="20dp"
-                        android:text="User:  Peter"
-                        android:textColor="@color/black" />
+                <TextView
+                    android:id="@+id/lotNumber"
+                    android:layout_width="262dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="30dp"
+                    android:background="@drawable/bg_edittext"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="20dp"
+                    android:text="LOT: 220003"
+                    android:textColor="@color/black" />
 
-                    <TextView
-                        android:id="@+id/productNameInfo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="38dp"
-                        android:layout_marginEnd="30dp"
-                        android:background="@drawable/bg_edittext"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="20dp"
-                        android:text="Product:  AniCheck"
-                        android:textColor="@color/black" />
-
-                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/memberBottomLayout"
-            android:layout_width="0dp"
-            android:layout_height="51dp"
-            android:background="#f0f3fa"
-            android:gravity="center"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:src="@drawable/info_icon" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:text="About ProteomeTech" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <androidx.core.widget.ContentLoadingProgressBar
-        android:id="@+id/progress_circular"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="gone" />
-
-<!--    <include-->
-<!--        android:id="@+id/bottom_sheet_layout"-->
-<!--        layout="@layout/info_bottom_sheet"-->
-<!--        android:visibility="gone" />-->
+    <!--    <include-->
+    <!--        android:id="@+id/bottom_sheet_layout"-->
+    <!--        layout="@layout/info_bottom_sheet"-->
+    <!--        android:visibility="gone" />-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.Global.getString
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
         startActivity(Intent(this, LoginActivity::class.java))
+
     }
 
     override fun onBackPressed() {

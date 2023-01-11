@@ -2,13 +2,6 @@ package org.tensorflow.lite.examples.objectdetection
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
-import android.view.View
-//import android.widget.CheckBox
-//import android.widget.ImageView
-//import android.widget.TextView
-//import org.tensorflow.lite.examples.objectdetection.R
-//import org.tensorflow.lite.examples.objectdetection.databinding.ActivityLoginBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivitySelectBinding
 
 class SelectActivity : AppCompatActivity() {
@@ -53,18 +46,23 @@ class SelectActivity : AppCompatActivity() {
                 kit2Check.isChecked = false
                 kit3Check.isChecked = false
                 MyEntryPoint.prefs.setString("prodName", "Bovine IgG")
+                MyEntryPoint.prefs.setString("lotNum", "220001")
             }
             2 -> {
                 kit1Check.isChecked = false
                 kit2Check.isChecked = true
                 kit3Check.isChecked = false
                 MyEntryPoint.prefs.setString("prodName", "ImmuneCheck IgE")
+                MyEntryPoint.prefs.setString("lotNum", "220002")
+
             }
             3 -> {
                 kit1Check.isChecked = false
                 kit2Check.isChecked = false
                 kit3Check.isChecked = true
                 MyEntryPoint.prefs.setString("prodName", "ImmuneCheck IgG")
+                MyEntryPoint.prefs.setString("lotNum", "220003")
+
             }
         }
     }
