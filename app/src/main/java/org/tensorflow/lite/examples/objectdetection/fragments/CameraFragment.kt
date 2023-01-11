@@ -416,8 +416,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     ) {
         //var uri: Uri
         activity?.runOnUiThread {
-            fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
-                String.format("%d ms", inferenceTime)
+//            fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
+//                String.format("%d ms", inferenceTime)
 
             // Pass necessary information to OverlayView for drawing on the canvas
             fragmentCameraBinding.overlay.setResults(

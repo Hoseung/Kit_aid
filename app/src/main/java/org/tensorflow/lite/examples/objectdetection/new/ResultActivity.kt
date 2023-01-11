@@ -22,11 +22,13 @@ class ResultActivity : AppCompatActivity() {
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        //regressionHelper.setupRegression()
+
         val imgPath = intent.getStringExtra("imagePath")!!
         //binding.resultImageView.setImageURI(uri)
         setImageFromPath(imgPath, binding.resultImageView)
 
-        //regressionHelper.setupRegression()
+        //
 
         val img = pathToBitmap(imgPath)!!
 
