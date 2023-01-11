@@ -2,6 +2,7 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.util.Log
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -17,6 +18,8 @@ import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp
 import org.tensorflow.lite.support.image.ops.Rot90Op
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.lang.Integer.min
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 class RegressionHelper (
     var numThreads: Int = 2,
@@ -31,7 +34,7 @@ class RegressionHelper (
     private var outputPredictShape = intArrayOf()
 
     init {
-        if (setupRegression2()) {
+        if (setupRegression()) {
             inputPredictTargetHeight = interpreterPredict!!.getInputTensor(0)
                 .shape()[1]
             inputPredictTargetWidth = interpreterPredict!!.getInputTensor(0)
@@ -41,11 +44,11 @@ class RegressionHelper (
             //regressionListener.onError("TFLite failed to init.")
         }
     }
-    fun setupRegression(){
-        println("SETUP")
-    }
+//    fun setupRegression(){
+//        println("SETUP")
+//    }
 
-    fun setupRegression2():Boolean {
+    fun setupRegression():Boolean {
         val tfliteOption = Interpreter.Options()
         tfliteOption.numThreads = numThreads
         println("SJKDJFLDSKJFDSLJF")
@@ -87,18 +90,41 @@ class RegressionHelper (
 
     }
 
-    fun predict(image: Bitmap, imageRotation: Int) {
+    fun predict(image: Bitmap, imageRotation: Int): Float {
         //interpreterPredict.run { bitmap }
 
-        val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
+        //val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
 
         // Preprocess the image and convert it into a TensorImage for detection.
-        //val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image))
 
-        val predictOutput = TensorBuffer.createFixedSize(
+        /*
+        val modelOutput2 = TensorBuffer.createFixedSize(
             outputPredictShape, DataType.FLOAT32
         )
-        interpreterPredict?.run(image, predictOutput)//tensorImage)
+        */
+
+        println("RUNNING REGRESSION@@@@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
+        val bufferSize = java.lang.Float.SIZE / java.lang.Byte.SIZE
+        val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
+        val input = processInputImage(image,
+            inputPredictTargetWidth,
+            inputPredictTargetHeight,
+            imageRotation)
+
+        println("GOGOGOGOGOGOGOGOGOGOGOOGOOGOG")
+
+        interpreterPredict?.run(input?.buffer, modelOutput)
+        println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        //val answer = modelOutput.floatArray.toString()
+
+        modelOutput.rewind()
+        val answer = modelOutput.asFloatBuffer().get()
+
+        println("DONE ${answer}")
+        println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
+        return answer
     }
 
     fun clearRegressionHelper() {
@@ -108,12 +134,14 @@ class RegressionHelper (
     private fun processInputImage(
         image: Bitmap,
         targetWidth: Int,
-        targetHeight: Int
+        targetHeight: Int,
+        imageRotation: Int
     ): TensorImage? {
         val height = image.height
         val width = image.width
         val cropSize = min(height, width)
         val imageProcessor = ImageProcessor.Builder()
+            .add(Rot90Op(-imageRotation / 90))
             .add(ResizeWithCropOrPadOp(cropSize, cropSize))
             .add(
                 ResizeOp(
@@ -126,6 +154,7 @@ class RegressionHelper (
             .build()
         val tensorImage = TensorImage(DataType.FLOAT32) // DataType Check!
         tensorImage.load(image)
+        println("TENSOR IMAGE READYYYYYYYYYYYYYYYYYYYYYYYYY")
         return imageProcessor.process(tensorImage)
     }
 

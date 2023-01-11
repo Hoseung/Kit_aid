@@ -38,16 +38,8 @@ class ResultActivity : AppCompatActivity() {
         //
 
         val img = pathToBitmap(imgPath)!!
-
-        //regressionHelper.predict(img, 0)
-        /*
-        * 여기에서 Regression 모델이 돌아가면 될 것 같은데.
-        *
-        *
-        * */
-
-
-
+        val answer = regressionHelper.predict(img, 0)
+        println(".....................++++++++ ${answer}###########")
         // saveResult()
     }
 
