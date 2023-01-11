@@ -6,11 +6,13 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.core.content.ContentProviderCompat.requireContext
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import org.tensorflow.lite.examples.objectdetection.RegressionHelper
 import java.io.File
 import java.io.FileInputStream
+
 
 class ResultActivity : AppCompatActivity() {
 
@@ -21,8 +23,13 @@ class ResultActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        //regressionHelper.setupRegression()
+        //regressionListener =
+        regressionHelper = RegressionHelper(
+            context = this, // provider 지정해주어야함
+            //regressionListener = regressionListener
+        )
+        initView()
+        regressionHelper.setupRegression()
 
         val imgPath = intent.getStringExtra("imagePath")!!
         //binding.resultImageView.setImageURI(uri)
@@ -39,7 +46,7 @@ class ResultActivity : AppCompatActivity() {
         *
         * */
 
-        initView()
+
 
         // saveResult()
     }

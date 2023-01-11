@@ -23,7 +23,7 @@ class RegressionHelper (
     var currentDelegate: Int = 0,
     //var currentModel: Int = 0,
     val context: Context,
-    val regressionListener: RegressionListener?
+    //val regressionListener: RegressionListener
 ){
     private var interpreterPredict: Interpreter? = null
     private var inputPredictTargetWidth = 0
@@ -31,21 +31,24 @@ class RegressionHelper (
     private var outputPredictShape = intArrayOf()
 
     init {
-        //if (setupRegression()) {
-        inputPredictTargetHeight = interpreterPredict!!.getInputTensor(0)
-            .shape()[1]
-        inputPredictTargetWidth = interpreterPredict!!.getInputTensor(0)
-            .shape()[2]
-        outputPredictShape = interpreterPredict!!.getOutputTensor(0).shape()
-//        } else {
-//            regressionListener?.onError("TFLite failed to init.")
-//        }
+        if (setupRegression2()) {
+            inputPredictTargetHeight = interpreterPredict!!.getInputTensor(0)
+                .shape()[1]
+            inputPredictTargetWidth = interpreterPredict!!.getInputTensor(0)
+                .shape()[2]
+            outputPredictShape = interpreterPredict!!.getOutputTensor(0).shape()
+        } else {
+            //regressionListener.onError("TFLite failed to init.")
+        }
+    }
+    fun setupRegression(){
+        println("SETUP")
     }
 
-    fun setupRegression() {
+    fun setupRegression2():Boolean {
         val tfliteOption = Interpreter.Options()
         tfliteOption.numThreads = numThreads
-
+        println("SJKDJFLDSKJFDSLJF")
         when (currentDelegate) {
             DELEGATE_CPU -> {
                 // Default
@@ -54,7 +57,7 @@ class RegressionHelper (
                 if (CompatibilityList().isDelegateSupportedOnThisDevice) {
                     tfliteOption.addDelegate(GpuDelegate())
                 } else {
-                    regressionListener?.onError("GPU is not supported on this device")
+                    //regressionListener.onError("GPU is not supported on this device")
                 }
             }
             DELEGATE_NNAPI -> {
@@ -71,14 +74,15 @@ class RegressionHelper (
                     modelPredict,
                 ), tfliteOption
             )
+            return true
 
         } catch (e: Exception) {
-            regressionListener?.onError(
-                "Regression failed to initialize. See error logs for " +
-                        "details"
-            )
+            //regressionListener.onError(
+            //    "Regression failed to initialize. See error logs for " +
+            //            "details"
+            //)
             Log.e(TAG, "TFLite failed to load model with error: " + e.message)
-            //return false
+            return false
         }
 
     }
@@ -128,6 +132,7 @@ class RegressionHelper (
     interface RegressionListener {
         fun onError(error: String)
         fun onResult(results: Float)
+        fun onInitialized()
     }
 
     companion object {
