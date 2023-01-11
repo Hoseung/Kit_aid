@@ -38,6 +38,7 @@ import android.view.LayoutInflater
 import android.view.Surface.ROTATION_0
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
@@ -46,11 +47,8 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import org.tensorflow.lite.examples.objectdetection.HistoryActivity
-import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper
-//import org.tensorflow.lite.examples.objectdetection.RegressionHelper
+import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.R
-import org.tensorflow.lite.examples.objectdetection.SelectActivity
 import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
 import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
@@ -138,6 +136,11 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // update Product name
+        //val view = inflater.inflate(R.layout.fragment, container, false)
+        //val myTextView = view.findViewById<TextView>(R.id.resultText)
+        //myTextView.text = MyEntryPoint.prefs.getString("prodName", "Bovine IgG")
 
         objectDetectorHelper = ObjectDetectorHelper(
             context = requireContext(),
