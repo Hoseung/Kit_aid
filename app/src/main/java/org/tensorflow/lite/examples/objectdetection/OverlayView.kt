@@ -41,7 +41,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private var backgroundPaint = Paint()
 
-    private var scaleFactor: Float = 1.0f
+    private var scaleFactor: Float = 0.3f
 
     private var bounds = Rect()
 
@@ -109,7 +109,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
             val top = boundingBox.top * scaleFactor
             val bottom = boundingBox.bottom * scaleFactor
-            val left = boundingBox.left * scaleFactor
+            val left = boundingBox.left * scaleFactor - 120f
             val right = boundingBox.right * scaleFactor
 
             // Draw bounding box around detected objects

@@ -45,6 +45,7 @@ import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
 import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
+import org.tensorflow.lite.examples.objectdetection.new.pathToBitmap
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 import java.io.File
@@ -310,6 +311,13 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     private fun carryOn(bitmap: Bitmap, bbox: RectF){
         //var bitmap =
         var cropped: Bitmap = cutBbox(rotate(bitmap, 90f), bbox)
+
+        cropped = Bitmap.createBitmap(cropped,
+            Math.ceil(cropped.width*0.08).toInt(),
+            Math.ceil(cropped.height *0.36).toInt(),
+            Math.ceil(cropped.width*0.48).toInt(),
+            Math.ceil(cropped.height * 0.245).toInt())
+
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
         absolutePath.let {
@@ -411,7 +419,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 //for (i in results) {
                 val i = results[0]
                     println(i.categories[0].score)
-                    if (i.categories[0].score > 0.97) {
+                    if (i.categories[0].score > 0.98) {
                         if (cnt > 3) {
                             if (cap) {
                                 Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()

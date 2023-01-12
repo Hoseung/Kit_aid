@@ -2,6 +2,7 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.RectF
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -13,6 +14,9 @@ import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBi
 import org.tensorflow.lite.examples.objectdetection.RegressionHelper
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class ResultActivity : AppCompatActivity() {
@@ -39,8 +43,15 @@ class ResultActivity : AppCompatActivity() {
         //
 
         val img = pathToBitmap(imgPath)!!
+        /*
+        var cropped = Bitmap.createBitmap(img,
+            Math.ceil(img.width*0.05).toInt(),
+            Math.ceil(img.height *0.3).toInt(),
+            Math.ceil(img.width*0.6).toInt(),
+            Math.ceil(img.height * 0.63).toInt())
+        */
         val answer = regressionHelper.predict(img, 0)
-        val answerStr = String.format("%.2fmg/ml", answer)
+        val answerStr = String.format("%.2fmg/ml", answer*180f)
         println(".....................++++++++ ${answer}###########")
 
         val myTextView = findViewById<TextView>(R.id.resultText)
