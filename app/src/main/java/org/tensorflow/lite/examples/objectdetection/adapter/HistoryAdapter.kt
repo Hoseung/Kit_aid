@@ -12,9 +12,11 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
     inner class HistoryItemViewHolder(private val binding: ItemHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(data: History) = with(binding) {
+            // bind to Text views
             itemDateTv.text = data.date
             itemTypeTv.text = data.productName
             itemResultTv.text = data.result
+            //itemImageNameTv.text = data.imgName
         }
     }
 

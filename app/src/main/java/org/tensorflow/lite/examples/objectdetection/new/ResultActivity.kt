@@ -17,6 +17,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.random.Random
 
 
 class ResultActivity : AppCompatActivity() {
@@ -41,16 +42,25 @@ class ResultActivity : AppCompatActivity() {
         setImageFromPath(imgPath, binding.resultImageView)
 
         //
-
         val img = pathToBitmap(imgPath)!!
-        /*
-        var cropped = Bitmap.createBitmap(img,
-            Math.ceil(img.width*0.05).toInt(),
-            Math.ceil(img.height *0.3).toInt(),
-            Math.ceil(img.width*0.6).toInt(),
-            Math.ceil(img.height * 0.63).toInt())
-        */
-        val answer = regressionHelper.predict(img, 0)
+        var cropped: Bitmap
+        val answers = mutableListOf<Float>()
+        for (i in 0..11) {
+            cropped = Bitmap.createBitmap(img,
+                Math.ceil(img.width*0.08).toInt() + Random.nextInt(10)-5,
+                Math.ceil(img.height *0.36).toInt() + Random.nextInt(10)-5,
+                Math.ceil(img.width*0.48).toInt() + Random.nextInt(10)-5,
+                Math.ceil(img.height * 0.245).toInt() + Random.nextInt(10)-5
+            )
+            answers.add(regressionHelper.predict(cropped, 0))
+            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
+            println(answers[i])
+        }
+
+        val answer = answers.sorted().let {
+            it[3]
+        }
+
         val answerStr = String.format("%.2fmg/ml", answer*180f)
         println(".....................++++++++ ${answer}###########")
 

@@ -22,4 +22,5 @@ class PreferenceUtil(context: Context) {
     fun setCnt(cnt: Int) {
         prefs.edit().putInt("cnt", cnt).apply()
     }
+
 }

@@ -73,6 +73,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    //private val range = camera?.cameraInfo?.exposureState?.exposureCompensationRange
 
     private lateinit var imageCapture: ImageCapture
 
@@ -187,14 +188,15 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         val builder = ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY)//CAPTURE_MODE_ZERO_SHUTTER_LAG)
             .setTargetAspectRatio(AspectRatio.RATIO_4_3)
             .setTargetRotation(ROTATION_0)
+            //.setTargetResolution(Size(1440*2,1080*2))
 
         imageCapture = builder.build()
 
         // ImageAnalysis. Using RGBA 8888 to match how our models work
         imageAnalyzer =
             ImageAnalysis.Builder()
-                //.setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                .setTargetResolution(Size(2400,1800)) // 1440 1080 max?
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                //.setTargetResolution(Size(1440, 1080)) // 1440 1080 max?
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -234,6 +236,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
+        MyEntryPoint.prefs.setCnt(0)
     }
 
     private var cap = true
@@ -243,46 +246,74 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         cap = true
     }
 
-    private fun savePictureToMemory() {
+    private fun savePictureToMemory(analysisImg: Bitmap, bbox: RectF) {
         if (!::imageCapture.isInitialized) return
+
+        val widthAnalysis = analysisImg.width.toFloat()
+        val heightAnalysis = analysisImg.height.toFloat()
+
         imageCapture.takePicture(cameraExecutor,
             object :  ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     //get bitmap from image
-                    var bitmap = imageProxyToBitmap(image)
-                    bitmap = rotate(bitmap, 90f)
+                    val bitmap = imageProxyToBitmap(image)
+                    val width = bitmap.width
+                    val height = bitmap.height
+                    //bitmap = rotate(bitmap, 90f)
+
+                    println("WIDTH, HEIGHT, $width, $height")
+                    val cropped0: Bitmap = cutBbox(rotate(bitmap, 90f),
+                        bbox,
+                        factorWidth=width/widthAnalysis,
+                        factorHeight=height/heightAnalysis)
+
+//                    val cropped = Bitmap.createBitmap(cropped0,
+//                        Math.ceil(cropped0.width*0.08).toInt(),
+//                        Math.ceil(cropped0.height *0.36).toInt(),
+//                        Math.ceil(cropped0.width*0.48).toInt(),
+//                        Math.ceil(cropped0.height * 0.245).toInt()
+//                    )
 
                     //}
                     //contentUri = imageSaver(bitmap)
-                    println("FILE SAVED ${contentUri?.path}")
-
                     super.onCaptureSuccess(image)
                     image.close()
 
-                    // Move to Result screen
-                    contentUri?.let {
+                    //val absolutePath_ = imageSaver(cropped0)
+                    val absolutePath = imageSaver(cropped0)
+                    absolutePath.let {
                         val resultIntent = Intent(requireContext(), ResultActivity::class.java)
-                        resultIntent.putExtra("imageUri", it)
+                        resultIntent.putExtra("imagePath", it)
                         startActivity(resultIntent)
                     }
+                    println("FILE SAVED ${contentUri?.path}")
+
+//                    // Move to Result screen
+//                    contentUri?.let {
+//                        val resultIntent = Intent(requireContext(), ResultActivity::class.java)
+//                        resultIntent.putExtra("imageUri", it)
+//                        startActivity(resultIntent)
+//                    }
                 }
                 override fun onError(exception: ImageCaptureException) {
                     super.onError(exception)
                 }
             }
         )
+
+
     }
 
-    private fun cutBbox(bitmap: Bitmap, bbox: RectF): Bitmap {
+    private fun cutBbox(bitmap: Bitmap, bbox: RectF, factorWidth: Float = 1f, factorHeight: Float = 1f): Bitmap {
         val width = bbox.width()
         val height = bbox.height()
         println("WIDTH and HEIGHT ${width} ${height}")
         println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
         var bitmap = Bitmap.createBitmap(bitmap,
-            ceil(bbox.centerX() - 0.525 * width).toInt(),
-            ceil(bbox.centerY() - 0.525 * height).toInt(),
-            ceil(1.05*width).toInt(),
-            height.toInt())
+            ceil((bbox.centerX() - 0.525 * width)*factorWidth).toInt(),
+            ceil((bbox.centerY() - 0.525 * height)*factorHeight).toInt(),
+            ceil(1.05*width*factorWidth).toInt(),
+            (height*factorHeight).toInt())
         return bitmap
     }
 
@@ -315,8 +346,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         cropped = Bitmap.createBitmap(cropped,
             Math.ceil(cropped.width*0.08).toInt(),
             Math.ceil(cropped.height *0.36).toInt(),
-            Math.ceil(cropped.width*0.48).toInt(),
-            Math.ceil(cropped.height * 0.245).toInt())
+            Math.ceil(cropped.width*0.5).toInt(),
+            Math.ceil(cropped.height * 0.244).toInt())
 
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
@@ -419,14 +450,19 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 //for (i in results) {
                 val i = results[0]
                     println(i.categories[0].score)
-                    if (i.categories[0].score > 0.98) {
-                        if (cnt > 3) {
+                    if (i.categories[0].score > 0.96) {
+                        if (cnt > 10) {
                             if (cap) {
+                                //MyEntryPoint.prefs.setCnt(0)
                                 Toast.makeText(requireContext(), "Wait...", Toast.LENGTH_SHORT).show()
                                 //captureCamera()
-                                //savePictureToMemory()
+
+
+                                savePictureToMemory(image, i.boundingBox!!)
+
+
                                 //ObjectDetectorHelper.clearObjectDetector()
-                                carryOn(image, i.boundingBox!!)
+                                //carryOn(image, i.boundingBox!!)
                             }
                             cap = false
                         } else {

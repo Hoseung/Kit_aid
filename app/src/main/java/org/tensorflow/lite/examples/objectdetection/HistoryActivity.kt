@@ -24,8 +24,8 @@ class HistoryActivity : AppCompatActivity() {
         kitHistoryRecyclerView.adapter = historyAdapter
         historyAdapter.setHistoryList(
             listOf(
-                History("2022-10-10", "AniCheck", "20mg/ml"),
-                History("2022-10-10", "AniCheck", "30mg/ml")
+                History("2022-10-10", "AniCheck", "20mg/ml", "img1.png"),
+                History("2022-10-10", "AniCheck", "30mg/ml", "img2.png")
             )
         )
     }
