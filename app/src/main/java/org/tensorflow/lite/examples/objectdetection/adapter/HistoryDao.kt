@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HistoryDao {
 
-//    @Query("SELECT * FROM history_table ORDER BY history ASC")
-//    fun getAlphabetizedWords(): Flow<List<History>>
+    @Query("SELECT * FROM history_table ORDER BY date ASC")
+    fun getOrderedHistory(): Flow<List<History>>
 //
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    suspend fun insert(history: History)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(history: History)
 //
-//    @Query("DELETE FROM history_table")
-//    suspend fun deleteAll()
+    @Query("DELETE FROM history_table")
+    suspend fun deleteAll()
 }

@@ -3,7 +3,9 @@ package org.tensorflow.lite.examples.objectdetection
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContentProviderCompat.requireContext
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -20,11 +22,15 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.lang.Integer.min
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import org.tensorflow.lite.examples.objectdetection.MainActivity.Companion.getOutputDirectory
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RegressionHelper (
     var numThreads: Int = 2,
     var currentDelegate: Int = 0,
-    //var currentModel: Int = 0,
     val context: Context,
     //val regressionListener: RegressionListener
 ){
@@ -44,9 +50,6 @@ class RegressionHelper (
             //regressionListener.onError("TFLite failed to init.")
         }
     }
-//    fun setupRegression(){
-//        println("SETUP")
-//    }
 
     fun setupRegression():Boolean {
         val tfliteOption = Interpreter.Options()
@@ -67,8 +70,7 @@ class RegressionHelper (
                 tfliteOption.addDelegate(NnApiDelegate())
             }
         }
-        val modelTransfer: String
-        val modelPredict = "regression_bovine.tflite"
+        val modelPredict = "230117_regression_wb.tflite"
 
         try {
             interpreterPredict = Interpreter(
@@ -87,32 +89,20 @@ class RegressionHelper (
             Log.e(TAG, "TFLite failed to load model with error: " + e.message)
             return false
         }
-
     }
 
     fun predict(image: Bitmap, imageRotation: Int): Float {
-        //interpreterPredict.run { bitmap }
-
         //val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
 
         // Preprocess the image and convert it into a TensorImage for detection.
 
-        /*
-        val modelOutput2 = TensorBuffer.createFixedSize(
-            outputPredictShape, DataType.FLOAT32
-        )
-        */
-
-        println("RUNNING REGRESSION@@@@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
         val bufferSize = java.lang.Float.SIZE / java.lang.Byte.SIZE
         val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
+        val absolutePath = imageSaver(image)
         val input = processInputImage(image,
             inputPredictTargetWidth,
             inputPredictTargetHeight,
             imageRotation)
-
-        println("GOGOGOGOGOGOGOGOGOGOGOOGOOGOG")
 
         interpreterPredict?.run(input?.buffer, modelOutput)
         println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
@@ -141,8 +131,8 @@ class RegressionHelper (
         val width = image.width
         val cropSize = min(height, width)
         val imageProcessor = ImageProcessor.Builder()
-            .add(Rot90Op(-imageRotation / 90))
-            .add(ResizeWithCropOrPadOp(cropSize, cropSize))
+            //.add(Rot90Op(-imageRotation / 90))
+            //.add(ResizeWithCropOrPadOp(cropSize, cropSize))
             .add(
                 ResizeOp(
                     targetHeight,
@@ -154,8 +144,25 @@ class RegressionHelper (
             .build()
         val tensorImage = TensorImage(DataType.FLOAT32) // DataType Check!
         tensorImage.load(image)
+
         println("TENSOR IMAGE READYYYYYYYYYYYYYYYYYYYYYYYYY")
         return imageProcessor.process(tensorImage)
+    }
+
+    fun imageSaver(bitmap: Bitmap): String{
+        val photoFile = File(
+            getOutputDirectory(context =context),
+            SimpleDateFormat(
+                "yyyy-MM-dd-HH-mm-ss-SSS", Locale.KOREA
+            ).format(System.currentTimeMillis()) + ".png"
+        )
+
+        val fileOutputStream = FileOutputStream(photoFile) //location of the image
+        val uri = Uri.fromFile(photoFile)
+
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
+        //bitmap.recycle() //
+        return photoFile.absolutePath
     }
 
     interface RegressionListener {
@@ -168,8 +175,8 @@ class RegressionHelper (
         const val DELEGATE_CPU = 0
         const val DELEGATE_GPU = 1
         const val DELEGATE_NNAPI = 2
-        const val MODEL_INT8 = 0
 
         private const val TAG = "Regression Helper"
     }
 }
+

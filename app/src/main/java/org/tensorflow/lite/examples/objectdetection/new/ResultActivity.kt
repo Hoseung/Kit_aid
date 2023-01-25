@@ -2,28 +2,31 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.RectF
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContentProviderCompat.requireContext
-import org.tensorflow.lite.examples.objectdetection.R
+import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
-import org.tensorflow.lite.examples.objectdetection.RegressionHelper
+import org.tensorflow.lite.examples.objectdetection.adapter.History
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.*
 import kotlin.random.Random
-
 
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
+/*
+    private val historyViewModel: HistoryViewModel by viewModels {
+        HistoryViewModelFactory((application as MyEntryPoint).repository)
+    }*/
+    /*
+    val applicationScope = CoroutineScope(SupervisorJob())
+    val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
+    private val repository by lazy { HistoryRepository(database.historyDao()) }
+    private val historyViewModel = HistoryViewModel(repository)
+    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,21 +48,24 @@ class ResultActivity : AppCompatActivity() {
         val img = pathToBitmap(imgPath)!!
         var cropped: Bitmap
         val answers = mutableListOf<Float>()
-        for (i in 0..11) {
-            cropped = Bitmap.createBitmap(img,
-                Math.ceil(img.width*0.08).toInt() + Random.nextInt(10)-5,
-                Math.ceil(img.height *0.36).toInt() + Random.nextInt(10)-5,
-                Math.ceil(img.width*0.48).toInt() + Random.nextInt(10)-5,
-                Math.ceil(img.height * 0.245).toInt() + Random.nextInt(10)-5
-            )
-            answers.add(regressionHelper.predict(cropped, 0))
-            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
-            println(answers[i])
-        }
+//        for (i in 0..11) {
+//            cropped = Bitmap.createBitmap(img,
+//                Math.ceil(img.width*0.065).toInt() + Random.nextInt(20)-10,
+//                Math.ceil(img.height *0.36).toInt() + Random.nextInt(20)-10,
+//                Math.ceil(img.width*0.52).toInt() + Random.nextInt(20)-10,
+//                Math.ceil(img.height * 0.25).toInt() + Random.nextInt(20)-10
+//            )
+//            answers.add(regressionHelper.predict(cropped, 0))
+//            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
+//            println(answers[i])
+//        }
+        //answers.add(regressionHelper.predict(img, 0))
+        val answer = regressionHelper.predict(img, 0)
+        println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
 
-        val answer = answers.sorted().let {
-            it[3]
-        }
+//        val answer = answers.sorted().let {
+//            it[3]
+//        }
 
         val answerStr = String.format("%.2fmg/ml", answer*180f)
         println(".....................++++++++ ${answer}###########")
@@ -67,6 +73,9 @@ class ResultActivity : AppCompatActivity() {
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr
         // saveResult()
+        //setHistoryList
+        val history = History("2023-01-13", "ANIANI", answerStr, imgPath)
+        //historyViewModel.insert(history)
     }
 
     private fun initView() = with(binding) {

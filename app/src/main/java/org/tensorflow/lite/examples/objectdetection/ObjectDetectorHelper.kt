@@ -144,6 +144,40 @@ class ObjectDetectorHelper(
             tensorImage.width)
     }
 
+    fun detectSecond(image: Bitmap, imageRotation: Int) {
+        println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RUNNING detectSecond()")
+
+        if (!TfLiteVision.isInitialized()) {
+            Log.e(TAG, "detect: TfLiteVision is not initialized yet")
+            return
+        }
+
+        if (objectDetector == null) {
+            setupObjectDetector()
+        }
+
+        // Create preprocessor for the image.
+        // See https://www.tensorflow.org/lite/inference_with_metadata/
+        //            lite_support#imageprocessor_architecture
+        val imageProcessor = ImageProcessor.Builder().add(Rot90Op(-imageRotation / 90)).build()
+
+        // Preprocess the image and convert it into a TensorImage for detection.
+        val tensorImage = imageProcessor.process(TensorImage.fromBitmap(image))
+
+        val results = objectDetector?.detect(tensorImage) //
+
+        println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Called detector.detect()22")
+        println("RESULT & IMAGE")
+        println(results)
+        println(image)
+
+        objectDetectorListener.onSecondResult(
+            image,
+            results,
+            tensorImage.height,
+            tensorImage.width)
+    }
+
     interface DetectorListener {
         fun onInitialized()
         fun onError(error: String)
@@ -153,6 +187,13 @@ class ObjectDetectorHelper(
             imageHeight: Int,
             imageWidth: Int
         )
+        fun onSecondResult(
+        image: Bitmap,
+        results: MutableList<Detection>?,
+        imageHeight: Int,
+        imageWidth: Int
+        )
+
     }
 
     companion object {

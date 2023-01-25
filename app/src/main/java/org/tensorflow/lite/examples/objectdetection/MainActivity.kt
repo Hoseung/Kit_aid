@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
         startActivity(Intent(this, LoginActivity::class.java))
-
     }
 
     override fun onBackPressed() {
