@@ -103,8 +103,7 @@ class ObjectDetectorHelper(
         }
 
         optionsBuilder.setBaseOptions(baseOptionsBuilder.build())
-
-        val modelName ="detection_kit.tflite"
+        val modelName = "detection_kit.tflite"
 
         try {
             objectDetector =
@@ -141,7 +140,8 @@ class ObjectDetectorHelper(
             image,
             results,
             tensorImage.height,
-            tensorImage.width)
+            tensorImage.width
+        )
     }
 
     fun detectSecond(image: Bitmap, imageRotation: Int) {
@@ -171,7 +171,7 @@ class ObjectDetectorHelper(
         println(results)
         println(image)
 
-        objectDetectorListener.onSecondResult(
+        objectDetectorListener.onResults(
             image,
             results,
             tensorImage.height,
@@ -185,14 +185,16 @@ class ObjectDetectorHelper(
             image: Bitmap,
             results: MutableList<Detection>?,
             imageHeight: Int,
-            imageWidth: Int
+            imageWidth: Int,
         )
+        /*
         fun onSecondResult(
         image: Bitmap,
         results: MutableList<Detection>?,
         imageHeight: Int,
         imageWidth: Int
         )
+         */
 
     }
 

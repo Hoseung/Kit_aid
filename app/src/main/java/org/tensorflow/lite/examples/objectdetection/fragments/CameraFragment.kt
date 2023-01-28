@@ -23,6 +23,7 @@ import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.os.Bundle
+import android.service.autofill.Validators.and
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
@@ -60,9 +61,7 @@ import java.util.concurrent.Executors
 class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
     private val TAG = "CameraFragment"
-
     private var binding: FragmentCameraBinding? = null
-
     private val fragmentCameraBinding
         get() = binding!!
 
@@ -74,6 +73,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+    private var detectionStage: Int = 1
     //private val range = camera?.cameraInfo?.exposureState?.exposureCompensationRange
 
     private lateinit var imageCapture: ImageCapture
@@ -82,6 +82,9 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
+
+    private var contentUri: Uri? = null
+    private var cap = true
 
     override fun onResume() {
         super.onResume()
@@ -115,19 +118,15 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentCameraBinding.inflate(inflater, container, false)
-
         binding!!.examineHistoryButton.setOnClickListener {
             startActivity(Intent(requireContext(), HistoryActivity::class.java))
         }
-
         binding!!.kitListButton.setOnClickListener {
             startActivity(Intent(requireContext(), SelectActivity::class.java))
         }
-
         binding!!.profileImageView.setOnClickListener {
             startActivity(Intent(requireContext(), MemberActivity::class.java))
         }
-
         return fragmentCameraBinding.root
     }
 
@@ -238,8 +237,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         MyEntryPoint.prefs.setCnt(0)
     }
 
-    private var cap = true
-
     override fun onStart() {
         super.onStart()
         cap = true
@@ -257,6 +254,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     }
 
     override fun onInitialized() {
+        detectionStage = 1
         objectDetectorHelper.setupObjectDetector()
         // Initialize our background executor
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -278,6 +276,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         imageCapture.takePicture(cameraExecutor,
             object :  ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(imageC: ImageProxy) {
+                    detectionStage = 2
                     println("#########################${imageC.format}")
 
                     val imageRotation = imageC.imageInfo.rotationDegrees
@@ -293,85 +292,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             }
         )
     }
-
-    fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap? {
-        //https://developer.android.com/reference/android/media/Image.html#getFormat()
-        //https://developer.android.com/reference/android/graphics/ImageFormat#JPEG
-        //https://developer.android.com/reference/android/graphics/ImageFormat#YUV_420_888
-        if (imageProxy.format == ImageFormat.JPEG) {
-            val buffer = imageProxy.planes[0].buffer
-            buffer.rewind()
-            val bytes = ByteArray(buffer.remaining())
-            buffer.get(bytes)
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-
-            return bitmap
-        }
-        else if (imageProxy.format == ImageFormat.YUV_420_888) {
-            val yBuffer = imageProxy.planes[0].buffer // Y
-            val uBuffer = imageProxy.planes[1].buffer // U
-            val vBuffer = imageProxy.planes[2].buffer // V
-
-            val ySize = yBuffer.remaining()
-            val uSize = uBuffer.remaining()
-            val vSize = vBuffer.remaining()
-
-            val nv21 = ByteArray(ySize + uSize + vSize)
-
-            yBuffer.get(nv21, 0, ySize)
-            vBuffer.get(nv21, ySize, vSize)
-            uBuffer.get(nv21, ySize + vSize, uSize)
-
-            val yuvImage = YuvImage(nv21, ImageFormat.NV21, imageProxy.width, imageProxy.height, null)
-            val out = ByteArrayOutputStream()
-            yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 100, out)
-            val imageBytes = out.toByteArray()
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-
-            return bitmap
-        }
-        return null
-    }
-    private var contentUri: Uri? = null
-
-    private fun captureCamera() {
-        if (!::imageCapture.isInitialized) return
-        val photoFile = File(
-            getOutputDirectory(requireActivity()),
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.KOREA
-            ).format(System.currentTimeMillis()) + ".jpg"
-        )
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-        imageCapture.takePicture(
-            outputOptions,
-            cameraExecutor,
-//            object : ImageCapture.OnImageCapturedCallback {
-//                override fun onCaptureSuccess(image: ImageProxy) {
-//                    super.onCaptureSuccess(image)
-//                }
-//            },
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = outputFileResults.savedUri ?: Uri.fromFile(photoFile)
-                    //val rotation = binding!!.viewFinder.display.rotation // 회전 값 설정
-                    contentUri = savedUri
-                    println("@@@@@ $savedUri $contentUri")
-                    contentUri?.let {
-                        val resultIntent = Intent(requireContext(), ResultActivity::class.java)
-                        resultIntent.putExtra("imageUri", it)
-                        startActivity(resultIntent)
-                    }
-                }
-
-                override fun onError(e: ImageCaptureException) {
-                    e.printStackTrace()
-                }
-            }
-        )
-    }
-
 
     private fun cutBbox(bitmap: Bitmap, bbox: RectF, factorWidth: Float = 1f, factorHeight: Float = 1f): Bitmap {
         val width = bbox.width()
@@ -427,23 +347,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         }
     }
 
-//    private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
-//        val planeProxy = image.planes[0]
-//        val buffer: ByteBuffer = planeProxy.buffer
-//        val bytes = ByteArray(buffer.remaining())
-//        buffer.get(bytes)
-//        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-//    }
-
-
-    private fun getOutputDirectory(activity: Activity): File = with(activity) {
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else filesDir
-    }
-
     private fun detectObjects(image: ImageProxy, cap: Boolean) {
         if (cap){
             // Copy out RGB bits to the shared bitmap buffer
@@ -479,7 +382,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
             objectDetectorHelper.detect(bitmapBuffer, imageRotation)
         }
-
     }
 
     // Update UI after objects have been detected. Extracts original image height/width
@@ -488,21 +390,22 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         image: Bitmap,
         results: MutableList<Detection>?,
         imageHeight: Int,
-        imageWidth: Int
+        imageWidth: Int,
     ) {
         //var uri: Uri
-        val cnt = MyEntryPoint.prefs.getCnt()
+        if (detectionStage==1){
+            val cnt = MyEntryPoint.prefs.getCnt()
 
-        activity?.runOnUiThread {
-            // Pass necessary information to OverlayView for drawing on the canvas
-            fragmentCameraBinding.overlay.setResults(
-                results ?: LinkedList<Detection>(),
-                imageHeight,
-                imageWidth
-            )
+            activity?.runOnUiThread {
+                // Pass necessary information to OverlayView for drawing on the canvas
+                fragmentCameraBinding.overlay.setResults(
+                    results ?: LinkedList<Detection>(),
+                    imageHeight,
+                    imageWidth
+                )
 
-            if (results != null && results.size > 0 ) {
-                val i = results[0]
+                if (results != null && results.size > 0 ) {
+                    val i = results[0]
                     println(i.categories[0].score)
                     if (i.categories[0].score > 0.92) {
                         if (cnt > 5) {
@@ -510,10 +413,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                                 MyEntryPoint.prefs.setCnt(0)
                                 Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
                                 captureAndDetect()
-                                //captureCamera()
-                                //savePictureToMemory(image, i.boundingBox!!)
-                                //ObjectDetectorHelper.clearObjectDetector()
-                                //carryOn(image, i.boundingBox!!)
                             }
                             cap = false
                         } else {
@@ -522,16 +421,87 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                     } else {
                         MyEntryPoint.prefs.setCnt(0)
                     }
-                    //println("CURRENT CNT $cnt")
-                //}
+                }
+                fragmentCameraBinding.overlay.invalidate()
             }
-            fragmentCameraBinding.overlay.invalidate()
         }
+        else {
+            println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SECOND RESULTS>>>>>>>>>>>>>>>>")
+            println(results)  // RESULT가 비어있음...
+            activity?.runOnUiThread {
+                if (results != null && results.size > 0 ) {
+                    val i = results[0]
+                    println(i.categories[0].score)
+                    if ((i.categories[0].score > 0.9) && (detectionStage == 2)) {
+                        Toast.makeText(requireContext(), "Capturing...", Toast.LENGTH_SHORT).show()
+                        carryOn(image, i.boundingBox!!)
+                    } else{
+                        Toast.makeText(requireContext(), "Try Again", Toast.LENGTH_SHORT).show()
+                        // TODO: Implement retry
+                        cap = true
+                        MyEntryPoint.prefs.setCnt(0)
+                        detectionStage = 1
+                    }
+                } else{
+                    Toast.makeText(requireContext(), "Try Again", Toast.LENGTH_SHORT).show()
+                    // TODO: Implement retry
+                    cap = true
+                    MyEntryPoint.prefs.setCnt(0)
+                    detectionStage = 1
+                }
+                fragmentCameraBinding.overlay.invalidate()
+            }
+        }
+
+    }
+    fun imageProxyToBitmap(imageProxy: ImageProxy): Bitmap? {
+        //https://developer.android.com/reference/android/media/Image.html#getFormat()
+        //https://developer.android.com/reference/android/graphics/ImageFormat#JPEG
+        //https://developer.android.com/reference/android/graphics/ImageFormat#YUV_420_888
+        if (imageProxy.format == ImageFormat.JPEG) {
+            val buffer = imageProxy.planes[0].buffer
+            buffer.rewind()
+            val bytes = ByteArray(buffer.remaining())
+            buffer.get(bytes)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+
+            return bitmap
+        }
+        else if (imageProxy.format == ImageFormat.YUV_420_888) {
+            val yBuffer = imageProxy.planes[0].buffer // Y
+            val uBuffer = imageProxy.planes[1].buffer // U
+            val vBuffer = imageProxy.planes[2].buffer // V
+
+            val ySize = yBuffer.remaining()
+            val uSize = uBuffer.remaining()
+            val vSize = vBuffer.remaining()
+
+            val nv21 = ByteArray(ySize + uSize + vSize)
+
+            yBuffer.get(nv21, 0, ySize)
+            vBuffer.get(nv21, ySize, vSize)
+            uBuffer.get(nv21, ySize + vSize, uSize)
+
+            val yuvImage = YuvImage(nv21, ImageFormat.NV21, imageProxy.width, imageProxy.height, null)
+            val out = ByteArrayOutputStream()
+            yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 100, out)
+            val imageBytes = out.toByteArray()
+            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
+            return bitmap
+        }
+        return null
+    }
+    private fun getOutputDirectory(activity: Activity): File = with(activity) {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let {
+            File(it, getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists())
+            mediaDir else filesDir
     }
 
     /*
     Save Captured image and pass to Result
-     */
     override fun onSecondResult(
         image: Bitmap,
         results: MutableList<Detection>?,
@@ -557,6 +527,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             }
         }
     }
-
+    */
 
 }

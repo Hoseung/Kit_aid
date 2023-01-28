@@ -16,8 +16,8 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp
-import org.tensorflow.lite.support.image.ops.Rot90Op
+//import org.tensorflow.lite.support.image.ops.ResizeWithCropOrPadOp
+//import org.tensorflow.lite.support.image.ops.Rot90Op
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.lang.Integer.min
 import java.nio.ByteBuffer
@@ -39,13 +39,20 @@ class RegressionHelper (
     private var inputPredictTargetHeight = 0
     private var outputPredictShape = intArrayOf()
 
+    // Custom detector
+    private var outputProbabilityBuffer = TensorBuffer.createDynamic(DataType.FLOAT32)
     init {
         if (setupRegression()) {
-            inputPredictTargetHeight = interpreterPredict!!.getInputTensor(0)
-                .shape()[1]
-            inputPredictTargetWidth = interpreterPredict!!.getInputTensor(0)
-                .shape()[2]
+            inputPredictTargetHeight = interpreterPredict!!.getInputTensor(0).shape()[1]
+            inputPredictTargetWidth = interpreterPredict!!.getInputTensor(0).shape()[2]
             outputPredictShape = interpreterPredict!!.getOutputTensor(0).shape()
+
+        // Custom detector
+            // 이 자체는 문제 없음. 실제 output과 모양이 안 맞을 뿐?
+            // Regression 모델도 [1,1] 모양이 있는데 왜 그거랑은 안 맞을까?
+            outputProbabilityBuffer = TensorBuffer.createFixedSize(
+                interpreterPredict!!.getOutputTensor(0).shape(),
+                interpreterPredict!!.getOutputTensor(0).dataType())
         } else {
             //regressionListener.onError("TFLite failed to init.")
         }
@@ -70,7 +77,7 @@ class RegressionHelper (
                 tfliteOption.addDelegate(NnApiDelegate())
             }
         }
-        val modelPredict = "230117_regression_wb.tflite"
+        val modelPredict = "230117_regression_wb.tflite"//"230126_detection_ver2.tflite"
 
         try {
             interpreterPredict = Interpreter(
@@ -82,10 +89,10 @@ class RegressionHelper (
             return true
 
         } catch (e: Exception) {
-            //regressionListener.onError(
-            //    "Regression failed to initialize. See error logs for " +
-            //            "details"
-            //)
+//            regressionListener.onError(
+//                "Regression failed to initialize. See error logs for " +
+//                        "details"
+//            )
             Log.e(TAG, "TFLite failed to load model with error: " + e.message)
             return false
         }
@@ -98,21 +105,25 @@ class RegressionHelper (
 
         val bufferSize = java.lang.Float.SIZE / java.lang.Byte.SIZE
         val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
+
         val absolutePath = imageSaver(image)
         val input = processInputImage(image,
             inputPredictTargetWidth,
             inputPredictTargetHeight,
             imageRotation)
 
+        println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        // custom detector
+        //interpreterPredict?.run(input?.buffer, outputProbabilityBuffer))
         interpreterPredict?.run(input?.buffer, modelOutput)
         println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        //val answer = modelOutput.floatArray.toString()
 
         modelOutput.rewind()
         val answer = modelOutput.asFloatBuffer().get()
 
-        println("DONE ${answer}")
-        println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        // custom detector
+//        val answer = outputProbabilityBuffer.getFloatValue(1)
+        println("XXXXXXXXXXXXXXXXX DONE ${answer}")
 
         return answer
     }
@@ -129,10 +140,8 @@ class RegressionHelper (
     ): TensorImage? {
         val height = image.height
         val width = image.width
-        val cropSize = min(height, width)
         val imageProcessor = ImageProcessor.Builder()
             //.add(Rot90Op(-imageRotation / 90))
-            //.add(ResizeWithCropOrPadOp(cropSize, cropSize))
             .add(
                 ResizeOp(
                     targetHeight,

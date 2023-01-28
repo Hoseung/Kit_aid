@@ -35,12 +35,11 @@
     <string name="label_delegate">Delegate</string>
     <string name="label_models">ML Model</string>
     <string name="detection_model1">detection_kit.tflite</string>
-    <string name="detection_model2">detection_box.tflite"</string>
-    <string name="regression_model">regression_bovine.tflite"</string>
+    <string name="detection_model2">detection_box.tflite</string>
+    <string name="regression_model">230117_regression_wb.tflite</string>
     <string name="product_1">Bovine IgG"</string>
     <string name="product_2">ImmuneCheck IgE"</string>
     <string name="product_3">ImmuneCheck IgG"</string>
-
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>
