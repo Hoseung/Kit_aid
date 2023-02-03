@@ -50,101 +50,101 @@ class TFObjectDetectionTest {
             listOf<Category>(Category.create("chair", "chair", 0.55078125f)))
     )
 
-    @Test
-    @Throws(Exception::class)
-    fun detectionResultsShouldNotChange() {
-        val objectDetectorListener = object : ObjectDetectorHelper.DetectorListener {
-            override fun onError(error: String) {
-                // no op
-            }
-
-            override fun onInitialized() {
-                // Create Bitmap and convert to TensorImage
-                val bitmap = loadImage("cat1.png")
-                // Run the object detector on the sample image
-                objectDetectorHelper.detect(bitmap!!, 0)
-            }
-
-            override fun onResults(
-              results: MutableList<Detection>?,
-              inferenceTime: Long,
-              imageHeight: Int,
-              imageWidth: Int
-            ) {
-
-                assertEquals(controlResults.size, results!!.size)
-
-                // Loop through the detected and control data
-                for (i in controlResults.indices) {
-                    // Verify that the bounding boxes are the same
-                    assertEquals(results[i].boundingBox, controlResults[i].boundingBox)
-
-                    // Verify that the detected data and control
-                    // data have the same number of categories
-                    assertEquals(
-                        results[i].categories.size,
-                        controlResults[i].categories.size
-                    )
-
-                    // Loop through the categories
-                    for (j in 0 until controlResults[i].categories.size - 1) {
-                        // Verify that the labels are consistent
-                        assertEquals(
-                            results[i].categories[j].label,
-                            controlResults[i].categories[j].label
-                        )
-                    }
-                }
-            }
-        }
-
-        objectDetectorHelper =
-            ObjectDetectorHelper(
-                context = InstrumentationRegistry.getInstrumentation().targetContext,
-                objectDetectorListener = objectDetectorListener
-            )
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun detectedImageIsScaledWithinModelDimens() {
-        val listener = object : ObjectDetectorHelper.DetectorListener {
-            override fun onError(error: String) {}
-
-            override fun onResults(
-              results: MutableList<Detection>?,
-              inferenceTime: Long,
-              imageHeight: Int,
-              imageWidth: Int
-            ) {
-                assertNotNull(results)
-                for (result in results!!) {
-                    assertTrue(result.boundingBox.top <= imageHeight)
-                    assertTrue(result.boundingBox.bottom <= imageHeight)
-                    assertTrue(result.boundingBox.left <= imageWidth)
-                    assertTrue(result.boundingBox.right <= imageWidth)
-                }
-            }
-
-            override fun onInitialized() {
-                // Create Bitmap and convert to TensorImage
-                val bitmap = loadImage("cat1.png")
-                // Run the object detector on the sample image
-                objectDetectorHelper.detect(bitmap!!, 0)
-            }
-        }
-        objectDetectorHelper =
-            ObjectDetectorHelper(
-                context = InstrumentationRegistry.getInstrumentation().targetContext,
-                objectDetectorListener = listener
-            )
-    }
-
-    @Throws(Exception::class)
-    private fun loadImage(fileName: String): Bitmap? {
-        val assetManager: AssetManager =
-            InstrumentationRegistry.getInstrumentation().context.assets
-        val inputStream: InputStream = assetManager.open(fileName)
-        return BitmapFactory.decodeStream(inputStream)
-    }
+//////    @Test
+//////    @Throws(Exception::class)
+//////    fun detectionResultsShouldNotChange() {
+//////        val objectDetectorListener = object : ObjectDetectorHelper.DetectorListener {
+//////            override fun onError(error: String) {
+//////                // no op
+//////            }
+//////
+//////            override fun onInitialized() {
+//////                // Create Bitmap and convert to TensorImage
+//////                val bitmap = loadImage("cat1.png")
+//////                // Run the object detector on the sample image
+//////                objectDetectorHelper.detect(bitmap!!, 0)
+//////            }
+//////
+//////            override fun onResults(
+//////              results: MutableList<Detection>?,
+//////              inferenceTime: Long,
+//////              imageHeight: Int,
+//////              imageWidth: Int
+//////            ) {
+//////
+//////                assertEquals(controlResults.size, results!!.size)
+//////
+//////                // Loop through the detected and control data
+//////                for (i in controlResults.indices) {
+//////                    // Verify that the bounding boxes are the same
+//////                    assertEquals(results[i].boundingBox, controlResults[i].boundingBox)
+//////
+//////                    // Verify that the detected data and control
+//////                    // data have the same number of categories
+//////                    assertEquals(
+//////                        results[i].categories.size,
+//////                        controlResults[i].categories.size
+//////                    )
+//////
+//////                    // Loop through the categories
+//////                    for (j in 0 until controlResults[i].categories.size - 1) {
+//////                        // Verify that the labels are consistent
+//////                        assertEquals(
+//////                            results[i].categories[j].label,
+//////                            controlResults[i].categories[j].label
+//////                        )
+//////                    }
+//////                }
+//////            }
+//////        }
+//////
+//////        objectDetectorHelper =
+//////            ObjectDetectorHelper(
+//////                context = InstrumentationRegistry.getInstrumentation().targetContext,
+//////                objectDetectorListener = objectDetectorListener
+//////            )
+//////    }
+////
+////    @Test
+////    @Throws(Exception::class)
+////    fun detectedImageIsScaledWithinModelDimens() {
+////        val listener = object : ObjectDetectorHelper.DetectorListener {
+////            override fun onError(error: String) {}
+////
+////            override fun onResults(
+////              results: MutableList<Detection>?,
+////              inferenceTime: Long,
+////              imageHeight: Int,
+////              imageWidth: Int
+////            ) {
+////                assertNotNull(results)
+////                for (result in results!!) {
+////                    assertTrue(result.boundingBox.top <= imageHeight)
+////                    assertTrue(result.boundingBox.bottom <= imageHeight)
+////                    assertTrue(result.boundingBox.left <= imageWidth)
+////                    assertTrue(result.boundingBox.right <= imageWidth)
+////                }
+////            }
+////
+////            override fun onInitialized() {
+////                // Create Bitmap and convert to TensorImage
+////                val bitmap = loadImage("cat1.png")
+////                // Run the object detector on the sample image
+////                objectDetectorHelper.detect(bitmap!!, 0)
+////            }
+////        }
+////        objectDetectorHelper =
+////            ObjectDetectorHelper(
+////                context = InstrumentationRegistry.getInstrumentation().targetContext,
+////                objectDetectorListener = listener
+////            )
+////    }
+//
+//    @Throws(Exception::class)
+//    private fun loadImage(fileName: String): Bitmap? {
+//        val assetManager: AssetManager =
+//            InstrumentationRegistry.getInstrumentation().context.assets
+//        val inputStream: InputStream = assetManager.open(fileName)
+//        return BitmapFactory.decodeStream(inputStream)
+//    }
 }

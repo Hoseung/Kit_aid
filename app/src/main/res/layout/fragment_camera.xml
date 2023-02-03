@@ -89,7 +89,7 @@
 
                 <org.tensorflow.lite.examples.objectdetection.OverlayView
                     android:id="@+id/overlay"
-                    android:layout_width="match_parent"
+                    android:layout_width="357dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:alpha="0.99" />

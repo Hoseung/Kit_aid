@@ -70,7 +70,7 @@ class RegressionHelper (
                 tfliteOption.addDelegate(NnApiDelegate())
             }
         }
-        val modelPredict = "230117_regression_wb.tflite"
+        val modelPredict = "230203_new_regression.tflite"
 
         try {
             interpreterPredict = Interpreter(
@@ -98,7 +98,7 @@ class RegressionHelper (
 
         val bufferSize = java.lang.Float.SIZE / java.lang.Byte.SIZE
         val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
-        val absolutePath = imageSaver(image)
+        //val absolutePath = imageSaver(image)
         val input = processInputImage(image,
             inputPredictTargetWidth,
             inputPredictTargetHeight,

@@ -11,6 +11,7 @@ import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBi
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import java.io.File
 import java.io.FileInputStream
+import kotlin.math.max
 import kotlin.random.Random
 
 class ResultActivity : AppCompatActivity() {
@@ -42,33 +43,43 @@ class ResultActivity : AppCompatActivity() {
 
         val imgPath = intent.getStringExtra("imagePath")!!
         //binding.resultImageView.setImageURI(uri)
+
+        // 결과화면 그림 띄우기
         setImageFromPath(imgPath, binding.resultImageView)
 
         //
         val img = pathToBitmap(imgPath)!!
+        // 파일 삭제
+        val f = File(imgPath)
+        f.delete()
         var cropped: Bitmap
         val answers = mutableListOf<Float>()
-//        for (i in 0..11) {
-//            cropped = Bitmap.createBitmap(img,
-//                Math.ceil(img.width*0.065).toInt() + Random.nextInt(20)-10,
-//                Math.ceil(img.height *0.36).toInt() + Random.nextInt(20)-10,
-//                Math.ceil(img.width*0.52).toInt() + Random.nextInt(20)-10,
-//                Math.ceil(img.height * 0.25).toInt() + Random.nextInt(20)-10
-//            )
-//            answers.add(regressionHelper.predict(cropped, 0))
-//            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
-//            println(answers[i])
-//        }
-        //answers.add(regressionHelper.predict(img, 0))
-        val answer = regressionHelper.predict(img, 0)
-        println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
+        for (i in 0..15) {
+            cropped = Bitmap.createBitmap(
+                img,
+                Math.ceil(img.width * 0.08).toInt() + Random.nextInt(40) - 20,
+                Math.ceil(img.height * 0.36).toInt() + Random.nextInt(60) - 30,
+                Math.ceil(img.width * 0.54).toInt() + Random.nextInt(40) - 20,
+                Math.ceil(img.height * 0.245).toInt() + Random.nextInt(60) - 30
+            )
+            answers.add(regressionHelper.predict(cropped, 0))
+            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
+            println(answers[i])
+        }
+        //var answer = regressionHelper.predict(img, 0)
 
-//        val answer = answers.sorted().let {
-//            it[3]
-//        }
+        var answer = answers.sorted().let {
+            it[7]
+        }
+        answer = max(0f, answer)
 
-        val answerStr = String.format("%.2fmg/ml", answer*180f)
-        println(".....................++++++++ ${answer}###########")
+        val answerStr = answer.let { it ->
+            if (it > 130) {
+                "> 130 mg/ml"
+            } else {
+                String.format("%.1fmg/ml", it * 180f)
+            }
+        }
 
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr

@@ -188,7 +188,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             .setTargetRotation(ROTATION_0)
 
         imageCapture = builder.build()
-//            .also{
+//              .also{
 //            }
 
         // ImageAnalysis. Using RGBA 8888 to match how our models work
@@ -275,10 +275,28 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         if (!::imageCapture.isInitialized) return
 
         println("!%%%%%%%%%%%%%%%%%%%%% In captureAndDetect")
+        val cameraController = camera?.cameraControl
+        val autoExposurePoint = SurfaceOrientedMeteringPointFactory(0.2f, 0.5f).createPoint(.5f, .51f)
+//        val autoExposurePoint2 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.49f, .52f)
+//        val autoExposurePoint3 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .49f)
+//        val autoExposurePoint4 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.51f, .48f)
+//        val autoExposurePoint5 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .47f)
+        val action = FocusMeteringAction.Builder(autoExposurePoint)
+//            .addPoint(autoExposurePoint2)
+//            .addPoint(autoExposurePoint3)
+//            .addPoint(autoExposurePoint4)
+//            .addPoint(autoExposurePoint5)
+            .build()
+        cameraController?.startFocusAndMetering(action)
+        val cameraInfo = camera?.cameraInfo
+
+        //cameraController?.setExposureCompensationIndex(-5)
         imageCapture.takePicture(cameraExecutor,
             object :  ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(imageC: ImageProxy) {
-                    println("#########################${imageC.format}")
+                    println("CCCCCCCCAAAAAAAAAMMMMMMMMMMEEEEEEEERRRRRRRRAAAAAAAAA")
+
+                    println(cameraInfo?.exposureState?.exposureCompensationIndex)
 
                     val imageRotation = imageC.imageInfo.rotationDegrees
                     // Pass Bitmap and rotation to the object detector helper for processing and detection
@@ -332,46 +350,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         }
         return null
     }
-    private var contentUri: Uri? = null
-
-    private fun captureCamera() {
-        if (!::imageCapture.isInitialized) return
-        val photoFile = File(
-            getOutputDirectory(requireActivity()),
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.KOREA
-            ).format(System.currentTimeMillis()) + ".jpg"
-        )
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-        imageCapture.takePicture(
-            outputOptions,
-            cameraExecutor,
-//            object : ImageCapture.OnImageCapturedCallback {
-//                override fun onCaptureSuccess(image: ImageProxy) {
-//                    super.onCaptureSuccess(image)
-//                }
-//            },
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = outputFileResults.savedUri ?: Uri.fromFile(photoFile)
-                    //val rotation = binding!!.viewFinder.display.rotation // 회전 값 설정
-                    contentUri = savedUri
-                    println("@@@@@ $savedUri $contentUri")
-                    contentUri?.let {
-                        val resultIntent = Intent(requireContext(), ResultActivity::class.java)
-                        resultIntent.putExtra("imageUri", it)
-                        startActivity(resultIntent)
-                    }
-                }
-
-                override fun onError(e: ImageCaptureException) {
-                    e.printStackTrace()
-                }
-            }
-        )
-    }
-
+//    private var contentUri: Uri? = null
 
     private fun cutBbox(bitmap: Bitmap, bbox: RectF, factorWidth: Float = 1f, factorHeight: Float = 1f): Bitmap {
         val width = bbox.width()
@@ -412,11 +391,11 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         //var bitmap =
         var cropped: Bitmap = cutBbox(rotate(bitmap, 90f), bbox)
 
-        cropped = Bitmap.createBitmap(cropped,
-            Math.ceil(cropped.width*0.08).toInt(),
-            Math.ceil(cropped.height *0.36).toInt(),
-            Math.ceil(cropped.width*0.54).toInt(),
-            Math.ceil(cropped.height * 0.244).toInt())
+//        cropped = Bitmap.createBitmap(cropped,
+//            Math.ceil(cropped.width*0.08).toInt(),
+//            Math.ceil(cropped.height *0.36).toInt(),
+//            Math.ceil(cropped.width*0.54).toInt(),
+//            Math.ceil(cropped.height * 0.244).toInt())
 
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
@@ -426,15 +405,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             startActivity(resultIntent)
         }
     }
-
-//    private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
-//        val planeProxy = image.planes[0]
-//        val buffer: ByteBuffer = planeProxy.buffer
-//        val bytes = ByteArray(buffer.remaining())
-//        buffer.get(bytes)
-//        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-//    }
-
 
     private fun getOutputDirectory(activity: Activity): File = with(activity) {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -465,7 +435,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Calling detectSecond()")
             println("###################### Image rotation $imageRotation")
             // SAVE to check
-            val absolutePath = imageSaver(bitmapBufferCapture)
+            //val absolutePath = imageSaver(bitmapBufferCapture)
             println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< IMAGE SAVED")
 
             objectDetectorHelper.detectSecond(bitmapBufferCapture, imageRotation)
@@ -505,24 +475,34 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 val i = results[0]
                     println(i.categories[0].score)
                     if (i.categories[0].score > 0.92) {
-                        if (cnt > 5) {
+                        if (cnt > 7) {
                             if (cap) {
                                 MyEntryPoint.prefs.setCnt(0)
                                 Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
+                                cap = false
                                 captureAndDetect()
                                 //captureCamera()
                                 //savePictureToMemory(image, i.boundingBox!!)
                                 //ObjectDetectorHelper.clearObjectDetector()
                                 //carryOn(image, i.boundingBox!!)
                             }
-                            cap = false
                         } else {
-                            MyEntryPoint.prefs.setCnt(cnt+1)
+                            if (i.boundingBox.height() < 0.25*imageHeight){
+//                                Toast.makeText(requireContext(), "Too far!", Toast.LENGTH_SHORT).show()
+                                MyEntryPoint.prefs.setCnt(0)
+                            }
+                            else if  (i.boundingBox.height() > 0.6*imageHeight){
+//                                Toast.makeText(requireContext(), "Too close!", Toast.LENGTH_SHORT).show()
+                                MyEntryPoint.prefs.setCnt(0)
+                            }
+                            else {
+                                MyEntryPoint.prefs.setCnt(cnt+1)
+                            }
                         }
                     } else {
                         MyEntryPoint.prefs.setCnt(0)
                     }
-                    //println("CURRENT CNT $cnt")
+                    println("CURRENT CNT $cnt")
                 //}
             }
             fragmentCameraBinding.overlay.invalidate()
@@ -540,23 +520,20 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     ) {
         //var uri: Uri
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SECOND RESULTS>>>>>>>>>>>>>>>>")
-        println("%%%%%%%%%%%%%%%%%%%%%%%%%")
         println(results)  // RESULT가 비어있음...
         activity?.runOnUiThread {
             if (results != null && results.size > 0 ) {
                 val i = results[0]
-                println(i.categories[0].score)
-                if (i.categories[0].score > 0.9) {
-                        Toast.makeText(requireContext(), "Capturing...", Toast.LENGTH_SHORT).show()
-                        //savePictureToMemory(image, i.boundingBox!!)
-
-                        carryOn(image, i.boundingBox!!)
+                if (i.categories[0].score > 0.96) {
+                    Toast.makeText(requireContext(), "Capturing...", Toast.LENGTH_SHORT).show()
+                    //savePictureToMemory(image, i.boundingBox!!)
+                    carryOn(image, i.boundingBox!!)
                 } else {
-                   println("BAD Captured Image, try again")
+                    Toast.makeText(requireContext(), "try again...", Toast.LENGTH_SHORT).show()
+                    cap = true
                 }
             }
         }
+        println("CCCCCCCCCCCC OnSecondResult Done")
     }
-
-
 }

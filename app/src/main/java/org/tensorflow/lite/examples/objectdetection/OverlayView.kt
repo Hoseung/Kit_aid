@@ -25,6 +25,7 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import java.util.LinkedList
 import kotlin.math.max
@@ -82,8 +83,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         super.draw(canvas)
 
         // GUIDE shadow
-        val viewW = width / 5.5f
-        val viewH = height / 2.8f
+        val viewW = width / 8f
+        val viewH = height / 3.2f
 
 //        val rectBack = Rect()
 //        rectBack.set(0, 0, viewW, viewH)
@@ -118,9 +119,18 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
 
             // Create text to display alongside detected objects
-            val drawableText =
-                result.categories[0].label + " " +
-                        String.format("%.2f", result.categories[0].score)
+            var drawableText : String
+            if (result.boundingBox.height() < 0.25*height){
+                drawableText = "Too Far"
+            }
+            else if (result.boundingBox.height() > 0.5*height) {
+                drawableText = "Too Close"
+            }
+            else{
+                drawableText =
+                    result.categories[0].label + " " +
+                            String.format("%.2f", result.categories[0].score)
+            }
 
             // Draw rect behind display text
             textBackgroundPaint.getTextBounds(drawableText, 0, drawableText.length, bounds)

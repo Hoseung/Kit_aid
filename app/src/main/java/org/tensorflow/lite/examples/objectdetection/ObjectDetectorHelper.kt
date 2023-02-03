@@ -104,7 +104,7 @@ class ObjectDetectorHelper(
 
         optionsBuilder.setBaseOptions(baseOptionsBuilder.build())
 
-        val modelName ="detection_kit.tflite"
+        val modelName = "detection_kit.tflite"
 
         try {
             objectDetector =
