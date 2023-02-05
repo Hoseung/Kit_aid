@@ -30,11 +30,11 @@ import org.tensorflow.lite.task.gms.vision.detector.Detection
 import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 
 class ObjectDetectorHelper(
-    var threshold: Float = 0.6f, // to show bounding box
+    var threshold: Float = 0.7f, // to show bounding box
     var numThreads: Int = 2,
     var maxResults: Int = 1,
     var currentDelegate: Int = 0,
-    var currentModel: Int = 0,
+    //var currentModel: Int = 0,
     val context: Context,
     val objectDetectorListener: DetectorListener
 ) {
