@@ -2,6 +2,8 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Path
+import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
@@ -11,6 +13,7 @@ import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBi
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import java.io.File
 import java.io.FileInputStream
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.random.Random
 
@@ -18,11 +21,11 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
-/*
+    /*
+    ToDo: History
     private val historyViewModel: HistoryViewModel by viewModels {
         HistoryViewModelFactory((application as MyEntryPoint).repository)
-    }*/
-    /*
+    }
     val applicationScope = CoroutineScope(SupervisorJob())
     val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
     private val repository by lazy { HistoryRepository(database.historyDao()) }
@@ -40,38 +43,32 @@ class ResultActivity : AppCompatActivity() {
         )
         initView()
         regressionHelper.setupRegression()
+    }
 
-        val imgPath = intent.getStringExtra("imagePath")!!
+    override fun onResume() {
+        super.onResume()
+        // Run inference onResume, not OnCreate
+
+        val imgDir = intent.getStringExtra("imagePath")!!
+        var imgPath : String
         //binding.resultImageView.setImageURI(uri)
 
         // 결과화면 그림 띄우기
-        setImageFromPath(imgPath, binding.resultImageView)
+        setImageFromPath("$imgDir/img1.png", binding.resultImageView)
 
-        //
-        val img = pathToBitmap(imgPath)!!
-        // 파일 삭제
-        val f = File(imgPath)
-        f.delete()
-        var cropped: Bitmap
         val answers = mutableListOf<Float>()
-        for (i in 0..15) {
-            cropped = Bitmap.createBitmap(
-                img,
-                Math.ceil(img.width * 0.08).toInt() + Random.nextInt(40) - 20,
-                Math.ceil(img.height * 0.36).toInt() + Random.nextInt(60) - 30,
-                Math.ceil(img.width * 0.54).toInt() + Random.nextInt(40) - 20,
-                Math.ceil(img.height * 0.245).toInt() + Random.nextInt(60) - 30
-            )
-            answers.add(regressionHelper.predict(cropped, 0))
-            println("_______@*Q(&(*^(*&)(OLJGLIJG_++++")
-            println(answers[i])
-        }
-        //var answer = regressionHelper.predict(img, 0)
+        for (i in 1..5) {
+            imgPath = "$imgDir/img${i}.png"
+            val img = pathToBitmap(imgPath)!!
+            // 파일 삭제
+            answers.add(randomCroppedPredict(img))
 
-        var answer = answers.sorted().let {
-            it[7]
+            val f = File(imgPath)
+            f.delete()
         }
-        answer = max(0f, answer)
+        val answer = answers.sorted().let {
+            it[2]
+        }
 
         val answerStr = answer.let { it ->
             if (it > 130) {
@@ -83,10 +80,31 @@ class ResultActivity : AppCompatActivity() {
 
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr
-        // saveResult()
+        // ToDo: saveResult()
         //setHistoryList
-        val history = History("2023-01-13", "ANIANI", answerStr, imgPath)
+        //val history = History("2023-01-13", "ANIANI", answerStr, imgPath)
         //historyViewModel.insert(history)
+    }
+
+    private fun randomCroppedPredict(image: Bitmap) : Float {
+        var cropped: Bitmap
+        val answers = mutableListOf<Float>()
+        for (i in 0..5) {
+            cropped = Bitmap.createBitmap(
+                image,
+                ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20,
+                ceil(image.height * 0.36).toInt() + Random.nextInt(60) - 30,
+                ceil(image.width * 0.54).toInt() + Random.nextInt(40) - 20,
+                ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
+            )
+            answers.add(regressionHelper.predict(cropped, 0))
+            println("prediction: ${answers[i]}")
+        }
+        var answer = answers.sorted().let {
+            it[2]
+        }
+        answer = max(0f, answer)
+        return answer
     }
 
     private fun initView() = with(binding) {

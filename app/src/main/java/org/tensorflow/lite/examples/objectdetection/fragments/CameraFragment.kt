@@ -84,7 +84,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
     private lateinit var imageCapture: ImageCapture
 
-    private val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    //private val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     /** Blocking camera operations are performed using this executor */
     private lateinit var cameraExecutor: ExecutorService
@@ -313,8 +313,6 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
                         val imageRotation = imageC.imageInfo.rotationDegrees
                         // Pass Bitmap and rotation to the object detector helper for processing and detection
-                        println("###################### Image rotation $imageRotation")
-
                         val bitmap = imageProxyToBitmap(imageC)
                         imageC.close()
 
@@ -323,6 +321,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 }
             )
         }
+        println("captureAndDetect Loop is Over. Did you see the Result??")
     }
 
     /*
@@ -340,7 +339,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         activity?.runOnUiThread {
             if (results != null && results.size > 0 ) {
                 if (imageCaptureDetectionSuccess == 0) {
-                    Toast.makeText(requireContext(), "Hold on for a second", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Hold on for a second", Toast.LENGTH_LONG).show()
                 }
                 val i = results[0]
                 if (i.categories[0].score > 0.96) {
@@ -350,14 +349,19 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                     //savePicture to storage
                     val cropped: Bitmap = cutBbox(rotate(image, 90f), i.boundingBox)
                     val absolutePath = imageSaver(cropped)
-                    if (imageCaptureDetectionSuccess == 5){
-                        cap2 = false
 
+                    if (imageCaptureDetectionSuccess == 5){
                         absolutePath.let {
                             val resultIntent = Intent(requireContext(), ResultActivity::class.java)
                             resultIntent.putExtra("imagePath", it)
                             startActivity(resultIntent)
                         }
+                        // Reset everything
+                        cap2 = false
+                        imageCaptureDetectionFail = 0
+                        detetc1Ready = false
+                        MyEntryPoint.prefs.setCnt(0)
+                        imageCaptureDetectionSuccess = 0
                         //carryOn(image, i.boundingBox!!)
                     }
                 } else {
@@ -444,19 +448,12 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream)
         //bitmap.recycle() //
-        return photoFile.absolutePath
+        return photoFile.parent!!
     }
 
     private fun carryOn(bitmap: Bitmap, bbox: RectF){
         //var bitmap =
         val cropped: Bitmap = cutBbox(rotate(bitmap, 90f), bbox)
-
-//        cropped = Bitmap.createBitmap(cropped,
-//            Math.ceil(cropped.width*0.08).toInt(),
-//            Math.ceil(cropped.height *0.36).toInt(),
-//            Math.ceil(cropped.width*0.54).toInt(),
-//            Math.ceil(cropped.height * 0.244).toInt())
-
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
         absolutePath.let {
@@ -499,10 +496,13 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
             val imageRotation = image.imageInfo.rotationDegrees
             println("DETECTOR1 ----")
-            if (MyEntryPoint.prefs.getCnt() <= 7){
+            if (MyEntryPoint.prefs.getCnt() <= 8){
+                image.close()
+                objectDetectorHelper.detect(bitmapBuffer, imageRotation)
+            } else {
+                // simply ignore the stream
                 image.close()
             }
-            objectDetectorHelper.detect(bitmapBuffer, imageRotation)
         }
     }
 
@@ -529,14 +529,18 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 val i = results[0]
                     println(i.categories[0].score)
                     if (i.categories[0].score > 0.92) {
-                        if (cnt > 7) {
-                            MyEntryPoint.prefs.setCnt(0)
+                        if (cnt == 7) {
                             // 여기는 한 번만 들어와야하는데?
                             Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
                             detetc1Ready = true
                             captureAndDetect()
+                            // No more captureAndDetect!
+                            MyEntryPoint.prefs.setCnt(cnt + 1)
+    // thread inside captureAndDetect
+    // and this Main thread are not synced.
+    // Below setCnt(0) will be effective before captureAndDetect() is over.
                             //ObjectDetectorHelper.clearObjectDetector()
-                        } else {
+                        } else if (cnt < 7){
                             if (i.boundingBox.height() < 0.25*imageHeight){
                                 MyEntryPoint.prefs.setCnt(0)
                                 println("RESET CNT  1 ... $cnt")
@@ -549,6 +553,12 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                                 MyEntryPoint.prefs.setCnt(cnt+1)
                                 println("INCREMENT CNT ... $cnt")
                             }
+                        } else {
+                            /* Some frames will stream in
+                            even after cnt == 7 is reached. ?
+                            I still have to close the image, or ...?
+                            */
+
                         }
                     } else {
                         MyEntryPoint.prefs.setCnt(0)
@@ -567,6 +577,12 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 // Todo: fragment ID 확인
                 val currentFragment = fragmentManager.findFragmentById(R.id.fragment_container)
                 currentFragment?.let{
+                    // Reset everything
+                    MyEntryPoint.prefs.setCnt(0)
+                    cap2 = false
+                    imageCaptureDetectionFail = 0
+                    detetc1Ready = false
+
                     val fragmentTransaction = fragmentManager.beginTransaction()
                     fragmentTransaction.detach(it)
                     fragmentTransaction.attach(it)
