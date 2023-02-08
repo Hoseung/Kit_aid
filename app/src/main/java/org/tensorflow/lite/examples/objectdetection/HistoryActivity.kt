@@ -1,17 +1,21 @@
 package org.tensorflow.lite.examples.objectdetection
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryAdapter
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModel
 //import org.tensorflow.lite.examples.objectdetection.HistoryRoomDataBase
 //import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityHistoryBinding
+import java.io.File
+import java.io.FileOutputStream
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -35,6 +39,8 @@ class HistoryActivity : AppCompatActivity() {
     }
 
 */
+    private var filePath: String = ""
+
     val hlist =listOf(
         History("2022-10-10", "AniCheck", "20mg/ml", "img1.png"),
         History("2022-10-10", "AniCheck", "30mg/ml", "img2.png")
@@ -50,31 +56,61 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun initView() = with(binding) {
         historyBackButton.setOnClickListener { finish() }
-        shareButton.setOnClickListener { startActivity(shareIntent)
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, getContentUri())
+            //type = "text/plain"
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        shareButton.setOnClickListener {
+            startActivity(shareIntent)
         }
         kitHistoryRecyclerView.adapter = historyAdapter
 
         //historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
-
-
         historyAdapter.setHistoryList(
             hlist
         )
 
+
     }
+    override fun onResume() {
+        super.onResume()
 
+        var sample_str = ""
 
-    val sendIntent: Intent = Intent().apply {
-        action = Intent.ACTION_SEND
-
-        for (i in hlist.indices){
-            out_str = out_str + "${hlist[i].date},  ${hlist[i].productName},  ${hlist[i].result},  ${hlist[i].imgName}  \n"
+        for (i in hlist.indices) {
+            sample_str += "${hlist[i].date},  ${hlist[i].productName},  ${hlist[i].result},  ${hlist[i].imgName}  \n"
         }
-        putExtra(Intent.EXTRA_TEXT, out_str)
-        type = "text/plain"
 
+//        openFileOutput("history.csv", Context.MODE_PRIVATE)
+//            .use {
+//
+//                it.write(sample_str.toByteArray())
+//            }
+
+        val extRoot = getExternalFilesDir(null)!!
+        val outFile = FileOutputStream("$extRoot/history.csv")
+        outFile.write(sample_str.toByteArray())
+        outFile.close()
+        //        FileOutputStream(historyFile)
+//            .use{
+//                for (i in hlist.indices){
+//                    sample_str = sample_str + "${hlist[i].date},  ${hlist[i].productName},  ${hlist[i].result},  ${hlist[i].imgName}  \n"
+//                }
+//                it.write(sample_str.toByteArray())
+//            }
+        //val historyFile = File(filePath)
     }
-
-    val shareIntent = Intent.createChooser(sendIntent, null)
-
+    private fun getContentUri(): Uri {
+        val extRoot = getExternalFilesDir(null)!!
+        return FileProvider.getUriForFile(
+            this@HistoryActivity,
+            applicationContext.packageName + ".provider",
+            //filePath
+            File("$extRoot/history.csv")
+        )
+    }
 }

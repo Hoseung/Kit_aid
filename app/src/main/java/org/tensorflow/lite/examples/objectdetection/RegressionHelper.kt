@@ -70,7 +70,7 @@ class RegressionHelper (
                 tfliteOption.addDelegate(NnApiDelegate())
             }
         }
-        val modelPredict = "230203_new_regression.tflite"
+        val modelPredict = "230207_new_regression.tflite"
 
         try {
             interpreterPredict = Interpreter(
