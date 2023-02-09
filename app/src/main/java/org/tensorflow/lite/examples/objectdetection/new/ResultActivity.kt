@@ -2,13 +2,19 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Path
-import android.media.Image
+//import android.graphics.Path
+//import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import org.tensorflow.lite.examples.objectdetection.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
+import org.tensorflow.lite.examples.objectdetection.RegressionHelper
+import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
+import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import java.io.File
@@ -21,6 +27,7 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
+    lateinit var database: HistoryRoomDatabase
     /*
     ToDo: History
     private val historyViewModel: HistoryViewModel by viewModels {
@@ -43,6 +50,8 @@ class ResultActivity : AppCompatActivity() {
         )
         initView()
         regressionHelper.setupRegression()
+
+        database = HistoryRoomDatabase.getDatabase(this)
     }
 
     override fun onResume() {
@@ -80,10 +89,21 @@ class ResultActivity : AppCompatActivity() {
 
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr
+
         // ToDo: saveResult()
         //setHistoryList
         //val history = History("2023-01-13", "ANIANI", answerStr, imgPath)
         //historyViewModel.insert(history)
+
+        val history = History(null,
+            MyEntryPoint.prefs.getString("prodName", "NoProduct"),
+            MyEntryPoint.prefs.getString("lotNum","0").toInt(),
+            answerStr,
+            "Today!!"
+        )
+        GlobalScope.launch(Dispatchers.IO){
+            database.historyDao().insert(history)
+        }
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {

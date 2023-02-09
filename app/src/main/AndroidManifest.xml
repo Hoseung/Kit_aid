@@ -30,7 +30,6 @@ xmlns:tools="http://schemas.android.com/tools">
             android:clearTaskOnLaunch="true"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_aid"
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
             tools:targetApi="31">
