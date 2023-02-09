@@ -1,9 +1,6 @@
 package org.tensorflow.lite.examples.objectdetection.adapter
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import kotlinx.coroutines.flow.Flow
 
@@ -11,11 +8,13 @@ import kotlinx.coroutines.flow.Flow
 interface HistoryDao {
 
     @Query("SELECT * FROM history_table ORDER BY date ASC")
-    fun getOrderedHistory(): Flow<List<History>>
+    suspend fun getOrderedHistory(): List<History> // Flow<List<History>>??
 //
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(history: History)
-//
+    suspend fun insert(history: History)
+    @Delete
+    suspend fun delete(history: History)
+
     @Query("DELETE FROM history_table")
     suspend fun deleteAll()
 }

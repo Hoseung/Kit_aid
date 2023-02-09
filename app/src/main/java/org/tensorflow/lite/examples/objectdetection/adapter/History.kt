@@ -16,12 +16,14 @@ import androidx.room.PrimaryKey
  */
 
 @Entity(tableName = "history_table")
-data class History(@PrimaryKey @ColumnInfo(name = "date")
-                   val date: String,
-                   val productName: String,
-                   val result: String,
-                   val imgName: String
+data class History(
+    @PrimaryKey(autoGenerate = true) val id: Int?,
+    @ColumnInfo(name = "product") val product: String?,
+    @ColumnInfo(name = "lot") val lot: Int?,
+    @ColumnInfo(name = "density") val density: String?,
+    @ColumnInfo(name = "date") val date: String?
 )
+
 
 //data class History(
 //    val date: String,

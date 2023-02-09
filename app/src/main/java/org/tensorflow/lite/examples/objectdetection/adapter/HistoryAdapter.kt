@@ -14,8 +14,8 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
         fun bind(data: History) = with(binding) {
             // bind to Text views
             itemDateTv.text = data.date
-            itemTypeTv.text = data.productName
-            itemResultTv.text = data.result
+            itemTypeTv.text = data.product
+            itemResultTv.text = data.density
             //itemImageNameTv.text = data.imgName
         }
     }
@@ -31,6 +31,7 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
 
     override fun getItemCount(): Int = historyList.size
 
+    //
     fun setHistoryList(historyList: List<History>) {
         this.historyList = historyList
         notifyDataSetChanged()
