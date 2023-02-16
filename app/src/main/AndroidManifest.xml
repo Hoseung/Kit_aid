@@ -32,7 +32,7 @@ xmlns:tools="http://schemas.android.com/tools">
             android:exported="true"
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
-            tools:targetApi="31">
+            tools:targetApi="33">
 
             <meta-data
                 android:name="android.notch_support"
@@ -50,16 +50,7 @@ xmlns:tools="http://schemas.android.com/tools">
         <activity android:name=".new.MemberActivity" />
         <activity android:name=".new.ResultActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <action android:name="android.media.action.IMAGE_CAPTURE" />-->
-<!--                <action android:name="android.media.action.STILL_IMAGE_CAMERA"/>-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
         </activity>
-<!--        <activity-->
-<!--            android:name=".new.Main2Activity"-->
-<!--            android:exported="true"></activity>-->
         <activity android:name=".HistoryActivity" />
         <provider
             android:name="androidx.core.content.FileProvider"
