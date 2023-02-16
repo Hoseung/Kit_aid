@@ -6,7 +6,7 @@ package org.tensorflow.lite.examples.objectdetection.adapter
 //        // - We can put an observer on the data (instead of polling for changes) and only update the
 //        //   the UI when the data actually changes.
 //        // - Repository is completely separated from the UI through the ViewModel.
-//        val allHistorys: LiveData<List<History>> = repository.allHistorys.asLiveData()
+//        val allHistory's: LiveData<List<History>> = repository.allHistory's.asLiveData()
 //
 //        /**
 //         * Launching a new coroutine to insert the data in a non-blocking way

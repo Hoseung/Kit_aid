@@ -20,8 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings.Global.getString
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
@@ -43,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, LoginActivity::class.java))
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         finishAffinity()
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
@@ -52,16 +51,16 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-    companion object {
-        /** Use external media if it is available, our app's file directory otherwise */
-        fun getOutputDirectory(context: Context): File {
-            val appContext = context.applicationContext
-            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
-            return if (mediaDir != null && mediaDir.exists())
-                mediaDir else appContext.filesDir
-        }
-    }
+//    companion object {
+//        /** Use external media if it is available, our app's file directory otherwise */
+//        fun getOutputDirectory(context: Context): File {
+//            val appContext = context.applicationContext
+//            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+//                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
+//            return if (mediaDir != null && mediaDir.exists())
+//                mediaDir else appContext.filesDir
+//        }
+//    }
 }
 
 

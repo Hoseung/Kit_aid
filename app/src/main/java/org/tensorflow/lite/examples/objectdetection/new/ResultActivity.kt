@@ -27,7 +27,7 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
-    lateinit var database: HistoryRoomDatabase
+    private lateinit var database: HistoryRoomDatabase
     /*
     ToDo: History
     private val historyViewModel: HistoryViewModel by viewModels {
@@ -45,7 +45,7 @@ class ResultActivity : AppCompatActivity() {
         setContentView(binding.root)
         //regressionListener =
         regressionHelper = RegressionHelper(
-            context = this, // provider 지정해주어야함
+            context = this,
             //regressionListener = regressionListener
         )
         initView()
@@ -62,7 +62,6 @@ class ResultActivity : AppCompatActivity() {
         var imgPath : String
         //binding.resultImageView.setImageURI(uri)
 
-        // 결과화면 그림 띄우기
         setImageFromPath("$imgDir/img1.png", binding.resultImageView)
 
         val answers = mutableListOf<Float>()
@@ -117,7 +116,7 @@ class ResultActivity : AppCompatActivity() {
                 ceil(image.width * 0.54).toInt() + Random.nextInt(40) - 20,
                 ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
             )
-            answers.add(regressionHelper.predict(cropped, 0))
+            answers.add(regressionHelper.predict(cropped))
             println("prediction: ${answers[i]}")
         }
         var answer = answers.sorted().let {
