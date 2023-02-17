@@ -21,11 +21,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
-import android.media.Image
-import android.net.Uri
+//import android.media.Image
+//import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.util.Size
+//import android.util.Size
 import android.view.LayoutInflater
 import android.view.Surface.ROTATION_0
 import android.view.View
@@ -38,7 +38,7 @@ import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat.recreate
+//import androidx.core.app.ActivityCompat.recreate
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
@@ -47,15 +47,15 @@ import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
 import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
-import org.tensorflow.lite.examples.objectdetection.new.pathToBitmap
+//import org.tensorflow.lite.examples.objectdetection.new.pathToBitmap
 import org.tensorflow.lite.task.gms.vision.detector.Detection
-import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
+//import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Math.ceil
-import java.nio.ByteBuffer
-import java.text.SimpleDateFormat
+//import java.lang.Math.ceil
+//import java.nio.ByteBuffer
+//import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -287,16 +287,16 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         println("!%%%%%%%%%%%%%%%%%%%%% In captureAndDetect")
         val cameraController = camera?.cameraControl
         val autoExposurePoint = SurfaceOrientedMeteringPointFactory(0.2f, 0.5f).createPoint(.5f, .51f)
-        val autoExposurePoint2 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.49f, .52f)
-        val autoExposurePoint3 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .49f)
-        val autoExposurePoint4 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.51f, .48f)
-        val autoExposurePoint5 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .47f)
+//        val autoExposurePoint2 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.49f, .52f)
+//        val autoExposurePoint3 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .49f)
+//        val autoExposurePoint4 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.51f, .48f)
+//        val autoExposurePoint5 = SurfaceOrientedMeteringPointFactory(0.1f, 0.3f).createPoint(.5f, .47f)
 
         val action1 = FocusMeteringAction.Builder(autoExposurePoint).build()
-        val action2 = FocusMeteringAction.Builder(autoExposurePoint2).build()
-        val action3 = FocusMeteringAction.Builder(autoExposurePoint3).build()
-        val action4 = FocusMeteringAction.Builder(autoExposurePoint4).build()
-        val action5 = FocusMeteringAction.Builder(autoExposurePoint5).build()
+//        val action2 = FocusMeteringAction.Builder(autoExposurePoint2).build()
+//        val action3 = FocusMeteringAction.Builder(autoExposurePoint3).build()
+//        val action4 = FocusMeteringAction.Builder(autoExposurePoint4).build()
+//        val action5 = FocusMeteringAction.Builder(autoExposurePoint5).build()
 //            .addPoint(autoExposurePoint2)
         val cameraInfo = camera?.cameraInfo
 
@@ -386,9 +386,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             buffer.rewind()
             val bytes = ByteArray(buffer.remaining())
             buffer.get(bytes)
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 
-            return bitmap
+            return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         }
         else if (imageProxy.format == ImageFormat.YUV_420_888) {
             val yBuffer = imageProxy.planes[0].buffer // Y
@@ -405,13 +404,13 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             vBuffer.get(nv21, ySize, vSize)
             uBuffer.get(nv21, ySize + vSize, uSize)
 
-            val yuvImage = YuvImage(nv21, ImageFormat.NV21, imageProxy.width, imageProxy.height, null)
+            val yuvImage =
+                YuvImage(nv21, ImageFormat.NV21, imageProxy.width, imageProxy.height, null)
             val out = ByteArrayOutputStream()
             yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 100, out)
             val imageBytes = out.toByteArray()
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-            return bitmap
+            return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         }
         return null
     }
@@ -420,7 +419,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     private fun cutBbox(bitmap: Bitmap, bbox: RectF, factorWidth: Float = 1f, factorHeight: Float = 1f): Bitmap {
         val width = bbox.width()
         val height = bbox.height()
-        println("WIDTH and HEIGHT ${width} ${height}")
+        println("WIDTH and HEIGHT $width $height")
         println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
         return Bitmap.createBitmap(bitmap,
             kotlin.math.ceil((bbox.centerX() - 0.525 * width) * factorWidth).toInt(),
@@ -527,50 +526,49 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
             if (results != null && results.size > 0 ) {
                 val i = results[0]
-                    println(i.categories[0].score)
-                    if (i.categories[0].score > 0.92) {
-                        if (cnt == 7) {
-                            // 여기는 한 번만 들어와야하는데?
-                            Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
-                            detetc1Ready = true
-                            captureAndDetect()
-                            // No more captureAndDetect!
-                            MyEntryPoint.prefs.setCnt(cnt + 1)
-    // thread inside captureAndDetect
-    // and this Main thread are not synced.
-    // Below setCnt(0) will be effective before captureAndDetect() is over.
-                            //ObjectDetectorHelper.clearObjectDetector()
-                        } else if (cnt < 7){
-                            if (i.boundingBox.height() < 0.25*imageHeight){
-                                MyEntryPoint.prefs.setCnt(0)
-                                println("RESET CNT  1 ... $cnt")
-                            }
-                            else if  (i.boundingBox.height() > 0.7*imageHeight){
-                                MyEntryPoint.prefs.setCnt(0)
-                                println("RESET CNT  2 ... $cnt")
-                            }
-                            else {
-                                MyEntryPoint.prefs.setCnt(cnt+1)
-                                println("INCREMENT CNT ... $cnt")
-                            }
-                        } else {
-                            /* Some frames will stream in
-                            even after cnt == 7 is reached. ?
-                            I still have to close the image, or ...?
-                            */
-
+                println(i.categories[0].score)
+                if (i.categories[0].score > 0.92) {
+                    if (cnt == 7) {
+                        Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
+                        detetc1Ready = true
+                        captureAndDetect()
+                        // No more captureAndDetect!
+                        MyEntryPoint.prefs.setCnt(cnt + 1)
+// thread inside captureAndDetect
+// and this Main thread are not synced.
+// Below setCnt(0) will be effective before captureAndDetect() is over.
+                        //ObjectDetectorHelper.clearObjectDetector()
+                    } else if (cnt < 7){
+                        if (i.boundingBox.height() < 0.25*imageHeight){
+                            MyEntryPoint.prefs.setCnt(0)
+                            println("RESET CNT  1 ... $cnt")
+                        }
+                        else if  (i.boundingBox.height() > 0.7*imageHeight){
+                            MyEntryPoint.prefs.setCnt(0)
+                            println("RESET CNT  2 ... $cnt")
+                        }
+                        else {
+                            MyEntryPoint.prefs.setCnt(cnt+1)
+                            println("INCREMENT CNT ... $cnt")
                         }
                     } else {
-                        MyEntryPoint.prefs.setCnt(0)
+                        /* Some frames will stream in
+                        even after cnt == 7 is reached. ?
+                        I still have to close the image, or ...?
+                        */
+
                     }
-                    println("CURRENT CNT $cnt")
-                //}
+                } else {
+                    MyEntryPoint.prefs.setCnt(0)
+                }
+                println("CURRENT CNT $cnt")
+            //}
             }
             fragmentCameraBinding.overlay.invalidate() // Todo: 이건 뭘까?
         }
     }
 
-    fun refreshFragment(context: Context?){
+    private fun refreshFragment(context: Context?){
         context?.let{
             val fragmentManager = ( context as? AppCompatActivity)?.supportFragmentManager
             fragmentManager?. let {

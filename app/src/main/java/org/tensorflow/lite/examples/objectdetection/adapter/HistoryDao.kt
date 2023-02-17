@@ -2,7 +2,7 @@ package org.tensorflow.lite.examples.objectdetection.adapter
 
 import androidx.room.*
 import org.tensorflow.lite.examples.objectdetection.adapter.History
-import kotlinx.coroutines.flow.Flow
+//import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HistoryDao {

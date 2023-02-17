@@ -23,7 +23,7 @@ apply plugin: 'de.undercouch.download'
 android {
     compileSdkVersion 33
     defaultConfig {
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         applicationId "org.tensorflow.lite.examples.objectdetection"
         minSdkVersion 21
         targetSdkVersion 33
@@ -46,7 +46,8 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -54,19 +55,18 @@ android {
     buildFeatures {
         viewBinding true
     }
-    androidResources {
-        noCompress 'tflite'
-    }
+//    androidResources {
+//        noCompress 'tflite'
+//    }
     //namespace 'org.tensorflow.lite.examples.objectdetection'
 }
 
 // import DownloadModels task
-project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
-project.ext.TEST_ASSETS_DIR = projectDir.toString() + '/src/androidTest/assets'
+//project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
+//project.ext.TEST_ASSETS_DIR = projectDir.toString() + '/src/androidTest/assets'
 
 // Download default models; if you wish to use your own models then
 // place them in the "assets" directory and comment out this line.`
-//apply from:'download_models.gradle'
 def lifecycle_version = "2.5.1"
 
 dependencies {
@@ -115,19 +115,19 @@ dependencies {
     //WindowManager
     implementation 'androidx.window:window:1.1.0-alpha04'
 
-    // Unit testing
-    testImplementation 'androidx.test.ext:junit:1.1.5'
-    testImplementation 'androidx.test:rules:1.5.0'
-    testImplementation 'androidx.test:runner:1.5.2'
-    testImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    testImplementation 'org.robolectric:robolectric:4.4'
-
-    // Instrumented testing
-    androidTestImplementation "androidx.test.ext:junit:1.1.5"
-    androidTestImplementation "androidx.test:core:1.5.0"
-    androidTestImplementation "androidx.test:rules:1.5.0"
-    androidTestImplementation "androidx.test:runner:1.5.2"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+//    // Unit testing
+//    testImplementation 'androidx.test.ext:junit:1.1.5'
+//    testImplementation 'androidx.test:rules:1.5.0'
+//    testImplementation 'androidx.test:runner:1.5.2'
+//    testImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+//    testImplementation 'org.robolectric:robolectric:4.4'
+//
+//    // Instrumented testing
+//    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+//    androidTestImplementation "androidx.test:core:1.5.0"
+//    androidTestImplementation "androidx.test:rules:1.5.0"
+//    androidTestImplementation "androidx.test:runner:1.5.2"
+//    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
 
     implementation 'org.tensorflow:tensorflow-lite-task-vision-play-services:0.4.2'
     implementation 'com.google.android.gms:play-services-tflite-gpu:16.1.0'

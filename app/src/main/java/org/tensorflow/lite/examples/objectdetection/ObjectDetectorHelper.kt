@@ -17,7 +17,6 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.SystemClock
 import android.util.Log
 import com.google.android.gms.tflite.client.TfLiteInitializationOptions
 import com.google.android.gms.tflite.gpu.support.TfLiteGpu
@@ -30,11 +29,10 @@ import org.tensorflow.lite.task.gms.vision.detector.Detection
 import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 
 class ObjectDetectorHelper(
-    var threshold: Float = 0.7f, // to show bounding box
-    var numThreads: Int = 2,
-    var maxResults: Int = 1,
-    var currentDelegate: Int = 0,
-    //var currentModel: Int = 0,
+    private var threshold: Float = 0.7f, // to show bounding box
+    private var numThreads: Int = 2,
+    private var maxResults: Int = 1,
+    private var currentDelegate: Int = 0,
     val context: Context,
     val objectDetectorListener: DetectorListener
 ) {
@@ -62,14 +60,6 @@ class ObjectDetectorHelper(
         }
     }
 
-    fun clearObjectDetector() {
-        objectDetector = null
-    }
-
-    // Initialize the object detector using current settings on the
-    // thread that is using it. CPU and NNAPI delegates can be used with detectors
-    // that are created on the main thread and used on a background thread, but
-    // the GPU delegate needs to be used on the thread that initialized the detector
     fun setupObjectDetector() {
         if (!TfLiteVision.isInitialized()) {
             Log.e(TAG, "setupObjectDetector: TfLiteVision is not initialized yet")
