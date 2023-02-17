@@ -39,10 +39,10 @@ class HistoryActivity : AppCompatActivity() {
 
 */
 
-//    val hlist =listOf(
-//        History(null,"2022-10-10", 2022003, "20mg/ml", "img1.png"),
-//        History(null,"2022-10-10", 2022003, "30mg/ml", "img2.png")
-//    )
+    private val hlist =listOf(
+        History(null, "Bovine", 2022003, "20mg/ml", "2022-10-10"),
+        History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryBinding.inflate(layoutInflater)
@@ -70,9 +70,7 @@ class HistoryActivity : AppCompatActivity() {
         // Todo: Update historyViewModel
         //historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
 
-    //        historyAdapter.setHistoryList(
-//            hlist
-//        )
+        historyAdapter.setHistoryList(hlist)
 
     }
     override fun onResume() {

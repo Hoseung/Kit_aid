@@ -26,6 +26,7 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
     }
 
     override fun onBindViewHolder(holder: HistoryItemViewHolder, position: Int) {
+        // Associate view holder with data
         holder.bind(historyList[position])
     }
 
@@ -34,6 +35,11 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
     //
     fun setHistoryList(historyList: List<History>) {
         this.historyList = historyList
+        notifyDataSetChanged()
+    }
+
+    fun addHistoryList(newHistory: History) {
+        this.historyList.plusElement(newHistory)
         notifyDataSetChanged()
     }
 }

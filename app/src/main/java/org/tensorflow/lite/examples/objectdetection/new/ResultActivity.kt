@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
 import org.tensorflow.lite.examples.objectdetection.RegressionHelper
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
@@ -28,16 +26,15 @@ class ResultActivity : AppCompatActivity() {
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
     private lateinit var database: HistoryRoomDatabase
-    /*
-    ToDo: History
-    private val historyViewModel: HistoryViewModel by viewModels {
-        HistoryViewModelFactory((application as MyEntryPoint).repository)
-    }
+    // ToDo: History
+
+//    private val historyViewModel: HistoryViewModel by viewModels {
+//        HistoryViewModelFactory((application as MyEntryPoint).repository)
+//    }
     val applicationScope = CoroutineScope(SupervisorJob())
-    val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
-    private val repository by lazy { HistoryRepository(database.historyDao()) }
-    private val historyViewModel = HistoryViewModel(repository)
-    */
+    //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
+//    private val repository by lazy { HistoryRepository(database.historyDao()) }
+//    private val historyViewModel = HistoryViewModel(repository)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,8 +88,10 @@ class ResultActivity : AppCompatActivity() {
 
         // ToDo: saveResult()
         //setHistoryList
-        //val history = History("2023-01-13", "ANIANI", answerStr, imgPath)
-        //historyViewModel.insert(history)
+
+//        historyViewModel.insert(
+//            History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
+//        )
 
         val history = History(null,
             MyEntryPoint.prefs.getString("prodName", "NoProduct"),
@@ -100,9 +99,13 @@ class ResultActivity : AppCompatActivity() {
             answerStr,
             "Today!!"
         )
+
+//        historyViewModel.insert(history)
+
         GlobalScope.launch(Dispatchers.IO){
             database.historyDao().insert(history)
         }
+
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {

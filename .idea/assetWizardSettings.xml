@@ -113,8 +113,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="f9d6d6" />
-                                      <entry key="generateLegacyIcon" value="false" />
+                                      <entry key="backgroundColor" value="ffd8cf" />
                                       <entry key="outputName" value="ic_launcher_aid" />
                                     </map>
                                   </option>
