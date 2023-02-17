@@ -15,6 +15,7 @@ import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import org.tensorflow.lite.examples.objectdetection.adapter.History
+import org.tensorflow.lite.examples.objectdetection.adapter.HistoryDao
 import java.io.File
 import java.io.FileInputStream
 import kotlin.math.ceil
@@ -101,6 +102,9 @@ class ResultActivity : AppCompatActivity() {
         )
 
 //        historyViewModel.insert(history)
+
+        //
+        //historyDao.insert(history)
 
         GlobalScope.launch(Dispatchers.IO){
             database.historyDao().insert(history)
