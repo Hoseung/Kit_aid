@@ -494,7 +494,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             // whether to block the next frame or not.
             bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
             val imageRotation = image.imageInfo.rotationDegrees
-            println("DETECTOR1 ----")
+            //println("DETECTOR1 ----")
             if (MyEntryPoint.prefs.getCnt() <= 8){
                 image.close()
                 objectDetectorHelper.detect(bitmapBuffer, imageRotation)

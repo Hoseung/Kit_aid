@@ -49,7 +49,7 @@ class ResultActivity : AppCompatActivity() {
         initView()
         regressionHelper.setupRegression()
 
-        database = HistoryRoomDatabase.getDatabase(this)
+        database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
     override fun onResume() {
@@ -101,15 +101,10 @@ class ResultActivity : AppCompatActivity() {
             "Today!!"
         )
 
-//        historyViewModel.insert(history)
-
-        //
-        //historyDao.insert(history)
-
         GlobalScope.launch(Dispatchers.IO){
             database.historyDao().insert(history)
         }
-
+//        historyViewModel.insert(history)
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {

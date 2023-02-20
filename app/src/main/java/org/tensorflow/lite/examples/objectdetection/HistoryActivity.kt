@@ -5,19 +5,23 @@ package org.tensorflow.lite.examples.objectdetection
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryAdapter
+import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModel
 //import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
-//import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
+import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityHistoryBinding
 import java.io.File
 import java.io.FileOutputStream
 
 class HistoryActivity : AppCompatActivity() {
-
+    val applicationScope = CoroutineScope(SupervisorJob())
     private lateinit var binding: ActivityHistoryBinding
     // Adapter = 데이터 표현용
     // DAO = DB access용
@@ -32,12 +36,9 @@ class HistoryActivity : AppCompatActivity() {
     //private val repository by lazy { HistoryRepository(database.historyDao()) }
     //private val historyViewModel = HistoryViewModel(repository)
 
-/*
     private val historyViewModel: HistoryViewModel by viewModels {
         HistoryViewModelFactory((application as MyEntryPoint).repository)
     }
-
-*/
 
     private val hlist =listOf(
         History(null, "Bovine", 2022003, "20mg/ml", "2022-10-10"),
@@ -47,8 +48,17 @@ class HistoryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val kitHistoryRecyclerView = findViewById<RecyclerView>(R.id.kitHistoryRecyclerView)
+        kitHistoryRecyclerView.adapter = historyAdapter
+
+        // FIXME: layoutManager is specified in activity_history.xml So, can I skip this?
+        kitHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
+        historyViewModel.allHistorys.observe(this) { historys ->
+            historys.let {historyAdapter.submitList(it)}
+        }
         initView()
-        database = HistoryRoomDatabase.getDatabase(this)
+        database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
     // Init에 할까? onResume에 할까?
@@ -65,12 +75,11 @@ class HistoryActivity : AppCompatActivity() {
         shareButton.setOnClickListener {
             startActivity(shareIntent)
         }
-        kitHistoryRecyclerView.adapter = historyAdapter
 
         // Todo: Update historyViewModel
-        //historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
+        // historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
 
-        historyAdapter.setHistoryList(hlist)
+        //historyAdapter.setHistoryList(hlist)
 
     }
     override fun onResume() {
@@ -88,12 +97,12 @@ class HistoryActivity : AppCompatActivity() {
         outFile.write(sampleStr.toByteArray())
         outFile.close()
 
-        val history = History(
-            null, "abs", 123, "234.56 mg/ml", "good day"
-        )
-        GlobalScope.launch(Dispatchers.IO){
-            database.historyDao().insert(history)
-        }
+//        val history = History(
+//            null, "abs", 123, "234.56 mg/ml", "good day"
+//        )
+//        GlobalScope.launch(Dispatchers.IO){
+//            database.historyDao().insert(history)
+//        }
     }
     private fun getContentUri(): Uri {
         val extRoot = getExternalFilesDir(null)!!

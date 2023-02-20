@@ -25,8 +25,10 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
         fun getDatabase(
             context: Context,
             // Do I need to specify the scope?
-        //    scope: CoroutineScope
+            scope: CoroutineScope
         ): HistoryRoomDatabase {
+
+            println("INSIDE getDatabase ------------------------------")
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
             return INSTANCE ?: synchronized(this) {
@@ -35,7 +37,7 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
                     HistoryRoomDatabase::class.java,
                     "history_database"
                 )
-        //        .addCallback(HistoryDatabaseCallback(scope)) //
+                .addCallback(HistoryDatabaseCallback(scope)) //
                 .build()
                 INSTANCE = instance
                 instance
@@ -43,29 +45,34 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
         }
     }
 
-//    private class HistoryDatabaseCallback(
-//        private val scope: CoroutineScope
-//    ) : Callback() {
-//
-//        override fun onCreate(db: SupportSQLiteDatabase) {
-//            super.onCreate(db)
-//            INSTANCE?.let { database ->
-//                scope.launch {
-//                    populateDatabase(database.historyDao())
-//                }
-//            }
-//        }
-//
-//        suspend fun populateDatabase(historyDao: HistoryDao) {
-//            // Delete all content here.
-//            historyDao.deleteAll()
-//
-//            // Sample entries
-//            // id = null, will be auto-generated
-//            var hist = History(null, "2023-02-10", 2022003, "20mg/ml", "img1.png")
-//            historyDao.insert(hist)
-//            hist = History(null,"2023-02-11", 2022003, "30mg/ml", "img2.png")
-//            historyDao.insert(hist)
-//        }
-//    }
+    private class HistoryDatabaseCallback(
+        private val scope: CoroutineScope
+    ) : Callback() {
+
+        // FIXME
+        // The following method will overwrite existing DB.
+        // I don't want this.
+        // keeping it just for testing purpose
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            println("INSIDE HistoryDatabaseCallback")
+            super.onCreate(db)
+            INSTANCE?.let { database ->
+                scope.launch {
+                    populateDatabase(database.historyDao())
+                }
+            }
+        }
+
+        suspend fun populateDatabase(historyDao: HistoryDao) {
+            // Delete all content here.
+            historyDao.deleteAll()
+            println("INSIDE populateDatabase")
+            // Sample entries
+            // id = null, will be auto-generated
+            var hist = History(null, "2023-02-10", 2022003, "20mg/ml", "img1.png")
+            historyDao.insert(hist)
+            hist = History(null,"2023-02-11", 2022003, "30mg/ml", "img2.png")
+            historyDao.insert(hist)
+        }
+    }
 }
