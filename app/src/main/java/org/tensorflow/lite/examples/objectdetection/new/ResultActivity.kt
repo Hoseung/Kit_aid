@@ -29,19 +29,14 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
-    //private lateinit var database: HistoryRoomDatabase
     // ToDo: History
 
-//    private val historyViewModel: HistoryViewModel by viewModels {
-//        HistoryViewModelFactory((application as MyEntryPoint).repository)
-//    }
-    val applicationScope = CoroutineScope(SupervisorJob())
-    //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
+    //val applicationScope = CoroutineScope(SupervisorJob())
 //    private val repository by lazy { HistoryRepository(database.historyDao()) }
 //    private val historyViewModel = HistoryViewModel(repository)
     // 이 historyViewModel이 HistoryActivity의 historyViewModel과 같은 instance일까?
     private val historyViewModel: HistoryViewModel by viewModels {
-        HistoryViewModelFactory((application as MyEntryPoint).repository)
+        HistoryViewModelFactory((application as MyEntryPoint).database.historyDao())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

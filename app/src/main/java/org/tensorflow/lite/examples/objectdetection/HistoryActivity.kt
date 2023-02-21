@@ -2,23 +2,15 @@ package org.tensorflow.lite.examples.objectdetection
 
 //import android.app.Activity
 //import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
-import org.tensorflow.lite.examples.objectdetection.adapter.History
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryAdapter
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModel
+import org.tensorflow.lite.examples.objectdetection.adapter.*
 //import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityHistoryBinding
-import java.io.File
-import java.io.FileOutputStream
 
 class HistoryActivity : AppCompatActivity() {
     val applicationScope = CoroutineScope(SupervisorJob())
@@ -33,7 +25,7 @@ class HistoryActivity : AppCompatActivity() {
     //private val historyViewModel = HistoryViewModel(repository)
 
     private val historyViewModel: HistoryViewModel by viewModels {
-        HistoryViewModelFactory((application as MyEntryPoint).repository)
+        HistoryViewModelFactory((application as MyEntryPoint).database.historyDao())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,13 +71,13 @@ class HistoryActivity : AppCompatActivity() {
             History(null, "2022-10-10", 20222002, "30mg/ml", "img2.png")
         )
         // 아래는 에러
-        //historyAdapter.setHistoryList(hlist)
+        //historyAdapter.setHistoryList(historyViewModel.allHistorys.)
         // 어댑터로 넣어봤자 RoomDB로 전달 안 됨.
         //historyAdapter.addHistoryList(History(null, "NEW2", 20222002, "20mg/ml", "img1.png"))
         //
         // RoomDB로 넣으려면 ViewModel에서 insert 해야함.
         // 근데 이렇게 해도 화면으로는 왜 안 나오냐고...
-        //historyViewModel.insert(History(null, "TEST", 2022003, "30mg/ml", "2022-10-10"))
+        historyViewModel.insert(History(null, "TEST222", 2022003, "30mg/ml", "2022-10-10"))
 
 
     }

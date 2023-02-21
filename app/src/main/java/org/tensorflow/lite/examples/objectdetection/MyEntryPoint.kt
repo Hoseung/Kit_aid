@@ -8,7 +8,7 @@ import org.tensorflow.lite.examples.objectdetection.adapter.HistoryRepository
 
 class MyEntryPoint : Application() {
     private val applicationScope = CoroutineScope(SupervisorJob())
-    private val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
+    val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
     val repository by lazy { HistoryRepository(database.historyDao()) }
     companion object {
         lateinit var prefs: PreferenceUtil
