@@ -29,7 +29,7 @@ class HistoryActivity : AppCompatActivity() {
     private var historyAdapter = HistoryAdapter()
     //private var historyDB: HistoryRoomDatabase?= null
 
-    lateinit var database: HistoryRoomDatabase
+    //lateinit var database: HistoryRoomDatabase
 
     //val applicationScope = CoroutineScope(SupervisorJob())
     //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope)}
@@ -40,12 +40,13 @@ class HistoryActivity : AppCompatActivity() {
         HistoryViewModelFactory((application as MyEntryPoint).repository)
     }
 
-    private val hlist =listOf(
-        History(null, "Bovine", 2022003, "20mg/ml", "2022-10-10"),
-        History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
-    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // 여기가 예제랑 조금 다름.
+        /*
+        예제는...
+        setContentView(R.layout.activity_main)
+        */
         binding = ActivityHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -58,59 +59,62 @@ class HistoryActivity : AppCompatActivity() {
             historys.let {historyAdapter.submitList(it)}
         }
         initView()
-        database = HistoryRoomDatabase.getDatabase(this, applicationScope)
+        //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
     // Init에 할까? onResume에 할까?
     private fun initView() = with(binding) {
         historyBackButton.setOnClickListener { finish() }
-
-        val sendIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_STREAM, getContentUri())
-            //type = "text/plain"
-            type = "text/plain"
-        }
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        shareButton.setOnClickListener {
-            startActivity(shareIntent)
-        }
+//        val sendIntent = Intent().apply {
+//            action = Intent.ACTION_SEND
+//            putExtra(Intent.EXTRA_STREAM, getContentUri())
+//            //type = "text/plain"
+//            type = "text/plain"
+//        }
+//        val shareIntent = Intent.createChooser(sendIntent, null)
+//        shareButton.setOnClickListener {
+//            startActivity(shareIntent)
+//        }
 
         // Todo: Update historyViewModel
         // historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
 
         //historyAdapter.setHistoryList(hlist)
+        // 여기서 해도 반응 없음.
+        //historyViewModel.insert(History(null, "TEST", 2022003, "30mg/ml", "2022-10-10"))
 
     }
-    override fun onResume() {
-        super.onResume()
-
-        var sampleStr = ""
-
-
-//        for (i in hlist.indices) {
-//            sampleStr += "${hlist[i].date},  ${hlist[i].product},  ${hlist[i].density},  ${hlist[i].date}  \n"
-//        }
-
-        val extRoot = getExternalFilesDir(null)!!
-        val outFile = FileOutputStream("$extRoot/history.csv")
-        outFile.write(sampleStr.toByteArray())
-        outFile.close()
-
-//        val history = History(
-//            null, "abs", 123, "234.56 mg/ml", "good day"
+//    override fun onResume() {
+//        super.onResume()
+//
+//        var sampleStr = ""
+//
+//
+////        for (i in hlist.indices) {
+////            sampleStr += "${hlist[i].date},  ${hlist[i].product},  ${hlist[i].density},  ${hlist[i].date}  \n"
+////        }
+//
+//        val extRoot = getExternalFilesDir(null)!!
+//        val outFile = FileOutputStream("$extRoot/history.csv")
+//        outFile.write(sampleStr.toByteArray())
+//        outFile.close()
+//
+////        val history = History(
+////            null, "abs", 123, "234.56 mg/ml", "good day"
+////        )
+////        GlobalScope.launch(Dispatchers.IO){
+////            database.historyDao().insert(history)
+////        }
+//        // 새 history는 Result Activity에서 만들어지는데.
+//        // observer는 여기 두고, insert는 Result activity에서 해도 되나?
+//    }
+//    private fun getContentUri(): Uri {
+//        val extRoot = getExternalFilesDir(null)!!
+//        return FileProvider.getUriForFile(
+//            this@HistoryActivity,
+//            applicationContext.packageName + ".provider",
+//            //filePath
+//            File("$extRoot/history.csv")
 //        )
-//        GlobalScope.launch(Dispatchers.IO){
-//            database.historyDao().insert(history)
-//        }
-    }
-    private fun getContentUri(): Uri {
-        val extRoot = getExternalFilesDir(null)!!
-        return FileProvider.getUriForFile(
-            this@HistoryActivity,
-            applicationContext.packageName + ".provider",
-            //filePath
-            File("$extRoot/history.csv")
-        )
-    }
+//    }
 }

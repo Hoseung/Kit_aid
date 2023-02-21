@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
 import org.tensorflow.lite.examples.objectdetection.RegressionHelper
@@ -16,6 +17,8 @@ import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryDao
+import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModel
+import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
 import java.io.File
 import java.io.FileInputStream
 import kotlin.math.ceil
@@ -26,7 +29,7 @@ class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
-    private lateinit var database: HistoryRoomDatabase
+    //private lateinit var database: HistoryRoomDatabase
     // ToDo: History
 
 //    private val historyViewModel: HistoryViewModel by viewModels {
@@ -36,6 +39,10 @@ class ResultActivity : AppCompatActivity() {
     //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
 //    private val repository by lazy { HistoryRepository(database.historyDao()) }
 //    private val historyViewModel = HistoryViewModel(repository)
+    // 이 historyViewModel이 HistoryActivity의 historyViewModel과 같은 instance일까?
+    private val historyViewModel: HistoryViewModel by viewModels {
+        HistoryViewModelFactory((application as MyEntryPoint).repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +56,7 @@ class ResultActivity : AppCompatActivity() {
         initView()
         regressionHelper.setupRegression()
 
-        database = HistoryRoomDatabase.getDatabase(this, applicationScope)
+        //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
     override fun onResume() {
@@ -101,10 +108,10 @@ class ResultActivity : AppCompatActivity() {
             "Today!!"
         )
 
-        GlobalScope.launch(Dispatchers.IO){
-            database.historyDao().insert(history)
-        }
-//        historyViewModel.insert(history)
+//        GlobalScope.launch(Dispatchers.IO){
+//            database.historyDao().insert(history)
+//        }
+        historyViewModel.insert(history)
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {

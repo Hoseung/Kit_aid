@@ -72,7 +72,8 @@
             android:layout_marginTop="10dp"
             android:orientation="vertical"
             android:paddingHorizontal="20dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/recycler_view_item" />
 
     </LinearLayout>
 
