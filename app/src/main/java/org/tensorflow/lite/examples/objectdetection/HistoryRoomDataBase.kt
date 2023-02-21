@@ -66,12 +66,9 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(historyDao: HistoryDao) {
             // Delete all content here.
             historyDao.deleteAll()
-            println("INSIDE populateDatabase")
             // Sample entries
             // id = null, will be auto-generated
-            var hist = History(null, "2023-02-10", 2022003, "20mg/ml", "img1.png")
-            historyDao.insert(hist)
-            hist = History(null,"2023-02-11", 2022003, "30mg/ml", "img2.png")
+            val hist = History(null, "Test", 2022003, "20mg/ml", "2023-02-10")
             historyDao.insert(hist)
         }
     }

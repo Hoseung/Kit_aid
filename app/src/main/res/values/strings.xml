@@ -37,10 +37,14 @@
     <string name="detection_model1">detection_kit.tflite</string>
     <string name="detection_model2">detection_box.tflite"</string>
     <string name="regression_model">regression_bovine.tflite"</string>
-    <string name="product_1">Bovine IgG"</string>
-    <string name="product_2">ImmuneCheck IgE"</string>
-    <string name="product_3">ImmuneCheck IgG"</string>
+    <string name="product_1">Bovine IgG</string>
+    <string name="product_2">ImmuneCheck IgE</string>
+    <string name="product_3">ImmuneCheck IgG</string>
+    <string name="back_button">Back</string>
+    <string name="export_button">EXPORT</string>
+    <string name="clear_button">CLEAR</string>
 
+    <string name="history_section_name">HISTORY</string>
 
     <string-array name="delegate_spinner_titles">
         <item>CPU</item>

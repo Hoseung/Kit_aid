@@ -2,10 +2,12 @@ package org.tensorflow.lite.examples.objectdetection
 
 //import android.app.Activity
 //import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -67,6 +69,19 @@ class HistoryActivity : AppCompatActivity() {
         val shareIntent = Intent.createChooser(sendIntent, null)
         shareButton.setOnClickListener {
             startActivity(shareIntent)
+        }
+
+        clearButton.setOnClickListener {
+            // TODO: Add alert dialog
+            val dlg: AlertDialog.Builder = AlertDialog.Builder(this@HistoryActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+            dlg.setTitle("CLEAR")
+            dlg.setMessage("Do you want to clear all history?")
+            dlg.setPositiveButton("YES", {
+                historyViewModel.clearAll()
+            }
+            })
+            dlg.show()
+
         }
 
         // Todo: Update historyViewModel

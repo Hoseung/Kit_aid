@@ -24,6 +24,10 @@ class HistoryViewModel (private val itemDao: HistoryDao) : ViewModel() {
         itemDao.insert(history)
     }
 
+    fun clearAll() = viewModelScope.launch {
+        itemDao.deleteAll()
+    }
+
     fun exportToCSV(extRoot:File) = viewModelScope.launch {
         // FIXME: file permission issue. extRoot for
         val stringBuilder = StringBuilder()
