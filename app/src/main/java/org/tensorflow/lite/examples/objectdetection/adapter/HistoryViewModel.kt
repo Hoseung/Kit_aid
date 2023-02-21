@@ -1,7 +1,11 @@
 package org.tensorflow.lite.examples.objectdetection.adapter
 
+import android.net.Uri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 
 class HistoryViewModel (private val itemDao: HistoryDao) : ViewModel() {
 
@@ -19,6 +23,20 @@ class HistoryViewModel (private val itemDao: HistoryDao) : ViewModel() {
     fun insert(history: History) = viewModelScope.launch {
         itemDao.insert(history)
     }
+
+    fun exportToCSV(extRoot:File) = viewModelScope.launch {
+        // FIXME: file permission issue. extRoot for
+        val stringBuilder = StringBuilder()
+        stringBuilder.append("ID, DATE, PRODUCT NAME, LOT #, RESULT \n")
+        for (s in itemDao.exportToCSV()) {
+            stringBuilder.append(s)
+            stringBuilder.append("\n")
+        }
+        val outFile = FileOutputStream("$extRoot/history.csv")
+        outFile.write(stringBuilder.toString().toByteArray())
+        outFile.close()
+    }
+
 }
 
 class HistoryViewModelFactory(private val itemDao: HistoryDao) : ViewModelProvider.Factory {

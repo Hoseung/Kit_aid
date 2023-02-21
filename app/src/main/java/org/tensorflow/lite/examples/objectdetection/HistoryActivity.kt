@@ -2,15 +2,20 @@ package org.tensorflow.lite.examples.objectdetection
 
 //import android.app.Activity
 //import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 //import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityHistoryBinding
+import java.io.File
+import java.io.FileOutputStream
 
 class HistoryActivity : AppCompatActivity() {
     val applicationScope = CoroutineScope(SupervisorJob())
@@ -21,7 +26,7 @@ class HistoryActivity : AppCompatActivity() {
     private var historyAdapter = HistoryAdapter()
     //private var historyDB: HistoryRoomDatabase?= null
 
-    //lateinit var database: HistoryRoomDatabase
+    lateinit var database: HistoryRoomDatabase
     //private val historyViewModel = HistoryViewModel(repository)
 
     private val historyViewModel: HistoryViewModel by viewModels {
@@ -47,29 +52,26 @@ class HistoryActivity : AppCompatActivity() {
             historys.let {historyAdapter.setHistoryList(it)}// submitList(it)}
         }
         initView()
-        //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
+        database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
     // Init에 할까? onResume에 할까?
     private fun initView() = with(binding) {
         historyBackButton.setOnClickListener { finish() }
-//        val sendIntent = Intent().apply {
-//            action = Intent.ACTION_SEND
-//            putExtra(Intent.EXTRA_STREAM, getContentUri())
-//            //type = "text/plain"
-//            type = "text/plain"
-//        }
-//        val shareIntent = Intent.createChooser(sendIntent, null)
-//        shareButton.setOnClickListener {
-//            startActivity(shareIntent)
-//        }
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, getContentUri())
+            //type = "text/plain"
+            type = "text/plain"
+        }
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        shareButton.setOnClickListener {
+            startActivity(shareIntent)
+        }
 
         // Todo: Update historyViewModel
         // historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
-        val hlist =listOf(
-            History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"),
-            History(null, "2022-10-10", 20222002, "30mg/ml", "img2.png")
-        )
+
         // 아래는 에러
         //historyAdapter.setHistoryList(historyViewModel.allHistorys.)
         // 어댑터로 넣어봤자 RoomDB로 전달 안 됨.
@@ -81,37 +83,33 @@ class HistoryActivity : AppCompatActivity() {
 
 
     }
-//    override fun onResume() {
-//        super.onResume()
-//
-//        var sampleStr = ""
-//
-//
-////        for (i in hlist.indices) {
-////            sampleStr += "${hlist[i].date},  ${hlist[i].product},  ${hlist[i].density},  ${hlist[i].date}  \n"
-////        }
-//
-//        val extRoot = getExternalFilesDir(null)!!
-//        val outFile = FileOutputStream("$extRoot/history.csv")
-//        outFile.write(sampleStr.toByteArray())
-//        outFile.close()
-//
-////        val history = History(
-////            null, "abs", 123, "234.56 mg/ml", "good day"
-////        )
-////        GlobalScope.launch(Dispatchers.IO){
-////            database.historyDao().insert(history)
-////        }
-//        // 새 history는 Result Activity에서 만들어지는데.
-//        // observer는 여기 두고, insert는 Result activity에서 해도 되나?
-//    }
-//    private fun getContentUri(): Uri {
-//        val extRoot = getExternalFilesDir(null)!!
-//        return FileProvider.getUriForFile(
-//            this@HistoryActivity,
-//            applicationContext.packageName + ".provider",
-//            //filePath
-//            File("$extRoot/history.csv")
+    override fun onResume() {
+        super.onResume()
+
+        var sampleStr = ""
+
+//        val hlist =listOf(
+//            History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"),
+//            History(null, "2022-10-10", 20222002, "30mg/ml", "img2.png")
 //        )
-//    }
+//
+        // 1. historyDao로부터 데이터 string으로 받아오기
+        // 2. String builder로 적절한 모양 만들기
+        // 3. CSV 파일로 저장
+        val extRoot = getExternalFilesDir(null)!!
+        historyViewModel.exportToCSV(extRoot)
+//        val outFile = FileOutputStream("$extRoot/history.csv")
+//        outFile.write(stringBuilder.toString().toByteArray())
+//        outFile.close()
+
+    }
+    private fun getContentUri(): Uri {
+        val extRoot = getExternalFilesDir(null)!!
+        return FileProvider.getUriForFile(
+            this@HistoryActivity,
+            applicationContext.packageName + ".provider",
+            //filePath
+            File("$extRoot/history.csv")
+        )
+    }
 }

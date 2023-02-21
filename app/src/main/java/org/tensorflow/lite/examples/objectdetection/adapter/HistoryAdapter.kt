@@ -85,4 +85,5 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
         this.historyList.plusElement(newHistory)
         notifyDataSetChanged()
     }
+
 }
