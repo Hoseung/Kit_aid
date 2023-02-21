@@ -112,6 +112,8 @@ class ResultActivity : AppCompatActivity() {
 //            database.historyDao().insert(history)
 //        }
         historyViewModel.insert(history)
+
+        //historyAdapter.addHistoryList(History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"))
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {

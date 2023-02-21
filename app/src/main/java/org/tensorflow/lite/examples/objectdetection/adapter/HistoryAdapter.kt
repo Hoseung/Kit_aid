@@ -7,28 +7,34 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ItemHistoryBinding
 
-//class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder>() {
-class HistoryAdapter : ListAdapter<History, HistoryAdapter.HistoryItemViewHolder> (HistoryComparator) {
+class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder>() {
+//class HistoryAdapter : ListAdapter<History, HistoryAdapter.HistoryItemViewHolder> (HistoryComparator) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryItemViewHolder {
-        return HistoryItemViewHolder.create(parent)
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryItemViewHolder {
+//        return HistoryItemViewHolder.create(parent)
+//    }
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryItemViewHolder {
+        val view = ItemHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return HistoryItemViewHolder(view)
     }
-
     override fun onBindViewHolder(holder: HistoryItemViewHolder, position: Int) {
         // Associate view holder with data
-        val current = getItem(position)
-        holder.bind(current)
+        //val current = getItem(position)
+        holder.bind(historyList[position])
     }
+
+
     private var historyList: List<History> = listOf()
 
     /*
     Bind History entry to TextView
      */
-    //class HistoryItemViewHolder(private val binding: ItemHistoryBinding) :
-    class HistoryItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    class HistoryItemViewHolder(private val binding: ItemHistoryBinding) : RecyclerView.ViewHolder(binding.root) {
+    //inner class HistoryItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         private val itemDateTv: TextView = itemView.findViewById(R.id.itemDateTv)
         private val itemTypeTv: TextView = itemView.findViewById(R.id.itemTypeTv)
         private val itemResultTv: TextView = itemView.findViewById(R.id.itemResultTv)
@@ -42,13 +48,13 @@ class HistoryAdapter : ListAdapter<History, HistoryAdapter.HistoryItemViewHolder
         }
 
         //RecyclerView.ViewHolder(binding.root) {
-        companion object {
-            fun create(parent: ViewGroup): HistoryItemViewHolder{
-                val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.item_history, parent, false)
-                return HistoryItemViewHolder(view)
-            }
-        }
+//        companion object {
+//            fun create(parent: ViewGroup): HistoryItemViewHolder{
+//                val view: View = LayoutInflater.from(parent.context)
+//                    .inflate(R.layout.item_history, parent, false)
+//                return HistoryItemViewHolder(view)
+//            }
+//        }
     }
 
     companion object {
@@ -65,10 +71,6 @@ class HistoryAdapter : ListAdapter<History, HistoryAdapter.HistoryItemViewHolder
             }
         }
     }
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryItemViewHolder {
-//        val view = ItemHistoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-//        return HistoryItemViewHolder(view)
-//    }
 
     override fun getItemCount(): Int = historyList.size
 
@@ -78,8 +80,8 @@ class HistoryAdapter : ListAdapter<History, HistoryAdapter.HistoryItemViewHolder
         notifyDataSetChanged()
     }
 
-//    fun addHistoryList(newHistory: History) {
-//        this.historyList.plusElement(newHistory)
-//        notifyDataSetChanged()
-//    }
+    fun addHistoryList(newHistory: History) {
+        this.historyList.plusElement(newHistory)
+        notifyDataSetChanged()
+    }
 }
