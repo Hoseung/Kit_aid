@@ -78,7 +78,6 @@ class HistoryActivity : AppCompatActivity() {
 
         // Todo: Update historyViewModel
         // historyAdapter.setHistoryList(historyViewModel.allHistorys.value!! )
-
         //historyAdapter.setHistoryList(hlist)
         // 여기서 해도 반응 없음.
         //historyViewModel.insert(History(null, "TEST", 2022003, "30mg/ml", "2022-10-10"))
