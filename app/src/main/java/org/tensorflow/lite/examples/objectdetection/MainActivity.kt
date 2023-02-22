@@ -29,6 +29,7 @@ import java.io.File
  * Main entry point into our app. This app follows the single-activity pattern, and all
  * functionality is implemented in the form of fragments.
  */
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, LoginActivity::class.java))
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         finishAffinity()
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
@@ -49,14 +51,16 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
-    companion object {
-        /** Use external media if it is available, our app's file directory otherwise */
-        fun getOutputDirectory(context: Context): File {
-            val appContext = context.applicationContext
-            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
-            return if (mediaDir != null && mediaDir.exists())
-                mediaDir else appContext.filesDir
-        }
-    }
+//    companion object {
+//        /** Use external media if it is available, our app's file directory otherwise */
+//        fun getOutputDirectory(context: Context): File {
+//            val appContext = context.applicationContext
+//            val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+//                File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() } }
+//            return if (mediaDir != null && mediaDir.exists())
+//                mediaDir else appContext.filesDir
+//        }
+//    }
 }
+
+

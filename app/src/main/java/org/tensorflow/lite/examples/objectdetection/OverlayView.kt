@@ -41,7 +41,7 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
     private var backgroundPaint = Paint()
 
-    private var scaleFactor: Float = 1f
+    private var scaleFactor: Float = 0.3f
 
     private var bounds = Rect()
 
@@ -81,8 +81,9 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
 
-        val viewW = width / 5.5f
-        val viewH = height / 2.8f
+        // GUIDE shadow
+        val viewW = width / 8f
+        val viewH = height / 3.2f
 
 //        val rectBack = Rect()
 //        rectBack.set(0, 0, viewW, viewH)
@@ -117,9 +118,14 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
 
             // Create text to display alongside detected objects
-            val drawableText =
+            val drawableText : String = if (result.boundingBox.height() < 0.25*height){
+                "Too Far"
+            } else if (result.boundingBox.height() > 0.5*height) {
+                "Too Close"
+            } else{
                 result.categories[0].label + " " +
                         String.format("%.2f", result.categories[0].score)
+            }
 
             // Draw rect behind display text
             textBackgroundPaint.getTextBounds(drawableText, 0, drawableText.length, bounds)
@@ -128,8 +134,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
             canvas.drawRect(
                 left,
                 top,
-                left + textWidth + Companion.BOUNDING_RECT_TEXT_PADDING,
-                top + textHeight + Companion.BOUNDING_RECT_TEXT_PADDING,
+                left + textWidth + BOUNDING_RECT_TEXT_PADDING,
+                top + textHeight + BOUNDING_RECT_TEXT_PADDING,
                 textBackgroundPaint
             )
 
