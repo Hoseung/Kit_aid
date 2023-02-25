@@ -2,7 +2,7 @@ package org.tensorflow.lite.examples.objectdetection
 
 //import android.app.Activity
 //import android.content.Context
-import android.content.DialogInterface
+//import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -17,7 +17,7 @@ import org.tensorflow.lite.examples.objectdetection.adapter.*
 //import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityHistoryBinding
 import java.io.File
-import java.io.FileOutputStream
+//import java.io.FileOutputStream
 
 class HistoryActivity : AppCompatActivity() {
     val applicationScope = CoroutineScope(SupervisorJob())
@@ -73,14 +73,18 @@ class HistoryActivity : AppCompatActivity() {
 
         clearButton.setOnClickListener {
             // TODO: Add alert dialog
-            val dlg: AlertDialog.Builder = AlertDialog.Builder(this@HistoryActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
-            dlg.setTitle("CLEAR")
-            dlg.setMessage("Do you want to clear all history?")
-            dlg.setPositiveButton("YES", {
-                historyViewModel.clearAll()
-            }
-            })
-            dlg.show()
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this@HistoryActivity,  android.R.style.Theme_DeviceDefault_Light_Dialog_NoActionBar_MinWidth)
+            builder.setTitle("CLEAR")
+                .setCancelable(false)
+                .setMessage("Do you want to clear all history?")
+                .setPositiveButton("YES") { _, _ ->
+                    historyViewModel.clearAll()
+//                    finish()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.cancel()
+                }
+            builder.show()
 
         }
 
@@ -94,14 +98,14 @@ class HistoryActivity : AppCompatActivity() {
         //
         // RoomDB로 넣으려면 ViewModel에서 insert 해야함.
         // 근데 이렇게 해도 화면으로는 왜 안 나오냐고...
-        historyViewModel.insert(History(null, "TEST222", 2022003, "30mg/ml", "2022-10-10"))
+        //historyViewModel.insert(History(null, "TEST222", 2022003, "30mg/ml", "2022-10-10"))
 
 
     }
     override fun onResume() {
         super.onResume()
 
-        var sampleStr = ""
+        //var sampleStr = ""
 
 //        val hlist =listOf(
 //            History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"),
