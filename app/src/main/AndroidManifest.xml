@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
-        android:name = "org.tensorflow.lite.examples.objectdetection.MyEntryPoint"
+        android:name=".MyEntryPoint"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_aid"
         android:label="@string/app_name"
@@ -17,9 +17,11 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
         <activity
+            android:name=".QrActivity"
+            android:exported="false" />
+        <activity
             android:name=".SelectActivity"
             android:exported="true">
-
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
@@ -32,14 +34,15 @@
             android:resizeableActivity="true"
             android:rotationAnimation="seamless"
             tools:targetApi="33">
-
             <meta-data
                 android:name="android.notch_support"
                 android:value="true" />
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.media.action.IMAGE_CAPTURE" />
-                <action android:name="android.media.action.STILL_IMAGE_CAMERA"/>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -47,10 +50,11 @@
             android:name=".new.LoginActivity"
             android:exported="true" />
         <activity android:name=".new.MemberActivity" />
-        <activity android:name=".new.ResultActivity"
-            android:exported="true">
-        </activity>
+        <activity
+            android:name=".new.ResultActivity"
+            android:exported="true"></activity>
         <activity android:name=".HistoryActivity" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="org.tensorflow.lite.examples.objectdetection.provider"

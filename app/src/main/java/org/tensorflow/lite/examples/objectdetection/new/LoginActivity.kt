@@ -1,10 +1,12 @@
 package org.tensorflow.lite.examples.objectdetection.new
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
+import org.tensorflow.lite.examples.objectdetection.QrActivity
 import org.tensorflow.lite.examples.objectdetection.R
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityLoginBinding
 
@@ -34,6 +36,10 @@ class LoginActivity : AppCompatActivity() {
 //                Toast.makeText(this@LoginActivity, "아이디 또는 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT)
 //                    .show()
 //            }
+        }
+        scanQRButton.setOnClickListener {
+            finish()
+            //startActivity(Intent(this, QrActivity::class.java))
         }
     }
 

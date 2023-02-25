@@ -51,10 +51,10 @@
         <item>ImmuneCheck IgE</item>
         <item>ImmuneCheck IgG</item>
     </string-array>
-<!--    <string-array name="models_spinner_titles">-->
-<!--        <item>MobileNet V1</item>-->
-<!--        <item>EfficientDet Lite0</item>-->
-<!--        <item>EfficientDet Lite1</item>-->
-<!--        <item>EfficientDet Lite2</item>-->
-<!--    </string-array>-->
+    <!--    <string-array name="models_spinner_titles">-->
+    <!--        <item>MobileNet V1</item>-->
+    <!--        <item>EfficientDet Lite0</item>-->
+    <!--        <item>EfficientDet Lite1</item>-->
+    <!--        <item>EfficientDet Lite2</item>-->
+    <!--    </string-array>-->
 </resources>

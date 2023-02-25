@@ -26,6 +26,7 @@ import org.tensorflow.lite.examples.objectdetection.new.LoginActivity
 import java.io.File
 
 /**
+ * Todo: No, I won't follow the single-activity pattern!!!
  * Main entry point into our app. This app follows the single-activity pattern, and all
  * functionality is implemented in the form of fragments.
  */
