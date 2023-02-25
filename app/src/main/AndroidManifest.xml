@@ -20,6 +20,9 @@
             android:name=".QrActivity"
             android:exported="false" />
         <activity
+            android:name=".CameraActivity"
+            android:exported="false" />
+        <activity
             android:name=".SelectActivity"
             android:exported="true">
             <meta-data
@@ -47,12 +50,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".new.LoginActivity"
-            android:exported="true" />
-        <activity android:name=".new.MemberActivity" />
-        <activity
             android:name=".new.ResultActivity"
-            android:exported="true"></activity>
+            android:exported="true"/>
         <activity android:name=".HistoryActivity" />
 
         <provider

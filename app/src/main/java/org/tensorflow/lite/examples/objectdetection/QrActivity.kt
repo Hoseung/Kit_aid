@@ -9,14 +9,13 @@ import androidx.camera.mlkit.vision.MlKitAnalyzer
 import androidx.camera.view.CameraController.COORDINATE_SYSTEM_VIEW_REFERENCED
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityQrBinding
-import org.tensorflow.lite.examples.objectdetection.fragments.CameraFragmentDirections
-import org.tensorflow.lite.examples.objectdetection.fragments.PermissionsFragment
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -30,9 +29,17 @@ class QrActivity : AppCompatActivity() {
         viewBinding = ActivityQrBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+//        // Request camera permissions
+//        if (!PermissionsFragment.hasPermissions(this)) {
+//            CameraFragmentDirections.actionCameraToPermissions()
+//        }
         // Request camera permissions
-        if (!PermissionsFragment.hasPermissions(this)) {
-            CameraFragmentDirections.actionCameraToPermissions()
+        if (allPermissionsGranted()) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()

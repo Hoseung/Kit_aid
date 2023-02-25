@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.tensorflow.lite.examples.objectdetection.fragments
+package org.tensorflow.lite.examples.objectdetection
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
@@ -26,11 +25,7 @@ import android.graphics.*
 import android.os.Bundle
 import android.util.Log
 //import android.util.Size
-import android.view.LayoutInflater
 import android.view.Surface.ROTATION_0
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -38,36 +33,28 @@ import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
-//import androidx.core.app.ActivityCompat.recreate
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import org.tensorflow.lite.examples.objectdetection.*
-import org.tensorflow.lite.examples.objectdetection.R
-import org.tensorflow.lite.examples.objectdetection.databinding.FragmentCameraBinding
-import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
+//import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
+//import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
-//import org.tensorflow.lite.examples.objectdetection.new.pathToBitmap
 import org.tensorflow.lite.task.gms.vision.detector.Detection
-//import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-//import java.lang.Math.ceil
-//import java.nio.ByteBuffer
-//import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
+class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
 
-    private val TAG = "CameraFragment"
+    private val TAG = "cameraFragment"
 
-    private var binding: FragmentCameraBinding? = null
+    private lateinit var viewBinding: ActivityCameraBinding
 
-    private val fragmentCameraBinding
-        get() = binding!!
+    //private val viewBinding
+    //get() = viewBinding!!
 
     private var imageCaptureDetectionSuccess = 0
     private var imageCaptureDetectionFail = 0
@@ -87,77 +74,102 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     //private val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     /** Blocking camera operations are performed using this executor */
+
     private lateinit var cameraExecutor: ExecutorService
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewBinding = ActivityCameraBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
+
+        viewBinding.examineHistoryButton.setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
+
+        viewBinding.kitListButton.setOnClickListener {
+            startActivity(Intent(this, SelectActivity::class.java))
+        }
+
+//        viewBinding.profileImageView.setOnClickListener {
+//            startActivity(Intent(this, MemberActivity::class.java))
+//        }
+        objectDetectorHelper = ObjectDetectorHelper(
+            context = this,
+            objectDetectorListener = this
+        )
+        cameraExecutor = Executors.newSingleThreadExecutor()
+    }
 
     override fun onResume() {
         super.onResume()
         // Make sure that all permissions are still present, since the
         // user could have removed them while the app was in paused state.
-        if (!PermissionsFragment.hasPermissions(requireContext())) {
-            Navigation.findNavController(requireActivity(), R.id.fragment_container)
-                .navigate(CameraFragmentDirections.actionCameraToPermissions())
-        }
+//        if (!PermissionsFragment.hasPermissions(this)) {
+//            Navigation.findNavController(requireActivity(), R.id.fragment_container)
+//                .navigate(CameraFragmentDirections.actionCameraToPermissions())
+//        }
+//        if (!PermissionsFragment.hasPermissions(this)) {
+//            CameraFragmentDirections.actionCameraToPermissions()
+//        }
 
         // update Product name
-        val productName = view?.findViewById<TextView>(R.id.productNameInfo)
+        val productName = viewBinding.productNameInfo //viewBinding?.findViewById<TextView>(R.id.productNameInfo)
         val myPrdName = String.format("Product: %s", MyEntryPoint.prefs.getString("prodName", "Bovine IgG"))
-        productName?.text = myPrdName
+        productName.text = myPrdName
 
-        val lotNum = view?.findViewById<TextView>(R.id.lotNumber)
-        lotNum?.text = String.format("LOT #: %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
-    }
-
-    override fun onDestroyView() {
-        binding = null
-        super.onDestroyView()
-
-        // Shut down our background executor
-        cameraExecutor.shutdown()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentCameraBinding.inflate(inflater, container, false)
-
-        binding!!.examineHistoryButton.setOnClickListener {
-            startActivity(Intent(requireContext(), HistoryActivity::class.java))
-        }
-
-        binding!!.kitListButton.setOnClickListener {
-            startActivity(Intent(requireContext(), SelectActivity::class.java))
-        }
-
-        binding!!.profileImageView.setOnClickListener {
-            startActivity(Intent(requireContext(), MemberActivity::class.java))
-        }
-
-        return fragmentCameraBinding.root
+        val lotNum = viewBinding.lotNumber
+        lotNum.text = String.format("LOT #: %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        binding = null
+        // Shut down our background executor
+        cameraExecutor.shutdown()
     }
 
-    @SuppressLint("MissingPermission")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    //override fun onCreate(savedInstanceState: Bundle?){
+//    (
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View {
+//        viewBinding = viewBinding.inflate(inflater, container, false)
+//
+//        binding!!.examineHistoryButton.setOnClickListener {
+//            startActivity(Intent(this, HistoryActivity::class.java))
+//        }
+//
+//        binding!!.kitListButton.setOnClickListener {
+//            startActivity(Intent(this, SelectActivity::class.java))
+//        }
+//
+//        binding!!.profileImageView.setOnClickListener {
+//            startActivity(Intent(this, MemberActivity::class.java))
+//        }
+//
+//        return viewBinding.root
+//    }
 
-        objectDetectorHelper = ObjectDetectorHelper(
-            context = requireContext(),
-            objectDetectorListener = this
-        )
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        binding = null
+//    }
 
-        // Attach listeners to UI control widgets
-        //initBottomSheetControls()
-    }
+//    @SuppressLint("MissingPermission")
+//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+//        super.onViewCreated(view, savedInstanceState)
+//
+//        objectDetectorHelper = ObjectDetectorHelper(
+//            context = this,
+//            objectDetectorListener = this
+//        )
+//
+//        // Attach listeners to UI control widgets
+//        //initBottomSheetControls()
+//    }
 
     // Initialize CameraX, and prepare to bind the camera use cases
     private fun setUpCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener(
             {
                 // CameraProvider
@@ -166,7 +178,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 // Build and bind the camera use cases
                 bindCameraUseCases()
             },
-            ContextCompat.getMainExecutor(requireContext())
+            ContextCompat.getMainExecutor(this)
         )
     }
 
@@ -186,7 +198,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         preview =
             Preview.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
-                .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
+                .setTargetRotation(viewBinding.viewFinder.display.rotation)
                 .build()
 
         val builder = ImageCapture.Builder().setCaptureMode(CAPTURE_MODE_MAXIMIZE_QUALITY)//CAPTURE_MODE_ZERO_SHUTTER_LAG)
@@ -202,7 +214,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             ImageAnalysis.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 //.setTargetResolution(Size(1440, 1080)) // 1440 1080 max?
-                .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
+                .setTargetRotation(viewBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(OUTPUT_IMAGE_FORMAT_RGBA_8888)
                 // Only one image at a time
@@ -239,40 +251,38 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             )
             //bindCaptureListener() // No Capture button
             // Attach the viewfinder's surface provider to preview use case
-            preview?.setSurfaceProvider(fragmentCameraBinding.viewFinder.surfaceProvider)
+            preview?.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
         MyEntryPoint.prefs.setCnt(0)
     }
 
-    private var detetc1Ready = false
+    private var detect1Ready = false
     private var cap2 = false
 
     override fun onStart() {
         super.onStart()
-        detetc1Ready = false
+        detect1Ready = false
         cap2 = false
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        imageAnalyzer?.targetRotation = fragmentCameraBinding.viewFinder.display.rotation
+        imageAnalyzer?.targetRotation = viewBinding.viewFinder.display.rotation
     }
 
     override fun onError(error: String) {
-        activity?.runOnUiThread {
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
-        }
+        Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
     }
 
     override fun onInitialized() {
         objectDetectorHelper.setupObjectDetector()
         // Initialize our background executor
-        cameraExecutor = Executors.newSingleThreadExecutor()
+
 
         // Wait for the views to be properly laid out
-        fragmentCameraBinding.viewFinder.post {
+        viewBinding.viewFinder.post {
             // Set up the camera and its use cases
             setUpCamera()
         }
@@ -336,10 +346,10 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     ) {
         //var uri: Uri
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SECOND RESULTS>>>>>>>>>>>>>>>>")
-        activity?.runOnUiThread {
+        runOnUiThread {
             if (results != null && results.size > 0 ) {
                 if (imageCaptureDetectionSuccess == 0) {
-                    Toast.makeText(requireContext(), "Hold on for a second", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Hold on for a second", Toast.LENGTH_LONG).show()
                 }
                 val i = results[0]
                 if (i.categories[0].score > 0.96) {
@@ -352,14 +362,14 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
                     if (imageCaptureDetectionSuccess == 5){
                         absolutePath.let {
-                            val resultIntent = Intent(requireContext(), ResultActivity::class.java)
+                            val resultIntent = Intent(this, ResultActivity::class.java)
                             resultIntent.putExtra("imagePath", it)
                             startActivity(resultIntent)
                         }
                         // Reset everything
                         cap2 = false
                         imageCaptureDetectionFail = 0
-                        detetc1Ready = false
+                        detect1Ready = false
                         MyEntryPoint.prefs.setCnt(0)
                         imageCaptureDetectionSuccess = 0
                         //carryOn(image, i.boundingBox!!)
@@ -369,8 +379,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 }
                 if (imageCaptureDetectionSuccess < 5) cap2 = true
                 if (imageCaptureDetectionFail > 5) {
-                    Toast.makeText(requireContext(), "try again...", Toast.LENGTH_SHORT).show()
-                    refreshFragment(context)
+                    Toast.makeText(this, "try again...", Toast.LENGTH_SHORT).show()
+                    //refreshFragment(context)
                 }// RESET
             }
         }
@@ -435,7 +445,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
     }
      private fun imageSaver(bitmap: Bitmap): String{
         val photoFile = File(
-            getOutputDirectory(requireActivity()),
+            getOutputDirectory(this),
             "img$imageCaptureDetectionSuccess.png"
 //            SimpleDateFormat(
 //                FILENAME_FORMAT, Locale.KOREA
@@ -456,7 +466,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         //contentUri = imageSaver(cropped)
         val absolutePath = imageSaver(cropped)
         absolutePath.let {
-            val resultIntent = Intent(requireContext(), ResultActivity::class.java)
+            val resultIntent = Intent(this, ResultActivity::class.java)
             resultIntent.putExtra("imagePath", it)
             startActivity(resultIntent)
         }
@@ -472,7 +482,7 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
 
     private fun detectObjects(image: ImageProxy) {
         // Copy out RGB bits to the shared bitmap buffer
-        if (detetc1Ready){
+        if (detect1Ready){
             if (!::bitmapBufferCapture.isInitialized) {
                 // The image rotation and RGB image buffer are initialized only once
                 // the analyzer has started running
@@ -516,9 +526,9 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         //var uri: Uri
         val cnt = MyEntryPoint.prefs.getCnt()
 
-        activity?.runOnUiThread {
+        runOnUiThread {
             // Pass necessary information to OverlayView for drawing on the canvas
-            fragmentCameraBinding.overlay.setResults(
+            viewBinding.overlay.setResults(
                 results ?: LinkedList<Detection>(),
                 imageHeight,
                 imageWidth
@@ -529,8 +539,8 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 println(i.categories[0].score)
                 if (i.categories[0].score > 0.92) {
                     if (cnt == 7) {
-                        Toast.makeText(requireContext(), "Ready to Capture", Toast.LENGTH_SHORT).show()
-                        detetc1Ready = true
+                        Toast.makeText(this, "Ready to Capture", Toast.LENGTH_SHORT).show()
+                        detect1Ready = true
                         captureAndDetect()
                         // No more captureAndDetect!
                         MyEntryPoint.prefs.setCnt(cnt + 1)
@@ -564,29 +574,29 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
                 println("CURRENT CNT $cnt")
             //}
             }
-            fragmentCameraBinding.overlay.invalidate() // Todo: 이건 뭘까?
+            viewBinding.overlay.invalidate() // Todo: 이건 뭘까?
         }
     }
 
-    private fun refreshFragment(context: Context?){
-        context?.let{
-            val fragmentManager = ( context as? AppCompatActivity)?.supportFragmentManager
-            fragmentManager?. let {
-                // Todo: fragment ID 확인
-                val currentFragment = fragmentManager.findFragmentById(R.id.fragment_container)
-                currentFragment?.let{
-                    // Reset everything
-                    MyEntryPoint.prefs.setCnt(0)
-                    cap2 = false
-                    imageCaptureDetectionFail = 0
-                    detetc1Ready = false
-
-                    val fragmentTransaction = fragmentManager.beginTransaction()
-                    fragmentTransaction.detach(it)
-                    fragmentTransaction.attach(it)
-                    fragmentTransaction.commit()
-                }
-            }
-        }
-    }
+//    private fun refreshFragment(context: Context?){
+//        context?.let{
+//            val fragmentManager = ( context as? AppCompatActivity)?.supportFragmentManager
+//            fragmentManager?. let {
+//                // Todo: fragment ID 확인
+//                val currentFragment = fragmentManager.findFragmentByTag("cameraFragment")//  findFragmentById(this)
+//                currentFragment?.let{
+//                    // Reset everything
+//                    MyEntryPoint.prefs.setCnt(0)
+//                    cap2 = false
+//                    imageCaptureDetectionFail = 0
+//                    detetc1Ready = false
+//
+//                    val fragmentTransaction = fragmentManager.beginTransaction()
+//                    fragmentTransaction.detach(it)
+//                    fragmentTransaction.attach(it)
+//                    fragmentTransaction.commit()
+//                }
+//            }
+//        }
+//    }
 }
