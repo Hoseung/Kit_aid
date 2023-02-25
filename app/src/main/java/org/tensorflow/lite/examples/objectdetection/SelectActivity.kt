@@ -45,14 +45,14 @@ class SelectActivity : AppCompatActivity() {
                 kit1Check.isChecked = true
                 kit2Check.isChecked = false
                 kit3Check.isChecked = false
-                MyEntryPoint.prefs.setString("prodName", "Bovine IgG")
+                MyEntryPoint.prefs.setString("prodName", R.string.product_1.toString())
                 MyEntryPoint.prefs.setString("lotNum", "220001")
             }
             2 -> {
                 kit1Check.isChecked = false
                 kit2Check.isChecked = true
                 kit3Check.isChecked = false
-                MyEntryPoint.prefs.setString("prodName", "ImmuneCheck IgE")
+                MyEntryPoint.prefs.setString("prodName", R.string.product_2.toString())
                 MyEntryPoint.prefs.setString("lotNum", "220002")
 
             }
@@ -60,7 +60,7 @@ class SelectActivity : AppCompatActivity() {
                 kit1Check.isChecked = false
                 kit2Check.isChecked = false
                 kit3Check.isChecked = true
-                MyEntryPoint.prefs.setString("prodName", "ImmuneCheck IgG")
+                MyEntryPoint.prefs.setString("prodName", R.string.product_3.toString())
                 MyEntryPoint.prefs.setString("lotNum", "220003")
 
             }
