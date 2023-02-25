@@ -55,6 +55,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'org.tensorflow.lite.examples.objectdetection'
 //    androidResources {
 //        noCompress 'tflite'
 //    }
@@ -113,7 +114,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
     //WindowManager
-    implementation 'androidx.window:window:1.1.0-alpha04'
+    implementation 'androidx.window:window:1.1.0-alpha06'
 
 //    // Unit testing
 //    testImplementation 'androidx.test.ext:junit:1.1.5'
