@@ -35,6 +35,27 @@ class QrCodeViewModel(barcode: Barcode) {
 
     init {
         when (barcode.valueType) {
+            Barcode.TYPE_TEXT -> {
+                qrContent = barcode.displayValue.toString()
+                qrCodeTouchCallback = { v: View, e: MotionEvent ->
+                    if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
+                        val words = qrContent.split(" ")
+                        if(words.size == 4){
+                            MyEntryPoint.prefs.setString("prodName", words[0])
+                            MyEntryPoint.prefs.setString("lotNum", words[1])
+                            MyEntryPoint.prefs.setString("Date", words[2])
+                            MyEntryPoint.prefs.setString("hash", words[3])
+                        }
+                        else{
+                            qrContent = "Cannot parse: $qrContent"
+                        }
+//                        val openBrowserIntent = Intent(Intent.ACTION_VIEW)
+//                        openBrowserIntent.data = Uri.parse(qrContent)
+//                        v.context.startActivity(openBrowserIntent)
+                    }
+                    true // return true from the callback to signify the event was handled
+                }
+            }
             Barcode.TYPE_URL -> {
                 qrContent = barcode.url!!.url!!
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->

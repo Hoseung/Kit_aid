@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-
         //startActivity(Intent(this, LoginActivity::class.java))
         initView()
     }
@@ -68,8 +67,8 @@ class MainActivity : AppCompatActivity() {
     }
     private fun initView()// = with(activityMainBinding)
     {
-        val productTextView = findViewById<TextView>(org.tensorflow.lite.examples.objectdetection.R.id.loginProductName)
-        val lotTextView = findViewById<TextView>(org.tensorflow.lite.examples.objectdetection.R.id.lotNumber)
+        val productTextView = findViewById<TextView>(R.id.loginProductName)
+        val lotTextView = findViewById<TextView>(R.id.lotNumber)
         // Todo: retain last sessions' choice
 //        productTextView.text = MyEntryPoint.prefs.getString("prodName", "PRODUCT NAME")
 //        lotTextView.text = MyEntryPoint.prefs.getString("lotNum", "LOT NUMBER")
@@ -83,8 +82,8 @@ class MainActivity : AppCompatActivity() {
 //            }
         }
         activityMainBinding.scanQRButton.setOnClickListener {
-            finish()
-            //startActivity(Intent(this, QrActivity::class.java))
+            startActivity(Intent(this, QrActivity::class.java))
+            //finish() // todo: finish가 하는 일은?
         }
     }
 
@@ -98,6 +97,7 @@ class MainActivity : AppCompatActivity() {
 //            super.onBackPressed()
 //        }
 //    }
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Exit").setMessage("Do you want to exit?")
