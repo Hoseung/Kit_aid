@@ -29,7 +29,6 @@ class ModelsViewModel (private val itemDao: ModelsDao) : ViewModel() {
             currentCalibUri = matchedModels[nMatched-1].uri!!
             MyEntryPoint.prefs.setString("CalibUri", matchedModels[nMatched-1].uri!!)
         }
-
     }
 
     fun updateModelUri(hash: String) = viewModelScope.launch {

@@ -27,6 +27,7 @@ import android.util.Log
 //import android.util.Size
 import android.view.Surface.ROTATION_0
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
 import androidx.camera.core.Camera
@@ -35,6 +36,9 @@ import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import org.tensorflow.lite.examples.objectdetection.*
+import org.tensorflow.lite.examples.objectdetection.adapter.Models
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
 //import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
 //import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
@@ -53,6 +57,9 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
     private lateinit var viewBinding: ActivityCameraBinding
 
+    private val modelsViewModel: ModelsViewModel by viewModels {
+        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
+    }
     //private val viewBinding
     //get() = viewBinding!!
 
@@ -89,13 +96,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             startActivity(Intent(this, SelectActivity::class.java))
         }
 
-        println("CAM?????????????????????")
-        println(MyEntryPoint.prefs.getString("CalibUri", "EMPTY?"))
-        println(MyEntryPoint.prefs.getString("ModelUri", "EMPTY?"))
-        println("CAMzzzzzzzzzzzzzzzzzzzzzzzzzz")
-
-
-
+        loadLocalModels()
 
 //        viewBinding.profileImageView.setOnClickListener {
 //            startActivity(Intent(this, MemberActivity::class.java))
@@ -105,6 +106,37 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             objectDetectorListener = this
         )
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun loadLocalModels(){
+        // todo: 임시. ASSET을 internal storage에 저장
+        //val modelCalibration = "Bovine-IgG_2023009.dat"
+        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
+        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
+        val date = MyEntryPoint.prefs.getString("date", "20231225")
+        val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
+
+        val modelCalibration = "${prodName}_${lotNum}.dat"
+
+        val copiedFile = File(applicationContext.filesDir, modelCalibration)
+        applicationContext.assets.open(modelCalibration).use { input ->
+            copiedFile.outputStream().use { output ->
+                input.copyTo(output, 1024)
+            }
+        }
+        // Get Uri of the file
+        val copiedURI = copiedFile.toURI()
+        modelsViewModel.insert(
+            Models(null, prodName, lotNum.toInt(), date, hash, copiedURI.toString())
+        )
+
+//        val modelPredict = "230213_new_regression_float16.tflite"
+//        modelsViewModel.insert(
+//            Models(null, "Bovine_IgG", 20230009, "20230226","a3dcex2745", Uri.fromFile(File(modelPredict)).toString())
+//        )
+
+        // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
+        modelsViewModel.updateCalibUri(hash)
     }
 
     override fun onResume() {

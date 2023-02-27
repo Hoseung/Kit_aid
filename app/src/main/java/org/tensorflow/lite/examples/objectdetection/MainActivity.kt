@@ -41,9 +41,9 @@ import java.io.File
 class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
-    private val modelsViewModel: ModelsViewModel by viewModels {
-        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
-           }
+//    private val modelsViewModel: ModelsViewModel by viewModels {
+//        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
+//           }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,15 +74,20 @@ class MainActivity : AppCompatActivity() {
     }
     private fun initView()// = with(activityMainBinding)
     {
-        val productTextView = findViewById<TextView>(R.id.loginProductName)
-        val lotTextView = findViewById<TextView>(R.id.lotNumber)
+        val productTextView = activityMainBinding.loginProductName
+        val lotTextView = activityMainBinding.loginLotNumber
+        val myPrdName = String.format(" %s", MyEntryPoint.prefs.getString("prodName", "Bovine IgG"))
+        productTextView.text = myPrdName
+        lotTextView.text = String.format(" %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
+
         // Todo: retain last sessions' choice
 //        productTextView.text = MyEntryPoint.prefs.getString("prodName", "PRODUCT NAME")
 //        lotTextView.text = MyEntryPoint.prefs.getString("lotNum", "LOT NUMBER")
 
+
         activityMainBinding.loginButton.setOnClickListener {
 //            if (idEditText.text.toString() == "user" && pwEditText.text.toString() == "1234") {
-                loadLocalModels()
+                //loadLocalModels()
                 startActivity(Intent(this, CameraActivity::class.java))
 //            } else {
 //                Toast.makeText(this@LoginActivity, "아이디 또는 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT)
@@ -105,36 +110,36 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    private fun loadLocalModels(){
-        // todo: 임시. ASSET을 internal storage에 저장
-        //val modelCalibration = "Bovine-IgG_2023009.dat"
-        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
-        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
-        val date = MyEntryPoint.prefs.getString("date", "20231225")
-        val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
-
-        val modelCalibration = "${prodName}_${lotNum}.dat"
-
-        val copiedFile = File(applicationContext.filesDir, modelCalibration)
-        applicationContext.assets.open(modelCalibration).use { input ->
-            copiedFile.outputStream().use { output ->
-                input.copyTo(output, 1024)
-            }
-        }
-        // Get Uri of the file
-        val copiedURI = copiedFile.toURI()
-        modelsViewModel.insert(
-            Models(null, prodName, lotNum.toInt(), date, hash, copiedURI.toString())
-        )
-
-//        val modelPredict = "230213_new_regression_float16.tflite"
+//    private fun loadLocalModels(){
+//        // todo: 임시. ASSET을 internal storage에 저장
+//        //val modelCalibration = "Bovine-IgG_2023009.dat"
+//        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
+//        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
+//        val date = MyEntryPoint.prefs.getString("date", "20231225")
+//        val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
+//
+//        val modelCalibration = "${prodName}_${lotNum}.dat"
+//
+//        val copiedFile = File(applicationContext.filesDir, modelCalibration)
+//        applicationContext.assets.open(modelCalibration).use { input ->
+//            copiedFile.outputStream().use { output ->
+//                input.copyTo(output, 1024)
+//            }
+//        }
+//        // Get Uri of the file
+//        val copiedURI = copiedFile.toURI()
 //        modelsViewModel.insert(
-//            Models(null, "Bovine_IgG", 20230009, "20230226","a3dcex2745", Uri.fromFile(File(modelPredict)).toString())
+//            Models(null, prodName, lotNum.toInt(), date, hash, copiedURI.toString())
 //        )
-
-        // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
-        modelsViewModel.updateCalibUri(hash)
-    }
+//
+////        val modelPredict = "230213_new_regression_float16.tflite"
+////        modelsViewModel.insert(
+////            Models(null, "Bovine_IgG", 20230009, "20230226","a3dcex2745", Uri.fromFile(File(modelPredict)).toString())
+////        )
+//
+//        // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
+//        modelsViewModel.updateCalibUri(hash)
+//    }
 
 
     //    @Deprecated("Deprecated in Java")

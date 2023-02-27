@@ -99,12 +99,6 @@ class QrActivity : AppCompatActivity() {
 
         cameraController.bindToLifecycle(this)
         previewView.controller = cameraController
-//
-//        println("?????????????????????")
-//        println(MyEntryPoint.prefs.getString("CalibUri", "EMPTY?"))
-//        println(MyEntryPoint.prefs.getString("ModelUri", "EMPTY?"))
-//        //MyEntryPoint.prefs.setString("ModelUri", modelsViewModel.currentModelUri)
-//        //MyEntryPoint.prefs.setString("CalibUri", modelsViewModel.currentCalibUri)
     }
 
     // Todo: save file to 'app internal' storage.
