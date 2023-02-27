@@ -91,6 +91,7 @@ class QrActivity : AppCompatActivity() {
     }
 
     // Todo: save file to 'app internal' storage.
+    // https://developer.android.com/training/data-storage/app-specific
     var downloadID : Long = 0
     private fun downloadMissingCalibration(){
         val missingCalib = "20230003"

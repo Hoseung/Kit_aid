@@ -40,6 +40,8 @@ class QrCodeViewModel(barcode: Barcode) {
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->
                     if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
                         val words = qrContent.split(" ")
+                        // Todo: complete downloading before updating prefs.
+                        //
                         if(words.size == 4){
                             MyEntryPoint.prefs.setString("prodName", words[0])
                             MyEntryPoint.prefs.setString("lotNum", words[1])
@@ -56,6 +58,7 @@ class QrCodeViewModel(barcode: Barcode) {
                     true // return true from the callback to signify the event was handled
                 }
             }
+            // Not needed. let me temporarily keep it for debugging purpose.
             Barcode.TYPE_URL -> {
                 qrContent = barcode.url!!.url!!
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->
