@@ -42,11 +42,11 @@ class QrCodeViewModel(barcode: Barcode) {
                         val words = qrContent.split(" ")
                         // Todo: complete downloading before updating prefs.
                         //
-                        if(words.size == 4){
-                            MyEntryPoint.prefs.setString("prodName", words[0])
-                            MyEntryPoint.prefs.setString("lotNum", words[1])
-                            MyEntryPoint.prefs.setString("Date", words[2])
-                            MyEntryPoint.prefs.setString("hash", words[3])
+                        if(words.size == 5 && words[0] == "Proteomtech"){
+                            MyEntryPoint.prefs.setString("prodName", words[1])
+                            MyEntryPoint.prefs.setString("lotNum", words[2])
+                            MyEntryPoint.prefs.setString("Date", words[3])
+                            MyEntryPoint.prefs.setString("hash", words[4])
                         }
                         else{
                             qrContent = "Cannot parse: $qrContent"
