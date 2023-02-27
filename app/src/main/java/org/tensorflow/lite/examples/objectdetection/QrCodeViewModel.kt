@@ -47,6 +47,7 @@ class QrCodeViewModel(barcode: Barcode) {
                             MyEntryPoint.prefs.setString("lotNum", words[2])
                             MyEntryPoint.prefs.setString("Date", words[3])
                             MyEntryPoint.prefs.setString("hash", words[4])
+
                         }
                         else{
                             qrContent = "Cannot parse: $qrContent"
@@ -59,17 +60,19 @@ class QrCodeViewModel(barcode: Barcode) {
                 }
             }
             // Not needed. let me temporarily keep it for debugging purpose.
-            Barcode.TYPE_URL -> {
-                qrContent = barcode.url!!.url!!
-                qrCodeTouchCallback = { v: View, e: MotionEvent ->
-                    if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
-                        val openBrowserIntent = Intent(Intent.ACTION_VIEW)
-                        openBrowserIntent.data = Uri.parse(qrContent)
-                        v.context.startActivity(openBrowserIntent)
-                    }
-                    true // return true from the callback to signify the event was handled
-                }
-            }
+//            Barcode.TYPE_URL -> {
+//                qrContent = barcode.url!!.url!!
+//                qrCodeTouchCallback = { v: View, e: MotionEvent ->
+//                    if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
+//                        val openBrowserIntent = Intent(Intent.ACTION_VIEW)
+//                        openBrowserIntent.data = Uri.parse(qrContent)
+//                        v.context.startActivity(openBrowserIntent)
+//                    }
+//
+//
+//                    true // return true from the callback to signify the event was handled
+//                }
+//            }
             // Add other QR Code types here to handle other types of data,
             // like Wifi credentials.
             else -> {

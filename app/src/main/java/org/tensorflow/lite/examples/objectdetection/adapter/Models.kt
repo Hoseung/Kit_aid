@@ -10,6 +10,7 @@ data class Models(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     @ColumnInfo(name = "product") val product: String?,
     @ColumnInfo(name = "lot") val lot: Int?,
+    @ColumnInfo(name = "date") val date: String?,
     @ColumnInfo(name = "hash") val hash: String?,
     @ColumnInfo(name = "uri") val uri: String?
 )

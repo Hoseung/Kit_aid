@@ -89,6 +89,14 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             startActivity(Intent(this, SelectActivity::class.java))
         }
 
+        println("CAM?????????????????????")
+        println(MyEntryPoint.prefs.getString("CalibUri", "EMPTY?"))
+        println(MyEntryPoint.prefs.getString("ModelUri", "EMPTY?"))
+        println("CAMzzzzzzzzzzzzzzzzzzzzzzzzzz")
+
+
+
+
 //        viewBinding.profileImageView.setOnClickListener {
 //            startActivity(Intent(this, MemberActivity::class.java))
 //        }

@@ -2,10 +2,15 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 //import android.net.Uri
 import android.util.Log
+import androidx.activity.viewModels
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.examples.objectdetection.adapter.Models
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 import org.tensorflow.lite.nnapi.NnApiDelegate
@@ -14,6 +19,7 @@ import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
+import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 //import org.tensorflow.lite.examples.objectdetection.MainActivity.Companion.getOutputDirectory
@@ -32,6 +38,10 @@ class RegressionHelper (
     private var inputPredictTargetWidth = 0
     private var inputPredictTargetHeight = 0
     private var outputPredictShape = intArrayOf()
+
+//    private val modelsViewModel: ModelsViewModel by viewModels {
+//        ModelsViewModelFactory((this.context as MyEntryPoint).database.modelsDao())
+//    }
 
     init {
         if (setupRegression()) {
@@ -63,13 +73,14 @@ class RegressionHelper (
                 tfliteOption.addDelegate(NnApiDelegate())
             }
         }
-        val modelPredict = "230213_new_regression_float16.tflite"
+        //val modelPredict =
 
         try {
             interpreterPredict = Interpreter(
+                // load a file from the asset folder.
                 FileUtil.loadMappedFile(
                     context,
-                    modelPredict,
+                    "230213_new_regression_float16.tflite",
                 ), tfliteOption
             )
             return true
@@ -93,14 +104,14 @@ class RegressionHelper (
             inputPredictTargetHeight)
 
         interpreterPredict?.run(input?.buffer, modelOutput)
-        println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        //println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         //val answer = modelOutput.floatArray.toString()
 
         modelOutput.rewind()
         val answer = modelOutput.asFloatBuffer().get()
 
-        println("DONE ${answer}")
-        println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        //println("DONE ${answer}")
+        //println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
         return answer
     }

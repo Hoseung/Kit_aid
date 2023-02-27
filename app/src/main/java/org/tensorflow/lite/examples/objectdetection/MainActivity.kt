@@ -20,6 +20,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
@@ -27,14 +28,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
-import kotlin.coroutines.coroutineContext
+import java.io.File
 
 /**
  * Todo: No, I won't follow the single-activity pattern!!!
@@ -86,6 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         activityMainBinding.loginButton.setOnClickListener {
 //            if (idEditText.text.toString() == "user" && pwEditText.text.toString() == "1234") {
+                loadLocalModels()
                 startActivity(Intent(this, CameraActivity::class.java))
 //            } else {
 //                Toast.makeText(this@LoginActivity, "아이디 또는 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT)
@@ -99,15 +96,48 @@ class MainActivity : AppCompatActivity() {
 //                MyEntryPoint.prefs.setString("uri",
 //                    modelsRepo.getUri(MyEntryPoint.prefs.getString("hash", "abc123")).toString())
 //            }
-            MyEntryPoint.prefs.setString("uri", modelsViewModel.currentUri)
+
 //            CoroutineScope(Dispatchers.IO).launch {
 //                modelsViewModel.updateCalibUri(MyEntryPoint.prefs.getString("hash", "abc123"))
 //            }
+
             //finish() // todo: finish가 하는 일은?
         }
+
+    }
+    private fun loadLocalModels(){
+        // todo: 임시. ASSET을 internal storage에 저장
+        //val modelCalibration = "Bovine-IgG_2023009.dat"
+        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
+        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
+        val date = MyEntryPoint.prefs.getString("date", "20231225")
+        val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
+
+        val modelCalibration = "${prodName}_${lotNum}.dat"
+
+        val copiedFile = File(applicationContext.filesDir, modelCalibration)
+        applicationContext.assets.open(modelCalibration).use { input ->
+            copiedFile.outputStream().use { output ->
+                input.copyTo(output, 1024)
+            }
+        }
+        // Get Uri of the file
+        val copiedURI = copiedFile.toURI()
+        modelsViewModel.insert(
+            Models(null, prodName, lotNum.toInt(), date, hash, copiedURI.toString())
+        )
+
+//        val modelPredict = "230213_new_regression_float16.tflite"
+//        modelsViewModel.insert(
+//            Models(null, "Bovine_IgG", 20230009, "20230226","a3dcex2745", Uri.fromFile(File(modelPredict)).toString())
+//        )
+
+        // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
+        modelsViewModel.updateCalibUri(hash)
     }
 
-//    @Deprecated("Deprecated in Java")
+
+    //    @Deprecated("Deprecated in Java")
 //    override fun onBackPressed() {
 //        finishAffinity()
 //        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {

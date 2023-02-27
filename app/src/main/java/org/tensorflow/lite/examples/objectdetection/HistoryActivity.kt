@@ -105,6 +105,7 @@ class HistoryActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
+
         //var sampleStr = ""
 
 //        val hlist =listOf(

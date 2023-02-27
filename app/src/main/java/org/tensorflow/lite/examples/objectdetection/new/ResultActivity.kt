@@ -60,6 +60,9 @@ class ResultActivity : AppCompatActivity() {
         super.onResume()
         // Run inference onResume, not OnCreate
 
+        val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
+        println("SURI $suri")
+
         val imgDir = intent.getStringExtra("imagePath")!!
         var imgPath : String
         //binding.resultImageView.setImageURI(uri)
@@ -79,6 +82,8 @@ class ResultActivity : AppCompatActivity() {
         var answer = answers.sorted().let {
             it[2]
         }
+
+
 
         /*
         Todo:
@@ -123,10 +128,15 @@ class ResultActivity : AppCompatActivity() {
 
     private fun calibrateLot(answer: Float) : Float {
         val dAnswer = answer.toDouble()
-        val uri = Uri.parse(MyEntryPoint.prefs.getString("uri", "badbadbad"))
-        val coefficients = File(uri.path!!).useLines { it.toList() }
+        val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
+        print("SURI $suri \n")
+        val uri = Uri.parse(suri)
+        print("URI $uri")
+        val file = File(uri.path!!)
+        val coefficients = file.readLines() //File(uri.path!!).useLines { it.toList() }
         var sum = 0.0
         for(i in coefficients.indices){
+            println("$i ZZZZZZZ $coefficients[i]")
             sum += coefficients[i].toDouble() * dAnswer.pow(i)
         }
         return sum.toFloat()
@@ -144,7 +154,7 @@ class ResultActivity : AppCompatActivity() {
                 ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
             )
             answers.add(regressionHelper.predict(cropped))
-            println("prediction: ${answers[i]}")
+            //println("prediction: ${answers[i]}")
         }
         var answer = answers.sorted().let {
             it[2]

@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.camera.mlkit.vision.MlKitAnalyzer
 import androidx.camera.view.CameraController.COORDINATE_SYSTEM_VIEW_REFERENCED
 import androidx.camera.view.LifecycleCameraController
@@ -21,7 +22,11 @@ import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
+import org.tensorflow.lite.examples.objectdetection.adapter.Models
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityQrBinding
+import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -30,10 +35,15 @@ class QrActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var barcodeScanner: BarcodeScanner
 
+    private val modelsViewModel: ModelsViewModel by viewModels {
+        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityQrBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
 
 //        // Request camera permissions
 //        if (!PermissionsFragment.hasPermissions(this)) {
@@ -89,6 +99,12 @@ class QrActivity : AppCompatActivity() {
 
         cameraController.bindToLifecycle(this)
         previewView.controller = cameraController
+//
+//        println("?????????????????????")
+//        println(MyEntryPoint.prefs.getString("CalibUri", "EMPTY?"))
+//        println(MyEntryPoint.prefs.getString("ModelUri", "EMPTY?"))
+//        //MyEntryPoint.prefs.setString("ModelUri", modelsViewModel.currentModelUri)
+//        //MyEntryPoint.prefs.setString("CalibUri", modelsViewModel.currentCalibUri)
     }
 
     // Todo: save file to 'app internal' storage.
@@ -117,6 +133,7 @@ class QrActivity : AppCompatActivity() {
         registerReceiver(br, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
     }
+
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
