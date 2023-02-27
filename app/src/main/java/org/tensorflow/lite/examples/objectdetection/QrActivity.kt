@@ -41,7 +41,7 @@ class QrActivity : AppCompatActivity() {
 //        }
         // Request camera permissions
         if (allPermissionsGranted()) {
-            Toast.makeText(this, "Touch QR on the screen", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Touch the QR on the screen", Toast.LENGTH_LONG).show()
             startCamera()
         } else {
             ActivityCompat.requestPermissions(

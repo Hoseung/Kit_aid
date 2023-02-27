@@ -23,10 +23,18 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
+import kotlin.coroutines.coroutineContext
 
 /**
  * Todo: No, I won't follow the single-activity pattern!!!
@@ -37,6 +45,9 @@ import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBind
 class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
+    private val modelsViewModel: ModelsViewModel by viewModels {
+        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
+           }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,6 +94,15 @@ class MainActivity : AppCompatActivity() {
         }
         activityMainBinding.scanQRButton.setOnClickListener {
             startActivity(Intent(this, QrActivity::class.java))
+            // Todo: can I move this somewhere else and not use GlobalScope?
+//            GlobalScope.launch{
+//                MyEntryPoint.prefs.setString("uri",
+//                    modelsRepo.getUri(MyEntryPoint.prefs.getString("hash", "abc123")).toString())
+//            }
+            MyEntryPoint.prefs.setString("uri", modelsViewModel.currentUri)
+//            CoroutineScope(Dispatchers.IO).launch {
+//                modelsViewModel.updateCalibUri(MyEntryPoint.prefs.getString("hash", "abc123"))
+//            }
             //finish() // todo: finish가 하는 일은?
         }
     }

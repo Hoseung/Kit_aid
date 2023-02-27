@@ -12,7 +12,7 @@ interface ModelsDao {
     suspend fun insert(models: Models)
 
     @Query("SELECT * FROM models_table WHERE hash LIKE :searchQuery")
-    fun searchModels(searchQuery: String) : List<Models>
+    suspend fun searchModels(searchQuery: String) : List<Models>
 
     @Delete
     suspend fun delete(models: Models)
