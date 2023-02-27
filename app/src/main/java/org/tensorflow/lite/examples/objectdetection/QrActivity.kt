@@ -1,7 +1,13 @@
 package org.tensorflow.lite.examples.objectdetection
 
 import android.Manifest
+import android.app.DownloadManager
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -82,6 +88,32 @@ class QrActivity : AppCompatActivity() {
 
         cameraController.bindToLifecycle(this)
         previewView.controller = cameraController
+    }
+
+    // Todo: save file to 'app internal' storage.
+    var downloadID : Long = 0
+    private fun downloadMissingCalibration(){
+        val missingCalib = "20230003"
+        val missingCalibModel = "BovineIgG"
+
+        var request = DownloadManager.Request(
+            Uri.parse("https://프로테옴텍/서버/주소/정해진/위치/${missingCalibModel}_${missingCalib}.dat"))
+            .setDescription("calibration model downloading")
+            .setAllowedOverMetered(true)
+
+        var dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        downloadID = dm.enqueue(request)
+
+        var br = object:BroadcastReceiver(){
+            override fun onReceive(p0: Context?, p1: Intent?) {
+                var id = p1?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                if(id==downloadID){
+                    Toast.makeText(applicationContext, "calibration model is ready!", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+        registerReceiver(br, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
