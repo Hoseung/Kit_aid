@@ -110,9 +110,9 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
     private fun loadLocalModels(){
         // todo: 임시. ASSET을 internal storage에 저장
-        //val modelCalibration = "Bovine-IgG_2023009.dat"
-        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
-        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
+        //val modelCalibration = "AniCheck-bIgG_BIG23006.dat"
+        val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        val lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
         val date = MyEntryPoint.prefs.getString("date", "20231225")
         val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
 
@@ -127,7 +127,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         // Get Uri of the file
         val copiedURI = copiedFile.toURI()
         modelsViewModel.insert(
-            Models(null, prodName, lotNum.toInt(), date, hash, copiedURI.toString())
+            Models(null, prodName, lotNum, date, hash, copiedURI.toString())
         )
 
 //        val modelPredict = "230213_new_regression_float16.tflite"
@@ -153,11 +153,11 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
         // update Product name
         val productName = viewBinding.productNameInfo //viewBinding?.findViewById<TextView>(R.id.productNameInfo)
-        val myPrdName = String.format("Product: %s", MyEntryPoint.prefs.getString("prodName", "Bovine IgG"))
+        val myPrdName = String.format("Product Name  %s", MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG"))
         productName.text = myPrdName
 
         val lotNum = viewBinding.lotNumber
-        lotNum.text = String.format("LOT #: %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
+        lotNum.text = String.format("Lot No.  %s", MyEntryPoint.prefs.getString("lotNum", "BIG22003"))
     }
 
     override fun onDestroy() {

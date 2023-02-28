@@ -24,8 +24,8 @@ class MyEntryPoint : Application() {
 
     override fun onCreate() {
         prefs = PreferenceUtil(applicationContext)
-        prefs.setString("prodName", "Bovine-IgG")
-        prefs.setString("logNum", "2022003")
+        prefs.setString("prodName", "AniCheck-bIgG")
+        prefs.setString("lotNum", "BIG22003")
         prefs.setString("date", "20231225")
         prefs.setString("hash", "abcdefg123")
         super.onCreate()

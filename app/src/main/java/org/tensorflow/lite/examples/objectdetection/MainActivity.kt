@@ -76,9 +76,9 @@ class MainActivity : AppCompatActivity() {
     {
         val productTextView = activityMainBinding.loginProductName
         val lotTextView = activityMainBinding.loginLotNumber
-        val myPrdName = String.format(" %s", MyEntryPoint.prefs.getString("prodName", "Bovine IgG"))
+        val myPrdName = String.format(" %s", MyEntryPoint.prefs.getString("prodName", "AniCheck-BIgG"))
         productTextView.text = myPrdName
-        lotTextView.text = String.format(" %s", MyEntryPoint.prefs.getString("lotNum", "220003"))
+        lotTextView.text = String.format(" %s", MyEntryPoint.prefs.getString("lotNum", "BIG22003"))
 
         // Todo: retain last sessions' choice
 //        productTextView.text = MyEntryPoint.prefs.getString("prodName", "PRODUCT NAME")
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
     }
 //    private fun loadLocalModels(){
 //        // todo: 임시. ASSET을 internal storage에 저장
-//        //val modelCalibration = "Bovine-IgG_2023009.dat"
+//        //val modelCalibration = "AniCheck-bIgG_BIG23006.dat"
 //        val prodName = MyEntryPoint.prefs.getString("prodName", "Bovine-IgG")
 //        val lotNum = MyEntryPoint.prefs.getString("lotNum", "2022003")
 //        val date = MyEntryPoint.prefs.getString("date", "20231225")

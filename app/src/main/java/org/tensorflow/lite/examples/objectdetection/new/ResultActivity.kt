@@ -113,7 +113,7 @@ class ResultActivity : AppCompatActivity() {
 
         val history = History(null,
             MyEntryPoint.prefs.getString("prodName", "NoProduct"),
-            MyEntryPoint.prefs.getString("lotNum","0").toInt(),
+            MyEntryPoint.prefs.getString("lotNum","0"),
             answerStr,
             "Today!!"
         )

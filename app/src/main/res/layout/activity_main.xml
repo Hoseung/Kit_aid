@@ -71,7 +71,7 @@
 
                     <TextView
                         android:id="@+id/labelProductName"
-                        android:layout_width="70sp"
+                        android:layout_width="110sp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="@string/current_product"
@@ -83,7 +83,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Product name"
+                        android:text="@string/current_product"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 
@@ -98,7 +98,7 @@
 
                     <TextView
                         android:id="@+id/labelLotNum"
-                        android:layout_width="70dp"
+                        android:layout_width="110sp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:text="@string/current_lot"
@@ -110,7 +110,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Lot Number"
+                        android:text="@string/current_lot"
                         android:textColor="@color/black"
                         android:textSize="16sp" />
 

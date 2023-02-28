@@ -73,7 +73,7 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
             historyDao.deleteAll()
             // Sample entries
             // id = null, will be auto-generated
-            val hist = History(null, "Test", 2022003, "20mg/ml", "2023-02-10")
+            val hist = History(null, "Test", "BIG22003", "20mg/ml", "2023-02-10")
             historyDao.insert(hist)
         }
     }
