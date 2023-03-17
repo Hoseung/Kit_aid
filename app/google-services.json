@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "439118700164",
+    "project_id": "kitaid",
+    "storage_bucket": "kitaid.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439118700164:android:8fbefa1cfaa886f9dd2cd1",
+        "android_client_info": {
+          "package_name": "com.proteomtech.kitaid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "439118700164-dhhrmot1pjt22ihkvc86vj0mckhmsnlv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.proteomtech.kitaid",
+            "certificate_hash": "e1209daeb2def7887a3c5ee7db5bb49a0b6d772c"
+          }
+        },
+        {
+          "client_id": "439118700164-nsilp5m20687883f8fct9gurs88ua56s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRUIzaRwF83MEbdLVmEGWnXvztTixIb4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "439118700164-nsilp5m20687883f8fct9gurs88ua56s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ plugins{
+     id 'com.android.application'
+     id 'kotlin-android'
+     id 'kotlin-kapt'
+     id "androidx.navigation.safeargs"
+     id 'de.undercouch.download'
+     id 'com.google.gms.google-services'
+ }
 
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: "androidx.navigation.safeargs"
-apply plugin: 'de.undercouch.download'
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.android.application'
+//apply plugin: 'kotlin-android'
+//apply plugin: 'kotlin-kapt'
+//apply plugin: "androidx.navigation.safeargs"
+//apply plugin: 'de.undercouch.download'
+//apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 33
@@ -115,11 +123,19 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+
     //WindowManager
     implementation 'androidx.window:window:1.1.0-alpha06'
 
     // firebase
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-bom:30.4.1'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.3.0'
+//    implementation 'com.google.firebase:firebase-storage-ktx:20.0.2'
+    implementation 'com.firebaseui:firebase-ui-storage:8.0.1'
+    implementation 'com.github.bumptech.glide:compiler:4.13.2'
 
 //    // Unit testing
 //    testImplementation 'androidx.test.ext:junit:1.1.5'

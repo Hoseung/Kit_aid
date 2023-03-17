@@ -15,16 +15,20 @@
  */
 package org.tensorflow.lite.examples.objectdetection
 
+//import android.media.Image
+//import android.net.Uri
+//import android.util.Size
+//import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
+//import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
+
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
-//import android.media.Image
-//import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-//import android.util.Size
 import android.view.Surface.ROTATION_0
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -35,13 +39,20 @@ import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
-//import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
-//import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.io.ByteArrayOutputStream
@@ -51,7 +62,13 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
+    companion object{
+        lateinit var auth: FirebaseAuth
+        lateinit var db: FirebaseFirestore
+        lateinit var Mystorage: FirebaseStorage
+    }
 
     private val TAG = "cameraFragment"
 
@@ -85,6 +102,13 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     private lateinit var cameraExecutor: ExecutorService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Firebase storage setting
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+        val storage = Firebase.storage
+        val storageRef = storage.reference
+
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
@@ -96,7 +120,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             startActivity(Intent(this, SelectActivity::class.java))
         }
 
-        loadLocalModels()
+        loadLocalModels(storageRef)
 
 //        viewBinding.profileImageView.setOnClickListener {
 //            startActivity(Intent(this, MemberActivity::class.java))
@@ -106,24 +130,32 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             objectDetectorListener = this
         )
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+
+
     }
 
-    private fun loadLocalModels(){
+    private fun loadLocalModels(storageRef:StorageReference){
         // todo: 임시. ASSET을 internal storage에 저장
         //val modelCalibration = "AniCheck-bIgG_BIG23006.dat"
         val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
         val lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
         val date = MyEntryPoint.prefs.getString("date", "20231225")
         val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
-
         val modelCalibration = "${prodName}_${lotNum}.dat"
 
+        println("$$$$$$$$$$$$$$$$$$"+modelCalibration)
+        println(storageRef)
         val copiedFile = File(applicationContext.filesDir, modelCalibration)
+        getFileFromFirebase(storageRef, modelCalibration)
+        println("@@@@@@@@@@@@@@@@@@@" + copiedFile)
+
         applicationContext.assets.open(modelCalibration).use { input ->
             copiedFile.outputStream().use { output ->
                 input.copyTo(output, 1024)
             }
         }
+
         // Get Uri of the file
         val copiedURI = copiedFile.toURI()
         modelsViewModel.insert(
@@ -298,13 +330,56 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         MyEntryPoint.prefs.setCnt(0)
     }
 
+    private fun getFileFromFirebase(ref: StorageReference, pathString:String) {
+        println("[getFileFromFirebase] function begin")
+
+        val fileRef: StorageReference = ref.child(pathString)
+        fileRef.downloadUrl .addOnSuccessListener {
+            println("url down comp!!! $it")
+
+            val request = DownloadManager.Request(it)
+                .setTitle("File")
+                .setDescription("Downloading...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
+                .setAllowedOverMetered(true)
+//                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downfire.txt")
+//                .setDestinationInExternalFilesDir(applicationContext, filesDir.toString(), pathString)
+
+            val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(request)
+
+    }.addOnFailureListener{
+        println("url down fail....")
+    }}
+
     private var detect1Ready = false
     private var cap2 = false
-
+    private fun signInAnonymously() {
+        auth.signInAnonymously().addOnSuccessListener(this, OnSuccessListener<AuthResult?> {
+            // do your stuff
+            println("user login success!!!")
+        })
+            .addOnFailureListener(this,
+                OnFailureListener { exception ->
+                    Log.e(
+                        TAG,
+                        "signInAnonymously:FAILURE",
+                        exception
+                    )
+                })
+    }
     override fun onStart() {
         super.onStart()
         detect1Ready = false
         cap2 = false
+        val user = auth.currentUser
+        if (user!= null){
+            println("user is not null")
+        } else {
+            signInAnonymously()
+            println("ano user go")
+        }
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -378,6 +453,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     objectDetectorHelper.detectSecond ->
         objectDectorListener.onSecondResult()
      */
+
     override fun onSecondResult(
         image: Bitmap,
         results: MutableList<Detection>?,

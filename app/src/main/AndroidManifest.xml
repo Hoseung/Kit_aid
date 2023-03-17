@@ -6,6 +6,7 @@
     <dist:module dist:instant="true" /> <!-- Declare features -->
     <uses-feature android:name="android.hardware.camera" /> <!-- Declare permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:name=".MyEntryPoint"
@@ -15,7 +16,9 @@
         android:roundIcon="@mipmap/ic_launcher_aid_round"
         android:taskAffinity=""
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup">
+        tools:ignore="AllowBackup"
+        android:requestLegacyExternalStorage="true"
+        >
         <activity
             android:name=".QrActivity"
             android:exported="false" />

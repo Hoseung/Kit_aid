@@ -15,13 +15,17 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.5.3'
         classpath 'de.undercouch:gradle-download-task:4.1.2'
-        classpath 'com.google.gms:google-services:4.3.15'
+        classpath 'com.google.gms:google-services:4.3.14'
 
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
+
+//plugins {
+//    id 'com.google.gms.google-services' version '4.3.14' apply false
+//}
 
 allprojects {
     repositories {
