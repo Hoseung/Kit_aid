@@ -95,7 +95,7 @@ class HistoryActivity : AppCompatActivity() {
         //historyAdapter.setHistoryList(historyViewModel.allHistorys.)
         // 어댑터로 넣어봤자 RoomDB로 전달 안 됨.
         //historyAdapter.addHistoryList(History(null, "NEW2", 20222002, "20mg/ml", "img1.png"))
-        //
+
         // RoomDB로 넣으려면 ViewModel에서 insert 해야함.
         // 근데 이렇게 해도 화면으로는 왜 안 나오냐고...
         //historyViewModel.insert(History(null, "TEST222", 2022003, "30mg/ml", "2022-10-10"))
