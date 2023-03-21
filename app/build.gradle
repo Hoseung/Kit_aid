@@ -35,6 +35,7 @@ android {
 //        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         applicationId "com.proteomtech.kitaid"
         minSdkVersion 21
+        multiDexEnabled true
         targetSdkVersion 33
         versionCode 1
         versionName "1.0.0"
@@ -63,6 +64,9 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+    viewBinding{
+        enabled = true
     }
     namespace 'org.tensorflow.lite.examples.objectdetection'
 //    androidResources {
@@ -93,7 +97,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx:20.1.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
     //implementation project(path: ':sdk')
 
     // Navigation library
@@ -129,11 +135,17 @@ dependencies {
 
     // firebase
     implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.8'
+
     implementation 'com.google.firebase:firebase-firestore-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.3.0'
+
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.google.firebase:firebase-bom:30.4.1'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.3.0'
-//    implementation 'com.google.firebase:firebase-storage-ktx:20.0.2'
+
+    implementation 'com.google.android.gms:play-services-auth:20.3.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+
     implementation 'com.firebaseui:firebase-ui-storage:8.0.1'
     implementation 'com.github.bumptech.glide:compiler:4.13.2'
 

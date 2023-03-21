@@ -1,6 +1,10 @@
 package org.tensorflow.lite.examples.objectdetection
 
 import android.app.Application
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryRepository
@@ -12,6 +16,24 @@ class MyEntryPoint : Application() {
     val repository by lazy { HistoryRepository(database.historyDao()) }
     companion object {
         lateinit var prefs: PreferenceUtil
+        lateinit var auth: FirebaseAuth
+        lateinit var storage: FirebaseStorage
+        var email: String? = null
+        fun checkAuth():Boolean{
+            val currentUser = auth.currentUser
+            return currentUser?.let{
+                email = currentUser.email
+                if (currentUser.isEmailVerified) {
+                    println("user email verified")
+                    true
+                } else {
+                    println("user email not verified")
+                    false
+                }
+            } ?: let {
+                false
+            }
+        }
         //lateinit var database: HistoryRoomDatabase
 
     }
@@ -29,6 +51,8 @@ class MyEntryPoint : Application() {
         prefs.setString("date", "20231225")
         prefs.setString("hash", "abcdefg123")
         super.onCreate()
+
+        auth = Firebase.auth
         //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
 
     }

@@ -21,6 +21,7 @@ package org.tensorflow.lite.examples.objectdetection
 //import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
 //import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 
+import android.accessibilityservice.GestureDescription.StrokeDescription
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
@@ -28,6 +29,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.Surface.ROTATION_0
 import android.widget.Toast
@@ -39,16 +41,17 @@ import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.firebase.auth.AuthResult
+import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import io.grpc.Context.Storage
 import org.tensorflow.lite.examples.objectdetection.*
+import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.auth
+import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.storage
 import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
@@ -57,19 +60,16 @@ import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.util.*
+import java.util.Collections.rotate
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.system.exitProcess
 
 
 class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
-    companion object{
-        lateinit var auth: FirebaseAuth
-        lateinit var db: FirebaseFirestore
-        lateinit var Mystorage: FirebaseStorage
-    }
-
     private val TAG = "cameraFragment"
 
     private lateinit var viewBinding: ActivityCameraBinding
@@ -105,9 +105,12 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
         //Firebase storage setting
         auth = FirebaseAuth.getInstance()
-        db = FirebaseFirestore.getInstance()
-        val storage = Firebase.storage
+//        db = FirebaseFirestore.getInstance()
+        storage = Firebase.storage("gs://kitaid.appspot.com/")
+        Log.d("FirebaseCompare", "!!!storage:$storage")
+
         val storageRef = storage.reference
+        Log.d("FirebaseCompare2", "$storageRef")
 
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
@@ -125,13 +128,12 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 //        viewBinding.profileImageView.setOnClickListener {
 //            startActivity(Intent(this, MemberActivity::class.java))
 //        }
+
         objectDetectorHelper = ObjectDetectorHelper(
             context = this,
             objectDetectorListener = this
         )
         cameraExecutor = Executors.newSingleThreadExecutor()
-
-
 
     }
 
@@ -145,16 +147,35 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         val modelCalibration = "${prodName}_${lotNum}.dat"
 
         println("$$$$$$$$$$$$$$$$$$"+modelCalibration)
-        println(storageRef)
-        val copiedFile = File(applicationContext.filesDir, modelCalibration)
-        getFileFromFirebase(storageRef, modelCalibration)
-        println("@@@@@@@@@@@@@@@@@@@" + copiedFile)
 
-        applicationContext.assets.open(modelCalibration).use { input ->
+        val copiedFile = File(applicationContext.filesDir, modelCalibration)
+        val fileRef: StorageReference = storageRef.child(modelCalibration)
+        Log.d("FirebaseCompare3", "$fileRef.")
+
+        Log.d("FirebaseCompare5", "${fileRef.listAll()}")
+
+        fileRef.downloadUrl.addOnSuccessListener {
+            Log.d("FirebaseCompare4", "url down comp!!! $it")
+
+            val request = DownloadManager.Request(it)
+                .setTitle("File")
+                .setDescription("Downloading...")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
+                .setAllowedOverMetered(true)
+                .setDestinationInExternalFilesDir(applicationContext, getFilesDir().toString(), modelCalibration)
+
+            val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(request)
+        }.addOnFailureListener{
+            println("url down fail....")
+        }
+
+        applicationContext.openFileInput(modelCalibration).use{ input ->
             copiedFile.outputStream().use { output ->
                 input.copyTo(output, 1024)
             }
         }
+        Log.d("firebase5", "application context open success!")
 
         // Get Uri of the file
         val copiedURI = copiedFile.toURI()
@@ -330,55 +351,13 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         MyEntryPoint.prefs.setCnt(0)
     }
 
-    private fun getFileFromFirebase(ref: StorageReference, pathString:String) {
-        println("[getFileFromFirebase] function begin")
-
-        val fileRef: StorageReference = ref.child(pathString)
-        fileRef.downloadUrl .addOnSuccessListener {
-            println("url down comp!!! $it")
-
-            val request = DownloadManager.Request(it)
-                .setTitle("File")
-                .setDescription("Downloading...")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
-                .setAllowedOverMetered(true)
-//                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "downfire.txt")
-//                .setDestinationInExternalFilesDir(applicationContext, filesDir.toString(), pathString)
-
-            val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            dm.enqueue(request)
-
-    }.addOnFailureListener{
-        println("url down fail....")
-    }}
-
     private var detect1Ready = false
     private var cap2 = false
-    private fun signInAnonymously() {
-        auth.signInAnonymously().addOnSuccessListener(this, OnSuccessListener<AuthResult?> {
-            // do your stuff
-            println("user login success!!!")
-        })
-            .addOnFailureListener(this,
-                OnFailureListener { exception ->
-                    Log.e(
-                        TAG,
-                        "signInAnonymously:FAILURE",
-                        exception
-                    )
-                })
-    }
+
     override fun onStart() {
         super.onStart()
         detect1Ready = false
         cap2 = false
-        val user = auth.currentUser
-        if (user!= null){
-            println("user is not null")
-        } else {
-            signInAnonymously()
-            println("ano user go")
-        }
 
     }
 
