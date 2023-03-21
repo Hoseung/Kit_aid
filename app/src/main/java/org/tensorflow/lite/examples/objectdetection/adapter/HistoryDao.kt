@@ -16,4 +16,7 @@ interface HistoryDao {
 
     @Query("DELETE FROM history_table")
     suspend fun deleteAll()
+
+    @Query("SELECT id||','||date||','||product||','||lot||','||density FROM history_table")
+    suspend fun exportToCSV(): List<String>
 }

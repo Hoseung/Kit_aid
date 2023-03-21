@@ -2,6 +2,7 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 //import android.graphics.Path
 //import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
@@ -14,35 +15,31 @@ import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
 import org.tensorflow.lite.examples.objectdetection.RegressionHelper
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
 import org.tensorflow.lite.examples.objectdetection.R
+import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
-import org.tensorflow.lite.examples.objectdetection.adapter.History
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryDao
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModel
-import org.tensorflow.lite.examples.objectdetection.adapter.HistoryViewModelFactory
 import java.io.File
 import java.io.FileInputStream
 import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.pow
 import kotlin.random.Random
 
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
-    //private lateinit var database: HistoryRoomDatabase
     // ToDo: History
 
-//    private val historyViewModel: HistoryViewModel by viewModels {
-//        HistoryViewModelFactory((application as MyEntryPoint).repository)
-//    }
-    val applicationScope = CoroutineScope(SupervisorJob())
-    //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
+    //val applicationScope = CoroutineScope(SupervisorJob())
 //    private val repository by lazy { HistoryRepository(database.historyDao()) }
 //    private val historyViewModel = HistoryViewModel(repository)
     // 이 historyViewModel이 HistoryActivity의 historyViewModel과 같은 instance일까?
     private val historyViewModel: HistoryViewModel by viewModels {
-        HistoryViewModelFactory((application as MyEntryPoint).repository)
+        HistoryViewModelFactory((application as MyEntryPoint).database.historyDao())
     }
+
+    //private val modelsDao = (application as MyEntryPoint).database.modelsDao()
+    //private val modelsRepo = ModelsRepository((application as MyEntryPoint).database.modelsDao())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +60,9 @@ class ResultActivity : AppCompatActivity() {
         super.onResume()
         // Run inference onResume, not OnCreate
 
+        val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
+        println("SURI $suri")
+
         val imgDir = intent.getStringExtra("imagePath")!!
         var imgPath : String
         //binding.resultImageView.setImageURI(uri)
@@ -79,9 +79,19 @@ class ResultActivity : AppCompatActivity() {
             val f = File(imgPath)
             f.delete()
         }
-        val answer = answers.sorted().let {
+        var answer = answers.sorted().let {
             it[2]
         }
+
+
+
+        /*
+        Todo:
+         Calibration
+
+         Also Todo: 혈청 / 전혈 선택에 따른 보정
+         */
+        answer = calibrateLot(answer)
 
         val answerStr = answer.let { it ->
             if (it > 130) {
@@ -103,7 +113,7 @@ class ResultActivity : AppCompatActivity() {
 
         val history = History(null,
             MyEntryPoint.prefs.getString("prodName", "NoProduct"),
-            MyEntryPoint.prefs.getString("lotNum","0").toInt(),
+            MyEntryPoint.prefs.getString("lotNum","0"),
             answerStr,
             "Today!!"
         )
@@ -112,6 +122,24 @@ class ResultActivity : AppCompatActivity() {
 //            database.historyDao().insert(history)
 //        }
         historyViewModel.insert(history)
+
+        //historyAdapter.addHistoryList(History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"))
+    }
+
+    private fun calibrateLot(answer: Float) : Float {
+        val dAnswer = answer.toDouble()
+        val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
+        print("SURI $suri \n")
+        val uri = Uri.parse(suri)
+        print("URI $uri")
+        val file = File(uri.path!!)
+        val coefficients = file.readLines() //File(uri.path!!).useLines { it.toList() }
+        var sum = 0.0
+        for(i in coefficients.indices){
+            println("$i ZZZZZZZ $coefficients[i]")
+            sum += coefficients[i].toDouble() * dAnswer.pow(i)
+        }
+        return sum.toFloat()
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {
@@ -126,7 +154,7 @@ class ResultActivity : AppCompatActivity() {
                 ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
             )
             answers.add(regressionHelper.predict(cropped))
-            println("prediction: ${answers[i]}")
+            //println("prediction: ${answers[i]}")
         }
         var answer = answers.sorted().let {
             it[2]

@@ -12,8 +12,8 @@
         android:id="@+id/resultBackButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
         android:background="@android:color/transparent"
+        android:contentDescription="@string/description_back"
         android:paddingStart="20dp"
         android:paddingTop="20dp"
         android:paddingEnd="20dp"
@@ -48,17 +48,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/icon" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" Results"
+                    android:text="@string/label_result"
                     android:textColor="@color/blue"
-                    android:textSize="25sp" />
+                    android:textSize="25sp"
+                    app:drawableLeftCompat="@drawable/icon" />
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,9 +71,10 @@
                 <ImageView
                     android:id="@+id/resultImageView"
                     android:layout_width="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:src="@drawable/image_kit"
                     android:layout_height="200dp"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription="@string/description_sample_result_image"
+                    android:src="@drawable/image_kit"
                     app:layout_constraintBottom_toTopOf="@id/resultText"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -88,7 +85,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="40dp"
-                    android:text="20mg/ml"
+                    android:text="@string/msg_sample_result"
                     android:textColor="@color/black"
                     android:textSize="30sp"
                     android:textStyle="bold"
@@ -100,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Analysis Complete"
+                    android:text="@string/msg_analysis_complete"
                     android:textColor="@color/black"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -119,26 +116,23 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/resultImageLayout">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/reference_icon" />
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" Reference"
+                    android:text="@string/label_reference"
                     android:textColor="@color/blue"
-                    android:textSize="25sp" />
+                    android:textSize="25sp"
+                    app:drawableLeftCompat="@drawable/step_1_icon" />
             </LinearLayout>
 
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:contentDescription="@string/description_reference"
                 android:src="@drawable/reference"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginBottom="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/referenceLayout" />
         </LinearLayout>

@@ -19,7 +19,7 @@ import androidx.room.PrimaryKey
 data class History(
     @PrimaryKey(autoGenerate = true) val id: Int?,
     @ColumnInfo(name = "product") val product: String?,
-    @ColumnInfo(name = "lot") val lot: Int?,
+    @ColumnInfo(name = "lot") val lot: String?,
     @ColumnInfo(name = "density") val density: String?,
     @ColumnInfo(name = "date") val date: String?
 )

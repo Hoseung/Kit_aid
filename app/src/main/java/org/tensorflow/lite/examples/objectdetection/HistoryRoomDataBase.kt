@@ -9,12 +9,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.objectdetection.adapter.History
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryDao
+import org.tensorflow.lite.examples.objectdetection.adapter.Models
+import org.tensorflow.lite.examples.objectdetection.adapter.ModelsDao
 
 // Annotates class to be a Room Database with a table (entity) of the History class
-@Database(entities = [History::class], version = 1)//, exportSchema = false)
+// Note that uninstalling the app doesn't remove the app data.
+// manual deletion required, or you will get DB version miss-match error.
+@Database(entities = [History::class, Models::class], version = 1)//, exportSchema = false)
 abstract class HistoryRoomDatabase : RoomDatabase() {
 
     abstract fun historyDao(): HistoryDao
+    abstract fun modelsDao(): ModelsDao
 
     companion object {
         // Singleton prevents multiple instances of database opening at the
@@ -66,12 +71,9 @@ abstract class HistoryRoomDatabase : RoomDatabase() {
         suspend fun populateDatabase(historyDao: HistoryDao) {
             // Delete all content here.
             historyDao.deleteAll()
-            println("INSIDE populateDatabase")
             // Sample entries
             // id = null, will be auto-generated
-            var hist = History(null, "2023-02-10", 2022003, "20mg/ml", "img1.png")
-            historyDao.insert(hist)
-            hist = History(null,"2023-02-11", 2022003, "30mg/ml", "img2.png")
+            val hist = History(null, "Test", "BIG22003", "20mg/ml", "2023-02-10")
             historyDao.insert(hist)
         }
     }
