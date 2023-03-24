@@ -21,15 +21,15 @@ package org.tensorflow.lite.examples.objectdetection
 //import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
 //import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
 
-import android.accessibilityservice.GestureDescription.StrokeDescription
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
+import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.Surface.ROTATION_0
 import android.widget.Toast
@@ -41,14 +41,10 @@ import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
-import io.grpc.Context.Storage
 import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.auth
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.storage
@@ -60,13 +56,11 @@ import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.util.*
 import java.util.Collections.rotate
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.system.exitProcess
 
 
 class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
@@ -91,10 +85,10 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+
     //private val range = camera?.cameraInfo?.exposureState?.exposureCompensationRange
 
     private lateinit var imageCapture: ImageCapture
-
     //private val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     /** Blocking camera operations are performed using this executor */
@@ -137,23 +131,26 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
     }
 
-    private fun loadLocalModels(storageRef:StorageReference){
-        // todo: 임시. ASSET을 internal storage에 저장
-        //val modelCalibration = "AniCheck-bIgG_BIG23006.dat"
+    private fun loadLocalModels(storageRef:StorageReference) {
+        // import saved preferences
         val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
-        val lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
+        var lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
         val date = MyEntryPoint.prefs.getString("date", "20231225")
         val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
         val modelCalibration = "${prodName}_${lotNum}.dat"
+        var downloadedURI: Nothing? = null
 
-        println("$$$$$$$$$$$$$$$$$$"+modelCalibration)
-
-        val copiedFile = File(applicationContext.filesDir, modelCalibration)
+        // setting file path
         val fileRef: StorageReference = storageRef.child(modelCalibration)
+        val downloadedFile = File(applicationContext.getExternalFilesDir("Calibration_file"), modelCalibration)
         Log.d("FirebaseCompare3", "$fileRef.")
 
-        Log.d("FirebaseCompare5", "${fileRef.listAll()}")
+        // if file is exists, replace it with new one
+        if (downloadedFile.exists()) {
+            downloadedFile.delete()
+        }
 
+        // file download with download manager
         fileRef.downloadUrl.addOnSuccessListener {
             Log.d("FirebaseCompare4", "url down comp!!! $it")
 
@@ -162,25 +159,36 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
                 .setDescription("Downloading...")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
                 .setAllowedOverMetered(true)
-                .setDestinationInExternalFilesDir(applicationContext, getFilesDir().toString(), modelCalibration)
+                .setDestinationInExternalFilesDir(
+                    applicationContext,
+                    "Calibration_file",
+                    modelCalibration
+                )
 
             val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
             dm.enqueue(request)
-        }.addOnFailureListener{
-            println("url down fail....")
+
+        }.addOnFailureListener {
+            Log.d("DownFail", "Url download fails... Use defalut calibration file")
         }
 
-        applicationContext.openFileInput(modelCalibration).use{ input ->
-            copiedFile.outputStream().use { output ->
-                input.copyTo(output, 1024)
-            }
-        }
-        Log.d("firebase5", "application context open success!")
+        /*
+        Todo
+        1. RegressionHelper에서 모델 로드할 때, 파일 없으면 try / catch로 에러 발생
+        2. 다운로드가 끝날때까지 하염없이 기다릴 것인가?
+        3. timeout을 걸어서, 그 동안에 안 되면 멈추고 메세지를 낼 것인가?
+          -- "다운로드가 실패했습니다. 안정적인 인터넷을... 확인..."
+          timeout은 다운로드 메니저에 기능이 있을 듯.. callback이든 처음에 옵션이든..
+        */
 
-        // Get Uri of the file
-        val copiedURI = copiedFile.toURI()
+        Log.d("downsuccess", "")
+
+        println(applicationContext.getExternalFilesDir("Calibration_file"))
+        println(downloadedFile)
+        println(downloadedFile.exists())
+
         modelsViewModel.insert(
-            Models(null, prodName, lotNum, date, hash, copiedURI.toString())
+            Models(null, prodName, lotNum, date, hash, downloadedURI.toString())
         )
 
 //        val modelPredict = "230213_new_regression_float16.tflite"
@@ -189,7 +197,8 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 //        )
 
         // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
-        modelsViewModel.updateCalibUri(hash)
+        //  -> 다른 곳에서 파일 체크하고 업데이트 해보자...
+//        modelsViewModel.updateCalibUri(hash)
     }
 
     override fun onResume() {

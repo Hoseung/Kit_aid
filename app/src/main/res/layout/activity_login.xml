@@ -60,15 +60,6 @@
             android:layout_weight="1"
             />
 
-        <Button
-            android:id="@+id/signupGoogle"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/google_logo"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"
-            />
-
     </LinearLayout>
 
     <TextView
@@ -78,6 +69,7 @@
         android:text="@string/first_sign_in"
         android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:layout_gravity="center_horizontal"
         />
 

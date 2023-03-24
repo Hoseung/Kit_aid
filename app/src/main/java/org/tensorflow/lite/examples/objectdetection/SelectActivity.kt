@@ -14,7 +14,6 @@ class SelectActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initView()
-
     }
 
     private fun initView() = with(binding) {

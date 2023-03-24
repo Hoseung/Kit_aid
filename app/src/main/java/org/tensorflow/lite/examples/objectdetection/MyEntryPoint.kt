@@ -43,13 +43,17 @@ class MyEntryPoint : Application() {
     //val applicationScope = CoroutineScope(SupervisorJob())
     //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
 
-
     override fun onCreate() {
         prefs = PreferenceUtil(applicationContext)
         prefs.setString("prodName", "AniCheck-bIgG")
-        prefs.setString("lotNum", "BIG22003")
+        prefs.setString("lotNum", "00000")
         prefs.setString("date", "20231225")
         prefs.setString("hash", "abcdefg123")
+        prefs.setString("CalibUri", "-")
+
+        // user info
+        prefs.setString("email", "")
+        prefs.setString("password", "")
         super.onCreate()
 
         auth = Firebase.auth

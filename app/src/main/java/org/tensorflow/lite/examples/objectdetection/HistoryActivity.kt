@@ -125,6 +125,7 @@ class HistoryActivity : AppCompatActivity() {
     }
     private fun getContentUri(): Uri {
         val extRoot = getExternalFilesDir(null)!!
+        println("$extRoot +++++++++++++++++++0")
         return FileProvider.getUriForFile(
             this@HistoryActivity,
             applicationContext.packageName + ".provider",

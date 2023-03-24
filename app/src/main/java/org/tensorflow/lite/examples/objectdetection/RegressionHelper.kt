@@ -102,7 +102,6 @@ class RegressionHelper (
         val input = processInputImage(image,
             inputPredictTargetWidth,
             inputPredictTargetHeight)
-
         interpreterPredict?.run(input?.buffer, modelOutput)
         //println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         //val answer = modelOutput.floatArray.toString()

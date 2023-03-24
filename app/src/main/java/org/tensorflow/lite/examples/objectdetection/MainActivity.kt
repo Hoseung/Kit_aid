@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -30,7 +31,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
+import java.io.BufferedReader
 import java.io.File
+import java.io.OutputStream
+import java.io.OutputStreamWriter
 
 /**
  * Todo: No, I won't follow the single-activity pattern!!!
@@ -49,6 +53,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
+
+        // copy asset calibration file to in-app repo ----------------------------------------------
+        val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        val lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
+
+        val inputFile = assets.open("${prodName}_${lotNum}.dat")
+        val outputFile = File(filesDir, "${prodName}_${lotNum}.dat")
+
+        val readStream: BufferedReader = inputFile.reader().buffered()
+        val writeStream: OutputStreamWriter = outputFile.writer()
+        readStream.forEachLine {
+            writeStream.write("$it\n")
+        }
+        MyEntryPoint.prefs.setString("CalibUri", "${outputFile.toURI()}")
+        // -----------------------------------------------------------------------------------------
 
         /*
         Todo:

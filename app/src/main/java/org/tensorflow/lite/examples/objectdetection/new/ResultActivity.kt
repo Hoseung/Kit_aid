@@ -7,6 +7,7 @@ import android.net.Uri
 //import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
@@ -91,6 +92,7 @@ class ResultActivity : AppCompatActivity() {
 
          Also Todo: 혈청 / 전혈 선택에 따른 보정
          */
+        Log.d("answer", "$answer")
         answer = calibrateLot(answer)
 
         val answerStr = answer.let { it ->
@@ -105,7 +107,7 @@ class ResultActivity : AppCompatActivity() {
         myTextView.text = answerStr
 
         // ToDo: saveResult()
-        //setHistoryList
+        // setHistoryList
 
 //        historyViewModel.insert(
 //            History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
@@ -130,9 +132,11 @@ class ResultActivity : AppCompatActivity() {
         val dAnswer = answer.toDouble()
         val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
         print("SURI $suri \n")
+
         val uri = Uri.parse(suri)
         print("URI $uri")
         val file = File(uri.path!!)
+
         val coefficients = file.readLines() //File(uri.path!!).useLines { it.toList() }
         var sum = 0.0
         for(i in coefficients.indices){
@@ -145,6 +149,7 @@ class ResultActivity : AppCompatActivity() {
     private fun randomCroppedPredict(image: Bitmap) : Float {
         var cropped: Bitmap
         val answers = mutableListOf<Float>()
+
         for (i in 0..5) {
             cropped = Bitmap.createBitmap(
                 image,
@@ -164,6 +169,13 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun initView() = with(binding) {
+
+        // todo calibration file check!
+//        if File()
+        Log.d("calicheck", "${MyEntryPoint.prefs.getString("CalibUri", "00000")}")
+        Log.d("calibcheck2", "${MyEntryPoint.prefs.getString("prodName", "---")}")
+        Log.d("calibcheck3", "${MyEntryPoint.prefs.getString("lotNum", "---")}")
+
         resultBackButton.setOnClickListener { finish() }
     }
 }

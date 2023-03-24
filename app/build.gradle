@@ -62,9 +62,6 @@ android {
         }
     }
 
-    buildFeatures {
-        viewBinding true
-    }
     viewBinding{
         enabled = true
     }
@@ -129,6 +126,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion"
+
+    //Preference
+    implementation('androidx.preference:preference:1.2.0'){
+        exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel'
+        exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
+    }
 
     //WindowManager
     implementation 'androidx.window:window:1.1.0-alpha06'
