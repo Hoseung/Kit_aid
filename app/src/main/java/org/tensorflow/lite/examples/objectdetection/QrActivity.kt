@@ -80,7 +80,7 @@ class QrActivity : AppCompatActivity() {
                 ContextCompat.getMainExecutor(this)
             ) { result: MlKitAnalyzer.Result? ->
                 val barcodeResults = result?.getValue(barcodeScanner)
-                Log.d("barcodeResults0", "${barcodeResults?.get(0)}")
+
                 if ((barcodeResults == null) ||
                     (barcodeResults.size == 0) ||
                     (barcodeResults.first() == null)
