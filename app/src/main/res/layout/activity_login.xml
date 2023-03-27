@@ -13,7 +13,18 @@
         android:layout_height="wrap_content"
         android:src="@drawable/hero"
         android:layout_gravity="center"
-        android:padding="50dp"/>
+        android:paddingTop="50dp"
+        android:paddingRight="50dp"
+        android:paddingLeft="50dp"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome to Ai-D Reader"
+        android:textSize="30dp"
+        android:textColor="@color/light_blue_900"
+        android:gravity="center"
+        />
 
     <EditText
         android:id="@+id/inputEmail"
@@ -41,26 +52,24 @@
         android:inputType="textPassword">
     </EditText>
 
-    <LinearLayout
+    <CheckBox
+        android:id="@+id/rememberMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:text="remember me"/>
+
+    <Button
+        android:id="@id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
+        android:text="Log in"
         android:layout_marginRight="10dp"
-        >
-
-        <Button
-            android:id="@id/loginButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="Log in"
-            android:layout_marginRight="5dp"
-            android:background="@color/bounding_box_color"
-            android:layout_weight="1"
-            />
-
-    </LinearLayout>
+        android:layout_marginLeft="10dp"
+        android:background="@color/bounding_box_color"
+        />
 
     <TextView
         android:id="@+id/signinText"

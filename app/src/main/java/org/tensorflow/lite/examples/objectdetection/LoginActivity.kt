@@ -24,6 +24,7 @@ import java.io.OutputStreamWriter
 class LoginActivity : AppCompatActivity() {
     private var email: String = ""
     private var password: String = ""
+    private var rememberMe: Boolean = false
 
     private fun login(email:String, password:String, binding: ActivityLoginBinding) {
         if (email.length?:0 >0 || password.length?:0 >0){
@@ -61,25 +62,28 @@ class LoginActivity : AppCompatActivity() {
         val binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 자동 로그인
+        // 로그인 체크
         val diUser = File(applicationContext.filesDir, "diUser.dat")
         if (diUser.exists()) {
             val readDiFile: BufferedReader = diUser.reader().buffered()
+            var cnt = 0
             readDiFile.forEachLine {
-                if (it != null && "@" in it) {
+                if (cnt == 0) {
                     email = it
-                } else if (it != null && email != null) {
+                } else if (cnt == 1) {
                     password = it
+                } else {
+                    rememberMe = it.toBoolean()
                 }
+                cnt += 1
             }
 
-            // 자동 로그인 시도
-            if (email?.length ?: 0 > 0 && password?.length ?: 0 > 6) {
-                binding.inputEmail.setText(email)
-                binding.inputPassword.setText(password)
-                login(email, password, binding)
+            binding.inputEmail.setText(email)
+            binding.inputPassword.setText(password)
+            binding.rememberMe.isChecked = true
+
             }
-        }
+
 
         // 로그인
         binding.loginButton.setOnClickListener {
@@ -98,10 +102,19 @@ class LoginActivity : AppCompatActivity() {
         if(mode === "login"){
             val diUser = File(applicationContext.filesDir, "diUser.dat")
             val writeStream: OutputStreamWriter = diUser.writer()
-            writeStream.write(binding.inputEmail.text.toString())
-            writeStream.write("\n")
-            writeStream.write(binding.inputPassword.text.toString())
-            writeStream.flush()
+            val rememberMe = binding.rememberMe.isChecked
+            Log.d("remem", "${rememberMe}")
+
+            if (rememberMe) {
+                writeStream.write(binding.inputEmail.text.toString())
+                writeStream.write("\n")
+                writeStream.write(binding.inputPassword.text.toString())
+                writeStream.write("\n")
+                writeStream.write("true")
+                writeStream.flush()
+            } else {
+                diUser.delete()
+            }
 
             binding.run {
                 val switchMain = Intent(this@LoginActivity, MainActivity::class.java)
