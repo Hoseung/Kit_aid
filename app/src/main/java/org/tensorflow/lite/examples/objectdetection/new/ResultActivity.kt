@@ -91,13 +91,13 @@ class ResultActivity : AppCompatActivity() {
          Also Todo: 혈청 / 전혈 선택에 따른 보정
          */
         Log.d("answer", "$answer")
-        answer = calibrateLot(answer)
+        answer = calibrateLot(answer  * 180f)
 
         val answerStr = answer.let { it ->
             if (it > 130) {
                 "> 130 mg/ml"
             } else {
-                String.format("%.1fmg/ml", it * 180f)
+                String.format("%.1fmg/ml", it)
             }
         }
 
@@ -138,7 +138,8 @@ class ResultActivity : AppCompatActivity() {
         val coefficients = file.readLines() //File(uri.path!!).useLines { it.toList() }
         var sum = 0.0
         for(i in coefficients.indices){
-            println("$i ZZZZZZZ $coefficients[i]")
+            println("$i ZZZZZZZ ${coefficients[i]}")
+            println("$i ${coefficients[i].toDouble()} * ${dAnswer.pow(i)}")
             sum += coefficients[i].toDouble() * dAnswer.pow(i)
         }
         return sum.toFloat()
@@ -151,7 +152,8 @@ class ResultActivity : AppCompatActivity() {
         for (i in 0..5) {
             var x = ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20
             Log.d("dx", "point x: $x")
-            if (x < 0) x=0
+            Log.d("imagesize", "${image.width} x ${image.height}")
+            if (x < 0) x = 0
             cropped = Bitmap.createBitmap(
                 image,
                  x,
