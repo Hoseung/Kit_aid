@@ -40,8 +40,8 @@ class QrCodeViewModel(barcode: Barcode) {
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->
                     if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
                         val words = qrContent.split(" ")
+
                         // Todo: complete downloading before updating prefs.
-                        //
                         if(words.size == 5 && words[0] == "Proteomtech"){
                             MyEntryPoint.prefs.setString("prodName", words[1])
                             MyEntryPoint.prefs.setString("lotNum", words[2])

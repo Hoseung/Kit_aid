@@ -1,63 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f0f3fa"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    >
 
     <ImageView
         android:id="@+id/loginImageView"
         android:layout_width="277dp"
-        android:layout_height="298dp"
+        android:layout_height="wrap_content"
         android:contentDescription="@string/description_app_logo"
         android:src="@drawable/hero"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        />
 
     <LinearLayout
         android:id="@+id/loginLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:background="@drawable/bg_login_layout"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/loginBottomLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/loginImageView">
+        android:orientation="vertical">
+<!--        app:layout_constraintBottom_toTopOf="@id/loginBottomLayout"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.157"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/loginImageView"-->
+<!--        >-->
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="30dp"
-            android:text="@string/welcome_to"
-            android:textColor="@color/black"
-            android:textSize="40sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
             android:text="@string/app_name"
-            android:textColor="#007dff"
-            android:textSize="45sp"
-            android:textStyle="bold" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="176dp"
-            android:layout_marginTop="30dp"
-            android:paddingHorizontal="20dp">
+            android:textColor="@color/light_blue_900"
+            android:layout_marginTop="10dp"
+            android:textSize="45dp"
+            android:textStyle="bold"
+            android:shadowColor="@color/black"
+            android:layout_gravity="center"/>
 
             <LinearLayout
                 android:id="@+id/linearLayout2"
-                android:layout_width="352dp"
-                android:layout_height="73dp"
-                android:layout_marginTop="8sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -76,7 +68,7 @@
                         android:layout_marginStart="16dp"
                         android:text="@string/current_product"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="25dp" />
 
                     <TextView
                         android:id="@+id/loginProductName"
@@ -85,7 +77,7 @@
                         android:layout_weight="1"
                         android:text="@string/current_product"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="25dp" />
 
                 </LinearLayout>
 
@@ -103,7 +95,7 @@
                         android:layout_marginStart="16dp"
                         android:text="@string/current_lot"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="25dp" />
 
                     <TextView
                         android:id="@+id/loginLotNumber"
@@ -112,64 +104,59 @@
                         android:layout_weight="1"
                         android:text="@string/current_lot"
                         android:textColor="@color/black"
-                        android:textSize="16sp" />
+                        android:textSize="25dp" />
 
                 </LinearLayout>
 
             </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="10dp"
+                >
+                <Button
+                    android:id="@+id/scanQRButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/button_QR"
+                    android:background="@color/bounding_box_color"
+                    android:textSize="25dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    />
+                <Button
+                    android:id="@+id/loginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/bounding_box_color"
+                    android:textSize="25dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/capture_kit"
+                    />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent=".5" />
-
-            <TextView
-                android:id="@+id/loginButton"
-                android:layout_width="90dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_login_button"
-                android:gravity="center"
-                android:text="@string/button_login"
-                android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.3"
-                app:layout_constraintStart_toStartOf="@+id/guideline"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-
-            <TextView
-                android:id="@+id/scanQRButton"
-                android:layout_width="90dp"
-                android:layout_height="70dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_login_button"
-                android:gravity="center"
-                android:text="@string/button_QR"
-                android:textColor="@color/white"
-                app:layout_constraintEnd_toStartOf="@+id/guideline"
-                app:layout_constraintHorizontal_bias="0.7"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"/>
+            </LinearLayout>
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        />
+
     <LinearLayout
         android:id="@+id/loginBottomLayout"
-        android:layout_width="0dp"
-        android:layout_height="51dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
         android:background="#f0f3fa"
-        android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginBottom="10dp"
+        android:gravity="center">
 
         <ImageView
             android:layout_width="20dp"
@@ -179,17 +166,13 @@
             android:src="@drawable/info_icon" />
 
         <TextView
+            android:id="@+id/goToHomepage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:text="@string/label_info"
             android:textColor="@color/black" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

@@ -22,10 +22,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -33,7 +30,6 @@ import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import java.io.BufferedReader
 import java.io.File
-import java.io.OutputStream
 import java.io.OutputStreamWriter
 
 /**
@@ -55,18 +51,42 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
 
         // copy asset calibration file to in-app repo ----------------------------------------------
-        val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
-        val lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
+        val modelInfo = File(applicationContext.filesDir, "model_info.dat")
+        var prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        var lotNum = "00000"
+        var inputFile = assets.open("${prodName}_00000.dat")
+        var readStream: BufferedReader = inputFile.reader().buffered()
 
-        val inputFile = assets.open("${prodName}_${lotNum}.dat")
-        val outputFile = File(filesDir, "${prodName}_${lotNum}.dat")
+        // if modelInfo -> read prodName and lotNum
+        if (modelInfo.exists()){
+            val modelInfoReader: BufferedReader = modelInfo.reader().buffered()
+            var i = 0
+            modelInfoReader.forEachLine {
+                if (i==0) {
+                    prodName = it
+                } else {
+                    lotNum = it
+                }
+                i ++
+            }
+            val inputFile2 = File(
+                applicationContext.filesDir, "lastCalib.dat")
+            readStream = inputFile2.reader().buffered()
+        } else {
+            println("modelInfo nothing...")
+        }
 
-        val readStream: BufferedReader = inputFile.reader().buffered()
+        MyEntryPoint.prefs.setString("prodName", "$prodName")
+        MyEntryPoint.prefs.setString("lotNum", "$lotNum")
+        val outputFile = File(applicationContext.filesDir, "${prodName}_${lotNum}.dat")
         val writeStream: OutputStreamWriter = outputFile.writer()
+        println("$outputFile is open...")
         readStream.forEachLine {
             writeStream.write("$it\n")
         }
+        writeStream.flush()
         MyEntryPoint.prefs.setString("CalibUri", "${outputFile.toURI()}")
+        println("write comp!!! model file nothing...")
         // -----------------------------------------------------------------------------------------
 
         /*
@@ -85,6 +105,12 @@ class MainActivity : AppCompatActivity() {
 
         //startActivity(Intent(this, LoginActivity::class.java))
         initView()
+
+        // go to homepage
+        activityMainBinding.goToHomepage.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.proteometech.com/main"))
+            startActivity(browserIntent)
+        }
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {

@@ -219,7 +219,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         productName.text = myPrdName
 
         val lotNum = viewBinding.lotNumber
-        lotNum.text = String.format("Lot No.  %s", MyEntryPoint.prefs.getString("lotNum", "BIG22003"))
+        lotNum.text = String.format("Lot No.  %s", MyEntryPoint.prefs.getString("lotNum", "00000"))
     }
 
     override fun onDestroy() {
