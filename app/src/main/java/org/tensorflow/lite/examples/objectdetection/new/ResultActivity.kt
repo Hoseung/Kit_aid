@@ -8,14 +8,12 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import kotlinx.coroutines.*
-import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
-import org.tensorflow.lite.examples.objectdetection.RegressionHelper
-import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
-import org.tensorflow.lite.examples.objectdetection.R
+import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import java.io.File
@@ -151,9 +149,12 @@ class ResultActivity : AppCompatActivity() {
         val answers = mutableListOf<Float>()
 
         for (i in 0..5) {
+            var x = ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20
+            Log.d("dx", "point x: $x")
+            if (x < 0) x=0
             cropped = Bitmap.createBitmap(
                 image,
-                ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20,
+                 x,
                 ceil(image.height * 0.36).toInt() + Random.nextInt(60) - 30,
                 ceil(image.width * 0.54).toInt() + Random.nextInt(40) - 20,
                 ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
@@ -171,11 +172,21 @@ class ResultActivity : AppCompatActivity() {
     private fun initView() = with(binding) {
 
         // todo calibration file check!
-//        if File()
-        Log.d("calicheck", "${MyEntryPoint.prefs.getString("CalibUri", "00000")}")
-        Log.d("calibcheck2", "${MyEntryPoint.prefs.getString("prodName", "---")}")
-        Log.d("calibcheck3", "${MyEntryPoint.prefs.getString("lotNum", "---")}")
+        val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        var lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
+        val modelCalibration = "${prodName}_${lotNum}.dat"
+        val CalibUri = MyEntryPoint.prefs.getString("CalibUri", "-")
+        val downloadedFile = File(applicationContext.getExternalFilesDir("Calibration_file"), modelCalibration)
 
+        if (downloadedFile.exists()) {
+            Log.d("filecheck", "$modelCalibration file used~")
+            MyEntryPoint.prefs.setString("CalibUri", "${downloadedFile.toURI()}")
+            binding.inaccurateResult.visibility = View.INVISIBLE
+        } else {
+            println("$modelCalibration")
+            println("$CalibUri")
+            binding.inaccurateResult.visibility = View.VISIBLE
+        }
         resultBackButton.setOnClickListener { finish() }
     }
 }
