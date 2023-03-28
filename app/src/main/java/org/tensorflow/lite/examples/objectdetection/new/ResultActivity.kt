@@ -2,6 +2,7 @@ package org.tensorflow.lite.examples.objectdetection.new
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Camera
 import android.net.Uri
 //import android.graphics.Path
 //import android.media.Image
@@ -123,6 +124,10 @@ class ResultActivity : AppCompatActivity() {
 //            database.historyDao().insert(history)
 //        }
         historyViewModel.insert(history)
+
+        // initialze camera activity successful counts
+        MyEntryPoint.prefs.setCnt("count1", 0)
+        MyEntryPoint.prefs.setCnt("count2", 0)
 
         //historyAdapter.addHistoryList(History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"))
     }

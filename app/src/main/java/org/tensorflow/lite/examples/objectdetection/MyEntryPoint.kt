@@ -56,6 +56,10 @@ class MyEntryPoint : Application() {
         prefs.setString("password", "")
         super.onCreate()
 
+        // successful camera capture info
+        prefs.setCnt("count1", 0)
+        prefs.setCnt("count2", 0)
+
         auth = Firebase.auth
         //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
 

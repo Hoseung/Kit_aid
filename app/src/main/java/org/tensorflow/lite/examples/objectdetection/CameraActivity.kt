@@ -24,11 +24,9 @@ package org.tensorflow.lite.examples.objectdetection
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.DownloadManager
-import android.content.BroadcastReceiver
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Surface.ROTATION_0
@@ -58,7 +56,6 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
-import java.util.Collections.rotate
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -74,7 +71,6 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     //private val viewBinding
     //get() = viewBinding!!
 
-    private var imageCaptureDetectionSuccess = 0
     private var imageCaptureDetectionFail = 0
 
     private lateinit var objectDetectorHelper: ObjectDetectorHelper
@@ -357,7 +353,8 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
-        MyEntryPoint.prefs.setCnt(0)
+        MyEntryPoint.prefs.setCnt("count1", 0)
+        MyEntryPoint.prefs.setCnt("count2", 0)
     }
 
     private var detect1Ready = false
@@ -395,7 +392,10 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     Capture image into memory and perform downstream tasks
      */
     private fun captureAndDetect() {
-        if (!::imageCapture.isInitialized) return
+        if (!::imageCapture.isInitialized) {
+            println("not init capture...")
+            return
+        }
 
         println("!%%%%%%%%%%%%%%%%%%%%% In captureAndDetect")
         val cameraController = camera?.cameraControl
@@ -414,20 +414,22 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         val cameraInfo = camera?.cameraInfo
 
         //cameraController?.setExposureCompensationIndex(-5)
+
         for (i in 1..5){
+            println("$i - captureAndDetect cnt1: ${MyEntryPoint.prefs.getCnt("count1", 0)}")
+            println("   - captureAndDetect cnt2: ${MyEntryPoint.prefs.getCnt("count2", 0)}")
             cameraController?.startFocusAndMetering(action1) // ToDo: Action List로 수정
 
             imageCapture.takePicture(cameraExecutor,
                 object :  ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(imageC: ImageProxy) {
-                        println("CCCCCCCCAAAAAAAAAMMMMMMMMMMEEEEEEEERRRRRRRRAAAAAAAAA")
-
-                        println(cameraInfo?.exposureState?.exposureCompensationIndex)
+                        println("caminfo: ${cameraInfo?.exposureState?.exposureCompensationIndex}")
 
                         val imageRotation = imageC.imageInfo.rotationDegrees
                         // Pass Bitmap and rotation to the object detector helper for processing and detection
                         val bitmap = imageProxyToBitmap(imageC)
                         imageC.close()
+                        println("bitmap?: $bitmap")
 
                         objectDetectorHelper.detectSecond(bitmap!!, imageRotation)
                     }
@@ -451,20 +453,25 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         //var uri: Uri
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SECOND RESULTS>>>>>>>>>>>>>>>>")
         runOnUiThread {
+            println("results??? -> ${results?.size?:100}") // todo delete it later
             if (results != null && results.size > 0 ) {
-                if (imageCaptureDetectionSuccess == 0) {
+                println("get in results!!! $results")
+                if (MyEntryPoint.prefs.getCnt("count2", 0) == 0) {
                     Toast.makeText(this, "Hold on for a second", Toast.LENGTH_LONG).show()
                 }
                 val i = results[0]
                 if (i.categories[0].score > 0.96) {
-                    imageCaptureDetectionSuccess += 1
-
+                    MyEntryPoint.prefs.increaseOneCnt("count1")
+                    MyEntryPoint.prefs.increaseOneCnt("count2")
+                    println("@@@getcnt@@@ ${MyEntryPoint.prefs.getCnt("count2", 0)}")
                     //savePictureToMemory(image, i.boundingBox!!)
                     //savePicture to storage
                     val cropped: Bitmap = cutBbox(rotate(image, 90f), i.boundingBox)
                     val absolutePath = imageSaver(cropped)
 
-                    if (imageCaptureDetectionSuccess == 5){
+                    if (MyEntryPoint.prefs.getCnt("count2", 0) >= 5){
+                        println("come in 5 points")
+
                         absolutePath.let {
                             val resultIntent = Intent(this, ResultActivity::class.java)
                             resultIntent.putExtra("imagePath", it)
@@ -474,14 +481,14 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
                         cap2 = false
                         imageCaptureDetectionFail = 0
                         detect1Ready = false
-                        MyEntryPoint.prefs.setCnt(0)
-                        imageCaptureDetectionSuccess = 0
+                        MyEntryPoint.prefs.setCnt("count2", 0)
                         //carryOn(image, i.boundingBox!!)
+                        finish()
                     }
                 } else {
                     imageCaptureDetectionFail += 1
                 }
-                if (imageCaptureDetectionSuccess < 5) cap2 = true
+                if (MyEntryPoint.prefs.getCnt("count2", 0) < 5) cap2 = true
                 if (imageCaptureDetectionFail > 5) {
                     Toast.makeText(this, "try again...", Toast.LENGTH_SHORT).show()
                     //refreshFragment(context)
@@ -550,7 +557,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
      private fun imageSaver(bitmap: Bitmap): String{
         val photoFile = File(
             getOutputDirectory(this),
-            "img$imageCaptureDetectionSuccess.png"
+            "img${MyEntryPoint.prefs.getCnt("count2", 0)}.png"
 //            SimpleDateFormat(
 //                FILENAME_FORMAT, Locale.KOREA
 //            ).format(System.currentTimeMillis()) + ".png"
@@ -609,7 +616,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
             val imageRotation = image.imageInfo.rotationDegrees
             //println("DETECTOR1 ----")
-            if (MyEntryPoint.prefs.getCnt() <= 8){
+            if (MyEntryPoint.prefs.getCnt("count1", 0) <= 8){
                 image.close()
                 objectDetectorHelper.detect(bitmapBuffer, imageRotation)
             } else {
@@ -627,9 +634,6 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         imageHeight: Int,
         imageWidth: Int
     ) {
-        //var uri: Uri
-        val cnt = MyEntryPoint.prefs.getCnt()
-
         runOnUiThread {
             // Pass necessary information to OverlayView for drawing on the canvas
             viewBinding.overlay.setResults(
@@ -640,30 +644,29 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
             if (results != null && results.size > 0 ) {
                 val i = results[0]
-                println(i.categories[0].score)
                 if (i.categories[0].score > 0.92) {
-                    if (cnt == 7) {
+                    if (MyEntryPoint.prefs.getCnt("count1", 0) >= 7) {
                         Toast.makeText(this, "Ready to Capture", Toast.LENGTH_SHORT).show()
                         detect1Ready = true
                         captureAndDetect()
                         // No more captureAndDetect!
-                        MyEntryPoint.prefs.setCnt(cnt + 1)
+                        MyEntryPoint.prefs.setCnt("count1", 0)
 // thread inside captureAndDetect
 // and this Main thread are not synced.
 // Below setCnt(0) will be effective before captureAndDetect() is over.
                         //ObjectDetectorHelper.clearObjectDetector()
-                    } else if (cnt < 7){
+                    } else if (MyEntryPoint.prefs.getCnt("count1", 0) < 7){
                         if (i.boundingBox.height() < 0.25*imageHeight){
-                            MyEntryPoint.prefs.setCnt(0)
-                            println("RESET CNT  1 ... $cnt")
+                            MyEntryPoint.prefs.setCnt("count1", 0)
+                            println("RESET CNT  1 ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                         else if  (i.boundingBox.height() > 0.7*imageHeight){
-                            MyEntryPoint.prefs.setCnt(0)
-                            println("RESET CNT  2 ... $cnt")
+                            MyEntryPoint.prefs.setCnt("count1", 0)
+                            println("RESET CNT  2 ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                         else {
-                            MyEntryPoint.prefs.setCnt(cnt+1)
-                            println("INCREMENT CNT ... $cnt")
+                            MyEntryPoint.prefs.increaseOneCnt("count1")
+                            println("INCREMENT CNT ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                     } else {
                         /* Some frames will stream in
@@ -673,12 +676,11 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
                     }
                 } else {
-                    MyEntryPoint.prefs.setCnt(0)
+                    MyEntryPoint.prefs.setCnt("count1", 0)
                 }
-                println("CURRENT CNT $cnt")
-            //}
+                println("CURRENT CNT ${MyEntryPoint.prefs.getCnt("count1", 0)}")
             }
-            viewBinding.overlay.invalidate() // Todo: 이건 뭘까?
+            viewBinding.overlay.invalidate()
         }
     }
 
