@@ -543,11 +543,16 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         val height = bbox.height()
         println("WIDTH and HEIGHT $width $height")
         println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
-        return Bitmap.createBitmap(bitmap,
-            kotlin.math.ceil((bbox.centerX() - 0.525 * width) * factorWidth).toInt(),
-            kotlin.math.ceil((bbox.centerY() - 0.525 * height)*factorHeight).toInt(),
-            kotlin.math.ceil(1.05*width*factorWidth).toInt(),
-            (height*factorHeight).toInt())
+
+        // setting x, y, w, h
+        var x = kotlin.math.ceil((bbox.centerX() - 0.525 * width) * factorWidth).toInt()
+        var y = kotlin.math.ceil((bbox.centerY() - 0.525 * height) * factorHeight).toInt()
+        val w = kotlin.math.ceil(1.05 * width * factorWidth).toInt()
+        val h = (height*factorHeight).toInt()
+        if (x < 0) x = 0
+        if (y < 0) y = 0
+
+        return Bitmap.createBitmap(bitmap, x, y, w, h)
     }
 
     private fun rotate(bitmap: Bitmap, degrees: Float): Bitmap {

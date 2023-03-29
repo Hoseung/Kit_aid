@@ -144,6 +144,7 @@ class ResultActivity : AppCompatActivity() {
         )
         println("SURI $suri \n")
         println("SURI check $prodName $lotNum")
+        println("OG answer: $dAnswer")
 
         val uri = Uri.parse(suri)
         print("URI $uri")
