@@ -51,7 +51,6 @@ class QrCodeViewModel(barcode: Barcode) {
                             println("xxxxxxxxxx ${words[0]} ${words[1]} ${words[2]} ${words[3]} ${words[4]}")
 
                             // download if model is missing
-
                             val cameraIntent = Intent(v.context, CameraActivity::class.java)
                             v.context.startActivity(cameraIntent)
                         }

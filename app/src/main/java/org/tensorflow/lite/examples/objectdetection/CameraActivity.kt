@@ -483,6 +483,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
                         detect1Ready = false
                         MyEntryPoint.prefs.setCnt("count2", 0)
                         //carryOn(image, i.boundingBox!!)
+                        println("finish? finish!")
                         finish()
                     }
                 } else {
