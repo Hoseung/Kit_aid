@@ -53,9 +53,11 @@ class MainActivity : AppCompatActivity() {
         // copy asset calibration file to in-app repo ----------------------------------------------
         val modelInfo = File(applicationContext.filesDir, "model_info.dat")
         var prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
-        var lotNum = "00000"
+        var lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
         var inputFile = assets.open("${prodName}_00000.dat")
         var readStream: BufferedReader = inputFile.reader().buffered()
+
+
 
         // if modelInfo -> read prodName and lotNum
         if (modelInfo.exists()){
@@ -72,12 +74,14 @@ class MainActivity : AppCompatActivity() {
             val inputFile2 = File(
                 applicationContext.filesDir, "lastCalib.dat")
             readStream = inputFile2.reader().buffered()
+            println("point1111111111111")
+            MyEntryPoint.prefs.setString("prodName", "$prodName")
+            MyEntryPoint.prefs.setString("lotNum", "$lotNum")
         } else {
             println("modelInfo nothing...")
         }
-
-        MyEntryPoint.prefs.setString("prodName", "$prodName")
-        MyEntryPoint.prefs.setString("lotNum", "$lotNum")
+        println("removeQR: ${MyEntryPoint.prefs.getString("removeQR", "???")}")
+        println("prodname: $prodName, lotnum: $lotNum")
         val outputFile = File(applicationContext.filesDir, "${prodName}_${lotNum}.dat")
         val writeStream: OutputStreamWriter = outputFile.writer()
         println("$outputFile is open...")
@@ -243,6 +247,11 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        initView()
     }
 }
 

@@ -27,6 +27,7 @@
     <string name="clear_button">CLEAR</string>
     <string name="capture_kit">CAPTURE\nKIT</string>
     <string name="button_QR">SCAN QR</string>
+    <string name="no_calibration_guide" color="red">NO CALIBRATION FILE</string>
 
 
     <string name="history_section_name">HISTORY</string>

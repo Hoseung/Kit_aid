@@ -1,5 +1,6 @@
 package org.tensorflow.lite.examples.objectdetection.new
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Camera
@@ -9,9 +10,11 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.*
@@ -222,6 +225,14 @@ class ResultActivity : AppCompatActivity() {
             binding.inaccurateResult.visibility = View.VISIBLE
         }
         resultBackButton.setOnClickListener { finish() }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode==KeyEvent.KEYCODE_BACK) {
+            val mainIntent = Intent(this, MainActivity::class.java)
+            startActivity(mainIntent)
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }
 

@@ -11,6 +11,8 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.camera.mlkit.vision.MlKitAnalyzer
@@ -45,6 +47,8 @@ class QrActivity : AppCompatActivity() {
         viewBinding = ActivityQrBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        // setting QR variable
+        MyEntryPoint.prefs.setString("removeQR", "false")
 
 //        // Request camera permissions
 //        if (!PermissionsFragment.hasPermissions(this)) {
@@ -92,14 +96,15 @@ class QrActivity : AppCompatActivity() {
 
                 val qrCodeViewModel = QrCodeViewModel(barcodeResults[0])
                 val qrCodeDrawable = QrCodeDrawable(qrCodeViewModel)
+                previewView.setOnTouchListener(qrCodeViewModel.qrCodeTouchCallback)
 
-//                previewView.setOnTouchListener(qrCodeViewModel.qrCodeTouchCallback)
-                previewView.setOnClickListener {
-                    qrCodeViewModel.qrCodeTouchCallback
-                    finish()
-                }
                 previewView.overlay.clear()
                 previewView.overlay.add(qrCodeDrawable)
+
+                if (MyEntryPoint.prefs.getString("removeQR", "false").toBoolean()){
+                    finish()
+                    println("finishi process##")
+                }
             }
         )
 

@@ -53,20 +53,20 @@ class QrCodeDrawable(qrCodeViewModel: QrCodeViewModel) : Drawable() {
 
     override fun draw(canvas: Canvas) {
         canvas.drawRect(qrCodeViewModel.boundingRect, boundingRectPaint)
-        canvas.drawRect(
-            Rect(
-                qrCodeViewModel.boundingRect.left,
-                qrCodeViewModel.boundingRect.bottom + contentPadding/2,
-                qrCodeViewModel.boundingRect.left + textWidth + contentPadding*2,
-                qrCodeViewModel.boundingRect.bottom + contentTextPaint.textSize.toInt() + contentPadding),
-            contentRectPaint
-        )
-        canvas.drawText(
-            qrCodeViewModel.qrContent,
-            (qrCodeViewModel.boundingRect.left + contentPadding).toFloat(),
-            (qrCodeViewModel.boundingRect.bottom + contentPadding*2).toFloat(),
-            contentTextPaint
-        )
+//        canvas.drawRect(
+//            Rect(
+//                qrCodeViewModel.boundingRect.left,
+//                qrCodeViewModel.boundingRect.bottom + contentPadding/2,
+//                qrCodeViewModel.boundingRect.left + textWidth + contentPadding*2,
+//                qrCodeViewModel.boundingRect.bottom + contentTextPaint.textSize.toInt() + contentPadding),
+//            contentRectPaint
+//        )
+//        canvas.drawText(
+//            qrCodeViewModel.qrContent,
+//            (qrCodeViewModel.boundingRect.left + contentPadding).toFloat(),
+//            (qrCodeViewModel.boundingRect.bottom + contentPadding*2).toFloat(),
+//            contentTextPaint
+//        )
     }
 
     override fun setAlpha(alpha: Int) {

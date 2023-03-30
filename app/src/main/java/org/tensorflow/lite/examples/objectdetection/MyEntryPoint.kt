@@ -60,8 +60,12 @@ class MyEntryPoint : Application() {
         prefs.setCnt("count1", 0)
         prefs.setCnt("count2", 0)
 
+        // QR
+        prefs.setString("removeQR", "false")
+
         auth = Firebase.auth
         //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
+        println("point22222222222")
 
     }
 }
