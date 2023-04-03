@@ -91,13 +91,7 @@
         android:layout_gravity="center_horizontal"
         />
 
-        <TextView
-            android:id="@+id/VerificationError"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="@string/verification_not_arrived"
-            />
+
 
     </LinearLayout>>
 

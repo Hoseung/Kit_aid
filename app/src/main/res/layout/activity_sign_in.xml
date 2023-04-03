@@ -29,13 +29,22 @@
         android:gravity="center"
         />
 
+    <TextView
+        android:id="@+id/VerificationError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/verification_not_arrived"
+        />
+
     <EditText
         android:id="@+id/signInEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email address"
         android:inputType="textEmailAddress"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="35dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
 

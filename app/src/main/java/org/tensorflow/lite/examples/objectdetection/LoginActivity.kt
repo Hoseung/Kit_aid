@@ -99,21 +99,6 @@ class LoginActivity : AppCompatActivity() {
             startActivity(switchSignIn)
         }
 
-        // login error guide
-        binding.VerificationError.setOnClickListener {
-            AlertDialog.Builder(this).run{
-                setMessage("If you signed up" +
-                        " using a business domain email account," +
-                        " such as @mybusiness.ai or @company.com," +
-                        " you may encounter issues" +
-                        " with receiving the verification email.\n\n" +
-                        "Please sign up with another domain service" +
-                        " like google or naver etc.")
-                setPositiveButton("OK", null)
-                show()
-            }
-        }
-
 }
     private fun changeMode(mode: String, binding:ActivityLoginBinding){
         if(mode === "login"){

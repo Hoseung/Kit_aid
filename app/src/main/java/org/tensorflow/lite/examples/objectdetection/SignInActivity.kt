@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.email
@@ -89,6 +90,21 @@ class SignInActivity : AppCompatActivity() {
                             ).show()
                         }
                     }
+            }
+        }
+
+        // login error guide
+        binding.VerificationError.setOnClickListener {
+            AlertDialog.Builder(this).run{
+                setMessage("If you signed up" +
+                        " using a business domain email account," +
+                        " such as @mybusiness.ai or @company.com," +
+                        " you may encounter issues" +
+                        " with receiving the verification email.\n\n" +
+                        "Please sign up with another domain service" +
+                        " like google or naver etc.")
+                setPositiveButton("OK", null)
+                show()
             }
         }
     }
