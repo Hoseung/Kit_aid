@@ -9,6 +9,7 @@ import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.startActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -97,6 +98,22 @@ class LoginActivity : AppCompatActivity() {
             val switchSignIn = Intent(this@LoginActivity, SignInActivity::class.java)
             startActivity(switchSignIn)
         }
+
+        // login error guide
+        binding.VerificationError.setOnClickListener {
+            AlertDialog.Builder(this).run{
+                setMessage("If you signed up" +
+                        " using a business domain email account," +
+                        " such as @mybusiness.ai or @company.com," +
+                        " you may encounter issues" +
+                        " with receiving the verification email.\n\n" +
+                        "Please sign up with another domain service" +
+                        " like google or naver etc.")
+                setPositiveButton("OK", null)
+                show()
+            }
+        }
+
 }
     private fun changeMode(mode: String, binding:ActivityLoginBinding){
         if(mode === "login"){
