@@ -150,8 +150,9 @@ class ResultActivity : AppCompatActivity() {
         println("OG answer: $dAnswer")
 
         val uri = Uri.parse(suri)
-        print("URI $uri")
+        println("URI $uri")
         val file = File(uri.path!!)
+        println("file exist?: ${file.exists()}")
 
         // save model prodName and Lot number to modelInfo.dat
         val modelInfo = File(applicationContext.filesDir, "model_info.dat")
@@ -218,10 +219,12 @@ class ResultActivity : AppCompatActivity() {
         if (downloadedFile.exists()) {
             Log.d("filecheck", "$modelCalibration file used~")
             MyEntryPoint.prefs.setString("CalibUri", "${downloadedFile.toURI()}")
+            binding.nocalibGuide.visibility = View.INVISIBLE
             binding.inaccurateResult.visibility = View.INVISIBLE
         } else {
             println("initview check $modelCalibration")
             println("$CalibUri")
+            binding.nocalibGuide.visibility = View.VISIBLE
             binding.inaccurateResult.visibility = View.VISIBLE
         }
         resultBackButton.setOnClickListener { finish() }

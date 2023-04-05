@@ -50,6 +50,7 @@ import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.io.ByteArrayOutputStream
@@ -62,7 +63,6 @@ import java.util.concurrent.Executors
 
 class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
     private val TAG = "cameraFragment"
-
     private lateinit var viewBinding: ActivityCameraBinding
 
     private val modelsViewModel: ModelsViewModel by viewModels {
@@ -93,6 +93,9 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewBinding = ActivityCameraBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
+
         //Firebase storage setting
         auth = FirebaseAuth.getInstance()
 //        db = FirebaseFirestore.getInstance()
@@ -101,23 +104,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
         val storageRef = storage.reference
         Log.d("FirebaseCompare2", "$storageRef")
-
-        viewBinding = ActivityCameraBinding.inflate(layoutInflater)
-        setContentView(viewBinding.root)
-
-        viewBinding.examineHistoryButton.setOnClickListener {
-            startActivity(Intent(this, HistoryActivity::class.java))
-        }
-
-        viewBinding.kitListButton.setOnClickListener {
-            startActivity(Intent(this, SelectActivity::class.java))
-        }
-
         loadLocalModels(storageRef)
-
-//        viewBinding.profileImageView.setOnClickListener {
-//            startActivity(Intent(this, MemberActivity::class.java))
-//        }
 
         objectDetectorHelper = ObjectDetectorHelper(
             context = this,
@@ -153,7 +140,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             val request = DownloadManager.Request(it)
                 .setTitle("File")
                 .setDescription("Downloading...")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
+//                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
                 .setAllowedOverMetered(true)
                 .setDestinationInExternalFilesDir(
                     applicationContext,
@@ -210,7 +197,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 //        }
 
         // update Product name
-        val productName = viewBinding.productNameInfo //viewBinding?.findViewById<TextView>(R.id.productNameInfo)
+        val productName = viewBinding.productNameInfo
         val myPrdName = String.format("Product Name  %s", MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG"))
         productName.text = myPrdName
 

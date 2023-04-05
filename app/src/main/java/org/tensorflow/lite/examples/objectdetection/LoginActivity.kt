@@ -1,6 +1,8 @@
 package org.tensorflow.lite.examples.objectdetection
 
+import android.app.ProgressDialog.show
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -15,7 +17,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.email
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivityForgotPasswordBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityLoginBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivitySignInBinding
 import java.io.BufferedReader
@@ -85,7 +90,6 @@ class LoginActivity : AppCompatActivity() {
 
             }
 
-
         // 로그인
         binding.loginButton.setOnClickListener {
             email = binding.inputEmail.text.toString()
@@ -99,7 +103,39 @@ class LoginActivity : AppCompatActivity() {
             startActivity(switchSignIn)
         }
 
-}
+        // 비밀번호 재설정
+        binding.forgotPassword.setOnClickListener {
+            AlertDialog.Builder(this).run {
+                setTitle("Please enter your email address")
+                setIcon(android.R.drawable.ic_dialog_info)
+                val forgotPasswordBinding = ActivityForgotPasswordBinding.inflate(layoutInflater)
+                setView(forgotPasswordBinding.root)
+                setPositiveButton("OK", DialogInterface.OnClickListener { dialog, which ->
+                    val lostEmail = forgotPasswordBinding.inputEmail.text.toString()
+                    Firebase.auth.sendPasswordResetEmail(lostEmail)
+                        .addOnSuccessListener { task ->
+                            AlertDialog.Builder(context).run {
+                                setMessage("Email sent successfully. Please check your email.")
+                                setPositiveButton("OK", null)
+                                show()
+                            }
+                        }.addOnFailureListener {
+                            AlertDialog.Builder(context).run {
+                                setMessage("Email sending failure. Please check your email format")
+                                setPositiveButton("OK", null)
+                                show()
+                            }
+                        }
+                    }
+                )
+                show()
+                setNegativeButton("Cancel", null)
+            }
+
+        }
+
+    }
+
     private fun changeMode(mode: String, binding:ActivityLoginBinding){
         if(mode === "login"){
             val diUser = File(applicationContext.filesDir, "diUser.dat")

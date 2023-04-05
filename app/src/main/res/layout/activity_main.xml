@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f0f3fa"
+    android:background="@color/app_background"
     android:orientation="vertical"
     tools:context=".MainActivity"
     >
 
     <ImageView
         android:id="@+id/loginImageView"
-        android:layout_width="277dp"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
         android:contentDescription="@string/description_app_logo"
-        android:src="@drawable/hero"
+        android:src="@drawable/main_image"
         android:layout_marginTop="50dp"
         android:layout_gravity="center"
         />
@@ -23,135 +23,149 @@
         android:id="@+id/loginLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="@drawable/bg_login_layout"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/rounded_rectangle_white"
         android:orientation="vertical">
-<!--        app:layout_constraintBottom_toTopOf="@id/loginBottomLayout"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.157"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/loginImageView"-->
-<!--        >-->
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/light_blue_900"
-            android:layout_marginTop="10dp"
-            android:textSize="45dp"
+            android:text="@string/current_kit_info"
+            android:textSize="24dp"
+            android:textColor="#767171"
             android:textStyle="bold"
-            android:shadowColor="@color/black"
-            android:layout_gravity="center"/>
+            android:layout_marginTop="15dp"
+            android:gravity="center"/>
 
             <LinearLayout
-                android:id="@+id/linearLayout2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <ImageView
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:src="@drawable/circle_gray"
+                    android:layout_marginLeft="40dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_gravity="center"
+                    />
+
+                <TextView
+                    android:id="@+id/labelProductName"
+                    android:layout_width="90dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="20dp"
-                    android:orientation="horizontal">
+                    android:layout_marginLeft="10dp"
+                    android:text="Product"
+                    android:textColor="#A6A6A6"
+                    android:textSize="18dp" />
 
-                    <TextView
-                        android:id="@+id/labelProductName"
-                        android:layout_width="110sp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="@string/current_product"
-                        android:textColor="@color/black"
-                        android:textSize="25dp" />
-
-                    <TextView
-                        android:id="@+id/loginProductName"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/current_product"
-                        android:textColor="@color/black"
-                        android:textSize="25dp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/loginProductName"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginEnd="20dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/labelLotNum"
-                        android:layout_width="110sp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:text="@string/current_lot"
-                        android:textColor="@color/black"
-                        android:textSize="25dp" />
-
-                    <TextView
-                        android:id="@+id/loginLotNumber"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/current_lot"
-                        android:textColor="@color/black"
-                        android:textSize="25dp" />
-
-                </LinearLayout>
+                    android:text="@string/current_product"
+                    android:textColor="#A6A6A6"
+                    android:textSize="18dp" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginTop="25dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 >
-                <Button
-                    android:id="@+id/scanQRButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="@string/button_QR"
-                    android:background="@color/bounding_box_color"
-                    android:textSize="25dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    />
-                <Button
-                    android:id="@+id/loginButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@color/bounding_box_color"
-                    android:textSize="25dp"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp"
-                    android:layout_marginLeft="5dp"
+
+                <ImageView
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:src="@drawable/circle_gray"
+                    android:layout_marginLeft="40dp"
                     android:layout_marginRight="10dp"
-                    android:text="@string/capture_kit"
+                    android:layout_gravity="center"
                     />
 
+                <TextView
+                    android:id="@+id/labelLotNum"
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/current_lot"
+                    android:textColor="#A6A6A6"
+                    android:textSize="18dp"/>
+
+                <TextView
+                    android:id="@+id/loginLotNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/current_lot"
+                    android:textColor="#A6A6A6"
+                    android:textSize="18dp" />
+
             </LinearLayout>
+
+        </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:src="@drawable/focus_ic"
+        android:background="@drawable/rounded_rectangle_lightgreen"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp">
+    </ImageButton>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        >
+
+        <ImageButton
+            android:id="@+id/examineHistoryButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/file_ic"
+            android:background="@drawable/rounded_rectangle_lightgreen"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/kitListButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:text="SELECT KIT"
+            android:background="@drawable/rounded_rectangle_lightgreen"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/scanQRButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/qr_ic"
+            android:background="@drawable/rounded_rectangle_lightgreen"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"/>
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            />
 
     <LinearLayout
         android:id="@+id/loginBottomLayout"

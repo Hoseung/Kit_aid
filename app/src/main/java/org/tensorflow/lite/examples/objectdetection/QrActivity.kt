@@ -102,8 +102,8 @@ class QrActivity : AppCompatActivity() {
                 previewView.overlay.add(qrCodeDrawable)
 
                 if (MyEntryPoint.prefs.getString("removeQR", "false").toBoolean()){
-                    finish()
                     println("finishi process##")
+                    finish()
                 }
             }
         )

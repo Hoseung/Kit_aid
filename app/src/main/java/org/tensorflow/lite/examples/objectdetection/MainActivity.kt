@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.tensorflow.lite.examples.objectdetection.adapter.*
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import java.io.BufferedReader
 import java.io.File
@@ -109,6 +110,14 @@ class MainActivity : AppCompatActivity() {
 
         //startActivity(Intent(this, LoginActivity::class.java))
         initView()
+
+        activityMainBinding.examineHistoryButton.setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
+
+        activityMainBinding.kitListButton.setOnClickListener {
+            startActivity(Intent(this, SelectActivity::class.java))
+        }
 
         // go to homepage
         activityMainBinding.goToHomepage.setOnClickListener {

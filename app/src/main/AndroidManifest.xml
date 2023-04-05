@@ -30,6 +30,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.media.action.IMAGE_CAPTURE" />
                 <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -58,12 +59,12 @@
                 android:name="android.notch_support"
                 android:value="true" />
 
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-<!--                <action android:name="android.media.action.IMAGE_CAPTURE" />-->
-<!--                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />-->
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <action android:name="android.media.action.IMAGE_CAPTURE" /> -->
+            <!-- <action android:name="android.media.action.STILL_IMAGE_CAMERA" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".new.ResultActivity"
@@ -80,10 +81,11 @@
                 android:resource="@xml/provider" />
         </provider>
 
-        <receiver android:name=".DownloadBroadcastReceiver"
+        <receiver
+            android:name=".DownloadBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
             </intent-filter>
         </receiver>
     </application>

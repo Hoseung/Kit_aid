@@ -10,39 +10,39 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/examineHistoryButton"
-            android:layout_width="123dp"
-            android:layout_height="41.5dp"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="15dp"
-            android:background="@drawable/bg_green_btn"
-            android:drawableStart="@drawable/history_icon"
-            android:drawablePadding="-15sp"
-            android:gravity="center"
-            android:paddingStart="18sp"
-            android:text="History"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        <TextView-->
+<!--            android:id="@+id/examineHistoryButton"-->
+<!--            android:layout_width="123dp"-->
+<!--            android:layout_height="41.5dp"-->
+<!--            android:layout_marginStart="15dp"-->
+<!--            android:layout_marginTop="15dp"-->
+<!--            android:background="@drawable/bg_green_btn"-->
+<!--            android:drawableStart="@drawable/history_icon"-->
+<!--            android:drawablePadding="-15sp"-->
+<!--            android:gravity="center"-->
+<!--            android:paddingStart="18sp"-->
+<!--            android:text="History"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
-        <TextView
-            android:id="@+id/kitListButton"
-            android:layout_width="123dp"
-            android:layout_height="41.5dp"
-            android:layout_marginStart="20dp"
-            android:background="@drawable/bg_green_btn"
-            android:drawableStart="@drawable/list_white_icon"
-            android:drawablePadding="-15sp"
-            android:gravity="center"
-            android:paddingStart="18sp"
-            android:text="Kit List"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@id/examineHistoryButton"
-            app:layout_constraintStart_toEndOf="@id/examineHistoryButton"
-            app:layout_constraintTop_toTopOf="@id/examineHistoryButton" />
+<!--        <TextView-->
+<!--            android:id="@+id/kitListButton"-->
+<!--            android:layout_width="123dp"-->
+<!--            android:layout_height="41.5dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:background="@drawable/bg_green_btn"-->
+<!--            android:drawableStart="@drawable/list_white_icon"-->
+<!--            android:drawablePadding="-15sp"-->
+<!--            android:gravity="center"-->
+<!--            android:paddingStart="18sp"-->
+<!--            android:text="Kit List"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/examineHistoryButton"-->
+<!--            app:layout_constraintStart_toEndOf="@id/examineHistoryButton"-->
+<!--            app:layout_constraintTop_toTopOf="@id/examineHistoryButton" />-->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="413dp"

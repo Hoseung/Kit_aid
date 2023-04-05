@@ -40,11 +40,7 @@ class QrCodeViewModel(barcode: Barcode) {
                 qrContent = barcode.displayValue.toString()
                 println("qrcontent: ${qrContent}")
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->
-                    println("----------------")
-                    println(e.action)
-                    println(e.getX().toInt())
-                    println(e.getY().toInt())
-                    println("----------------")
+
                     if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
                         val words = qrContent.split(" ")
                         println("234234234")
