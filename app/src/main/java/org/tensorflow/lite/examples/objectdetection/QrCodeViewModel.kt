@@ -34,21 +34,26 @@ class QrCodeViewModel(barcode: Barcode) {
     var qrCodeTouchCallback = { v: View, e: MotionEvent -> false} //no-op
 
     init {
+        println("barcode.valueType ${barcode.valueType} + ${Barcode.TYPE_TEXT}")
         when (barcode.valueType) {
             Barcode.TYPE_TEXT -> {
                 qrContent = barcode.displayValue.toString()
+                println("qrcontent: ${qrContent}")
                 qrCodeTouchCallback = { v: View, e: MotionEvent ->
+
                     if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
                         val words = qrContent.split(" ")
-                        // Todo: complete downloading before updating prefs.
-                        //
-                        if(words.size == 5 && words[0] == "Proteomtech"){
+                        println("234234234")
+                        if(words.size == 5 && words[0].lowercase() == "proteometech"){
                             MyEntryPoint.prefs.setString("prodName", words[1])
-                            MyEntryPoint.prefs.setString("lotNum", words[2])
+                            MyEntryPoint.prefs.setString("lotNum", words[2].replace("BIG", ""))
                             MyEntryPoint.prefs.setString("Date", words[3])
                             MyEntryPoint.prefs.setString("hash", words[4])
 
                             println("xxxxxxxxxx ${words[0]} ${words[1]} ${words[2]} ${words[3]} ${words[4]}")
+
+                            // download if model is missing
+                            MyEntryPoint.prefs.setString("removeQR", "true")
                             val cameraIntent = Intent(v.context, CameraActivity::class.java)
                             v.context.startActivity(cameraIntent)
                         }

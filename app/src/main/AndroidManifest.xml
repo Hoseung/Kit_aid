@@ -6,16 +6,34 @@
     <dist:module dist:instant="true" /> <!-- Declare features -->
     <uses-feature android:name="android.hardware.camera" /> <!-- Declare permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".MyEntryPoint"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_aid"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_aid_round"
         android:taskAffinity=""
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
+        <activity
+            android:name=".SignInActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.media.action.IMAGE_CAPTURE" />
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".QrActivity"
             android:exported="false" />
@@ -41,28 +59,35 @@
                 android:name="android.notch_support"
                 android:value="true" />
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.media.action.IMAGE_CAPTURE" />
-                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <action android:name="android.media.action.IMAGE_CAPTURE" /> -->
+            <!-- <action android:name="android.media.action.STILL_IMAGE_CAMERA" /> -->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".new.ResultActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity android:name=".HistoryActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="org.tensorflow.lite.examples.objectdetection.provider"
+            android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider" />
         </provider>
+
+        <receiver
+            android:name=".DownloadBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -10,6 +10,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.camera.mlkit.vision.MlKitAnalyzer
@@ -44,6 +47,8 @@ class QrActivity : AppCompatActivity() {
         viewBinding = ActivityQrBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        // setting QR variable
+        MyEntryPoint.prefs.setString("removeQR", "false")
 
 //        // Request camera permissions
 //        if (!PermissionsFragment.hasPermissions(this)) {
@@ -79,6 +84,7 @@ class QrActivity : AppCompatActivity() {
                 ContextCompat.getMainExecutor(this)
             ) { result: MlKitAnalyzer.Result? ->
                 val barcodeResults = result?.getValue(barcodeScanner)
+
                 if ((barcodeResults == null) ||
                     (barcodeResults.size == 0) ||
                     (barcodeResults.first() == null)
@@ -90,10 +96,15 @@ class QrActivity : AppCompatActivity() {
 
                 val qrCodeViewModel = QrCodeViewModel(barcodeResults[0])
                 val qrCodeDrawable = QrCodeDrawable(qrCodeViewModel)
-
                 previewView.setOnTouchListener(qrCodeViewModel.qrCodeTouchCallback)
+
                 previewView.overlay.clear()
                 previewView.overlay.add(qrCodeDrawable)
+
+                if (MyEntryPoint.prefs.getString("removeQR", "false").toBoolean()){
+                    println("finishi process##")
+                    finish()
+                }
             }
         )
 
@@ -103,31 +114,6 @@ class QrActivity : AppCompatActivity() {
 
     // Todo: save file to 'app internal' storage.
     // https://developer.android.com/training/data-storage/app-specific
-    var downloadID : Long = 0
-    private fun downloadMissingCalibration(){
-        val missingCalib = "20230003"
-        val missingCalibModel = "BovineIgG"
-
-        var request = DownloadManager.Request(
-            Uri.parse("https://프로테옴텍/서버/주소/정해진/위치/${missingCalibModel}_${missingCalib}.dat"))
-            .setDescription("calibration model downloading")
-            .setAllowedOverMetered(true)
-
-        var dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        downloadID = dm.enqueue(request)
-
-        var br = object:BroadcastReceiver(){
-            override fun onReceive(p0: Context?, p1: Intent?) {
-                var id = p1?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-                if(id==downloadID){
-                    Toast.makeText(applicationContext, "calibration model is ready!", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-        registerReceiver(br, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-
-    }
-
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(

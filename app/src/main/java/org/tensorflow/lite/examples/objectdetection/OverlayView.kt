@@ -36,12 +36,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
     private var boxPaint = Paint()
     private var textBackgroundPaint = Paint()
     private var textPaint = Paint()
-
     private var cameraPaint = Paint()
-
     private var backgroundPaint = Paint()
-
-    private var scaleFactor: Float = 0.3f
+    private var widthScaleFactor: Float = 0.0f
+    private var heightScaleFactor: Float = 0.0f
 
     private var bounds = Rect()
 
@@ -107,10 +105,10 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
         for (result in results) {
             val boundingBox = result.boundingBox
 
-            val top = boundingBox.top * scaleFactor
-            val bottom = boundingBox.bottom * scaleFactor
-            val left = boundingBox.left * scaleFactor
-            val right = boundingBox.right * scaleFactor
+            val top = boundingBox.top * heightScaleFactor
+            val bottom = boundingBox.bottom * heightScaleFactor
+            val left = boundingBox.left * widthScaleFactor
+            val right = boundingBox.right * widthScaleFactor
 
             // Draw bounding box around detected objects
             val drawableRect = RectF(left, top, right, bottom)
@@ -153,7 +151,8 @@ class OverlayView(context: Context?, attrs: AttributeSet?) : View(context, attrs
 
         // PreviewView is in FILL_START mode. So we need to scale up the bounding box to match with
         // the size that the captured images will be displayed.
-        scaleFactor = max(width * 1f / imageWidth, height * 1f / imageHeight)
+        widthScaleFactor = width * 1f / imageWidth
+        heightScaleFactor = height * 1f / imageHeight
     }
 
     companion object {

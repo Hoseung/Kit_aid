@@ -25,13 +25,14 @@
     <string name="back_button">Back</string>
     <string name="export_button">EXPORT</string>
     <string name="clear_button">CLEAR</string>
-    <string name="button_login">LOGIN</string>
+    <string name="capture_kit">CAPTURE\nKIT</string>
     <string name="button_QR">SCAN QR</string>
+    <string name="no_calibration_guide" color="red">NO CALIBRATION FILE</string>
 
 
     <string name="history_section_name">HISTORY</string>
     <string name="welcome_to">Welcome to</string>
-    <string name="current_product">Product Name</string>
+    <string name="current_product">Product</string>
     <string name="current_lot">Lot No.</string>
     <string name="label_result">Result</string>
     <string name="label_reference">Reference</string>
@@ -51,10 +52,20 @@
         <item>ImmuneCheck IgE</item>
         <item>ImmuneCheck IgG</item>
     </string-array>
-    <!--    <string-array name="models_spinner_titles">-->
-    <!--        <item>MobileNet V1</item>-->
-    <!--        <item>EfficientDet Lite0</item>-->
-    <!--        <item>EfficientDet Lite1</item>-->
-    <!--        <item>EfficientDet Lite2</item>-->
-    <!--    </string-array>-->
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="first_sign_up"><u>Don\'t have an account? Sign up</u></string>
+    <string name="forgot_password"><u>Forgot password?</u></string>
+    <string name="verification_not_arrived"><u>Verification email not arrived yet?</u></string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="current_kit_info"><u>Current Kit Information</u></string>
+
+
 </resources>

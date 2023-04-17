@@ -80,7 +80,7 @@ class RegressionHelper (
                 // load a file from the asset folder.
                 FileUtil.loadMappedFile(
                     context,
-                    "230213_new_regression_float16.tflite",
+                    "230329_regression_float16.tflite",
                 ), tfliteOption
             )
             return true
@@ -102,7 +102,6 @@ class RegressionHelper (
         val input = processInputImage(image,
             inputPredictTargetWidth,
             inputPredictTargetHeight)
-
         interpreterPredict?.run(input?.buffer, modelOutput)
         //println("INFERENCE DONE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         //val answer = modelOutput.floatArray.toString()

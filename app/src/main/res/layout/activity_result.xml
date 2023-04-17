@@ -49,12 +49,40 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="110dp"
                     android:layout_height="wrap_content"
                     android:text="@string/label_result"
                     android:textColor="@color/blue"
                     android:textSize="25sp"
                     app:drawableLeftCompat="@drawable/icon" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/nocalib_guide"
+                        android:layout_width="258dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_calibration_guide"
+                        android:visibility="visible"
+                        android:textColor="#E31425"
+                        android:textStyle="bold"
+                        />
+
+                    <TextView
+                        android:id="@+id/inaccurateResult"
+                        android:layout_width="258dp"
+                        android:layout_height="wrap_content"
+                        android:text="Result might be inaccurate"
+                        android:visibility="visible"
+                        />
+
+                </LinearLayout>
+
+
+
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -135,6 +163,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/referenceLayout" />
+
         </LinearLayout>
     </ScrollView>
 

@@ -1,24 +1,28 @@
 package org.tensorflow.lite.examples.objectdetection.new
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Camera
 import android.net.Uri
 //import android.graphics.Path
 //import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import kotlinx.coroutines.*
-import org.tensorflow.lite.examples.objectdetection.HistoryRoomDatabase
-import org.tensorflow.lite.examples.objectdetection.RegressionHelper
-import org.tensorflow.lite.examples.objectdetection.MyEntryPoint
-import org.tensorflow.lite.examples.objectdetection.R
+import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBinding
 import java.io.File
 import java.io.FileInputStream
+import java.io.OutputStreamWriter
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
@@ -91,13 +95,14 @@ class ResultActivity : AppCompatActivity() {
 
          Also Todo: 혈청 / 전혈 선택에 따른 보정
          */
-        answer = calibrateLot(answer)
+        Log.d("answer", "$answer")
+        answer = calibrateLot(answer  * 180f)
 
         val answerStr = answer.let { it ->
             if (it > 130) {
                 "> 130 mg/ml"
             } else {
-                String.format("%.1fmg/ml", it * 180f)
+                String.format("%.1fmg/ml", it)
             }
         }
 
@@ -105,7 +110,7 @@ class ResultActivity : AppCompatActivity() {
         myTextView.text = answerStr
 
         // ToDo: saveResult()
-        //setHistoryList
+        // setHistoryList
 
 //        historyViewModel.insert(
 //            History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
@@ -123,32 +128,71 @@ class ResultActivity : AppCompatActivity() {
 //        }
         historyViewModel.insert(history)
 
+        // initialze camera activity successful counts
+        MyEntryPoint.prefs.setCnt("count1", 0)
+        MyEntryPoint.prefs.setCnt("count2", 0)
+
         //historyAdapter.addHistoryList(History(null, "2022-10-10", 20222002, "20mg/ml", "img1.png"))
     }
 
     private fun calibrateLot(answer: Float) : Float {
         val dAnswer = answer.toDouble()
         val suri = MyEntryPoint.prefs.getString("CalibUri", "badbadbad")
-        print("SURI $suri \n")
+        val suriArray = suri.split("/")
+        val fileName = suriArray[suriArray.size-1]
+
+        val prodName = fileName.slice(0 until fileName.indexOf("_"))
+        val lotNum = fileName.slice(
+            fileName.indexOf("_")+1 until fileName.indexOf(".")
+        )
+        println("SURI $suri \n")
+        println("SURI check $prodName $lotNum")
+        println("OG answer: $dAnswer")
+
         val uri = Uri.parse(suri)
-        print("URI $uri")
+        println("URI $uri")
         val file = File(uri.path!!)
+        println("file exist?: ${file.exists()}")
+
+        // save model prodName and Lot number to modelInfo.dat
+        val modelInfo = File(applicationContext.filesDir, "model_info.dat")
+        val modelWriteStream: OutputStreamWriter = modelInfo.writer()
+        modelWriteStream.write("$prodName")
+        modelWriteStream.write("\n")
+        modelWriteStream.write("$lotNum")
+        modelWriteStream.flush()
+
+        // save last used coefficient to lastCalibFile.dat
+        val lastCalibFile = File(applicationContext.filesDir, "lastCalib.dat")
+        val lastCalibWriteStream: OutputStreamWriter = lastCalibFile.writer()
+
         val coefficients = file.readLines() //File(uri.path!!).useLines { it.toList() }
         var sum = 0.0
         for(i in coefficients.indices){
-            println("$i ZZZZZZZ $coefficients[i]")
+            println("$i ZZZZZZZ ${coefficients[i]}")
+            println("$i ${coefficients[i].toDouble()} * ${dAnswer.pow(i)}")
+
+            lastCalibWriteStream.write(coefficients[i])
+            lastCalibWriteStream.write("\n")
+
             sum += coefficients[i].toDouble() * dAnswer.pow(i)
         }
+        lastCalibWriteStream.flush()
         return sum.toFloat()
     }
 
     private fun randomCroppedPredict(image: Bitmap) : Float {
         var cropped: Bitmap
         val answers = mutableListOf<Float>()
+
         for (i in 0..5) {
+            var x = ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20
+            Log.d("dx", "point x: $x")
+            Log.d("imagesize", "${image.width} x ${image.height}")
+            if (x < 0) x = 0
             cropped = Bitmap.createBitmap(
                 image,
-                ceil(image.width * 0.08).toInt() + Random.nextInt(40) - 20,
+                 x,
                 ceil(image.height * 0.36).toInt() + Random.nextInt(60) - 30,
                 ceil(image.width * 0.54).toInt() + Random.nextInt(40) - 20,
                 ceil(image.height * 0.245).toInt() + Random.nextInt(60) - 30
@@ -164,7 +208,34 @@ class ResultActivity : AppCompatActivity() {
     }
 
     private fun initView() = with(binding) {
+
+        // todo calibration file check!
+        val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        var lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
+        val modelCalibration = "${prodName}_${lotNum}.dat"
+        val CalibUri = MyEntryPoint.prefs.getString("CalibUri", "-")
+        val downloadedFile = File(applicationContext.getExternalFilesDir("Calibration_file"), modelCalibration)
+
+        if (downloadedFile.exists()) {
+            Log.d("filecheck", "$modelCalibration file used~")
+            MyEntryPoint.prefs.setString("CalibUri", "${downloadedFile.toURI()}")
+            binding.nocalibGuide.visibility = View.INVISIBLE
+            binding.inaccurateResult.visibility = View.INVISIBLE
+        } else {
+            println("initview check $modelCalibration")
+            println("$CalibUri")
+            binding.nocalibGuide.visibility = View.VISIBLE
+            binding.inaccurateResult.visibility = View.VISIBLE
+        }
         resultBackButton.setOnClickListener { finish() }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode==KeyEvent.KEYCODE_BACK) {
+            val mainIntent = Intent(this, MainActivity::class.java)
+            startActivity(mainIntent)
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }
 

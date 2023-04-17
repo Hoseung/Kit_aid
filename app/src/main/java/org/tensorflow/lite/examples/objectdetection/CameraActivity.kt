@@ -15,16 +15,20 @@
  */
 package org.tensorflow.lite.examples.objectdetection
 
+//import android.media.Image
+//import android.net.Uri
+//import android.util.Size
+//import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
+//import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
+
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.*
-//import android.media.Image
-//import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-//import android.util.Size
 import android.view.Surface.ROTATION_0
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -35,13 +39,18 @@ import androidx.camera.core.ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import org.tensorflow.lite.examples.objectdetection.*
+import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.auth
+import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.storage
 import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
-//import org.tensorflow.lite.examples.objectdetection.databinding.viewBinding
-//import org.tensorflow.lite.examples.objectdetection.new.MemberActivity
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
 import org.tensorflow.lite.examples.objectdetection.new.ResultActivity
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import java.io.ByteArrayOutputStream
@@ -51,10 +60,9 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListener {
-
     private val TAG = "cameraFragment"
-
     private lateinit var viewBinding: ActivityCameraBinding
 
     private val modelsViewModel: ModelsViewModel by viewModels {
@@ -63,9 +71,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     //private val viewBinding
     //get() = viewBinding!!
 
-    private var imageCaptureDetectionSuccess = 0
     private var imageCaptureDetectionFail = 0
-
     private lateinit var objectDetectorHelper: ObjectDetectorHelper
     //private lateinit var regressionHelper: RegressionHelper
     private lateinit var bitmapBuffer: Bitmap
@@ -74,10 +80,10 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
     private var cameraProvider: ProcessCameraProvider? = null
+
     //private val range = camera?.cameraInfo?.exposureState?.exposureCompensationRange
 
     private lateinit var imageCapture: ImageCapture
-
     //private val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
 
     /** Blocking camera operations are performed using this executor */
@@ -85,49 +91,84 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     private lateinit var cameraExecutor: ExecutorService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        viewBinding.examineHistoryButton.setOnClickListener {
-            startActivity(Intent(this, HistoryActivity::class.java))
-        }
+        //Firebase storage setting
+        auth = FirebaseAuth.getInstance()
+        storage = Firebase.storage("gs://kitaid.appspot.com/")
 
-        viewBinding.kitListButton.setOnClickListener {
-            startActivity(Intent(this, SelectActivity::class.java))
-        }
+        val storageRef = storage.reference
+        Log.d("FirebaseCompare2", "$storageRef")
+        loadLocalModels(storageRef)
 
-        loadLocalModels()
-
-//        viewBinding.profileImageView.setOnClickListener {
-//            startActivity(Intent(this, MemberActivity::class.java))
-//        }
         objectDetectorHelper = ObjectDetectorHelper(
             context = this,
             objectDetectorListener = this
         )
         cameraExecutor = Executors.newSingleThreadExecutor()
+
     }
 
-    private fun loadLocalModels(){
-        // todo: 임시. ASSET을 internal storage에 저장
-        //val modelCalibration = "AniCheck-bIgG_BIG23006.dat"
+    private fun loadLocalModels(storageRef:StorageReference) {
+        // import saved preferences
         val prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
-        val lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
+        var lotNum = MyEntryPoint.prefs.getString("lotNum", "BIG22003")
         val date = MyEntryPoint.prefs.getString("date", "20231225")
         val hash = MyEntryPoint.prefs.getString("hash", "abcdefg123")
-
         val modelCalibration = "${prodName}_${lotNum}.dat"
+        var downloadedURI: Nothing? = null
 
-        val copiedFile = File(applicationContext.filesDir, modelCalibration)
-        applicationContext.assets.open(modelCalibration).use { input ->
-            copiedFile.outputStream().use { output ->
-                input.copyTo(output, 1024)
-            }
+        // setting file path
+        val fileRef: StorageReference = storageRef.child(modelCalibration)
+        val downloadedFile = File(applicationContext.getExternalFilesDir("Calibration_file"), modelCalibration)
+        Log.d("FirebaseCompare3", "$fileRef.")
+
+        // if file is exists, replace it with new one
+        if (downloadedFile.exists()) {
+            downloadedFile.delete()
         }
-        // Get Uri of the file
-        val copiedURI = copiedFile.toURI()
+
+        // file download with download manager
+        fileRef.downloadUrl.addOnSuccessListener {
+            Log.d("FirebaseCompare4", "url down comp!!! $it")
+
+            val request = DownloadManager.Request(it)
+                .setTitle("File")
+                .setDescription("Downloading...")
+//                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED) // 나중에 주석처리 할 것
+                .setAllowedOverMetered(true)
+                .setDestinationInExternalFilesDir(
+                    applicationContext,
+                    "Calibration_file",
+                    modelCalibration
+                )
+
+            val dm = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(request)
+
+        }.addOnFailureListener {
+            Log.d("DownFail", "Url download fails... Use defalut calibration file")
+        }
+
+        /*
+        Todo
+        1. RegressionHelper에서 모델 로드할 때, 파일 없으면 try / catch로 에러 발생
+        2. 다운로드가 끝날때까지 하염없이 기다릴 것인가?
+        3. timeout을 걸어서, 그 동안에 안 되면 멈추고 메세지를 낼 것인가?
+          -- "다운로드가 실패했습니다. 안정적인 인터넷을... 확인..."
+          timeout은 다운로드 메니저에 기능이 있을 듯.. callback이든 처음에 옵션이든..
+        */
+
+        Log.d("downsuccess", "")
+
+        println(applicationContext.getExternalFilesDir("Calibration_file"))
+        println(downloadedFile)
+        println(downloadedFile.exists())
+
         modelsViewModel.insert(
-            Models(null, prodName, lotNum, date, hash, copiedURI.toString())
+            Models(null, prodName, lotNum, date, hash, downloadedURI.toString())
         )
 
 //        val modelPredict = "230213_new_regression_float16.tflite"
@@ -136,7 +177,8 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 //        )
 
         // ToDo: modelsViewModel.updateCalibUri(hash) 하기 전엔 modelViewMdoel은 빈 string.
-        modelsViewModel.updateCalibUri(hash)
+        //  -> 다른 곳에서 파일 체크하고 업데이트 해보자...
+//        modelsViewModel.updateCalibUri(hash)
     }
 
     override fun onResume() {
@@ -152,12 +194,12 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 //        }
 
         // update Product name
-        val productName = viewBinding.productNameInfo //viewBinding?.findViewById<TextView>(R.id.productNameInfo)
+        val productName = viewBinding.productNameInfo
         val myPrdName = String.format("Product Name  %s", MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG"))
         productName.text = myPrdName
 
         val lotNum = viewBinding.lotNumber
-        lotNum.text = String.format("Lot No.  %s", MyEntryPoint.prefs.getString("lotNum", "BIG22003"))
+        lotNum.text = String.format("Lot No.  %s", MyEntryPoint.prefs.getString("lotNum", "00000"))
     }
 
     override fun onDestroy() {
@@ -295,7 +337,8 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
-        MyEntryPoint.prefs.setCnt(0)
+        MyEntryPoint.prefs.setCnt("count1", 0)
+        MyEntryPoint.prefs.setCnt("count2", 0)
     }
 
     private var detect1Ready = false
@@ -305,6 +348,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         super.onStart()
         detect1Ready = false
         cap2 = false
+
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -332,7 +376,10 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     Capture image into memory and perform downstream tasks
      */
     private fun captureAndDetect() {
-        if (!::imageCapture.isInitialized) return
+        if (!::imageCapture.isInitialized) {
+            println("not init capture...")
+            return
+        }
 
         println("!%%%%%%%%%%%%%%%%%%%%% In captureAndDetect")
         val cameraController = camera?.cameraControl
@@ -351,20 +398,22 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         val cameraInfo = camera?.cameraInfo
 
         //cameraController?.setExposureCompensationIndex(-5)
+
         for (i in 1..5){
+            println("$i - captureAndDetect cnt1: ${MyEntryPoint.prefs.getCnt("count1", 0)}")
+            println("   - captureAndDetect cnt2: ${MyEntryPoint.prefs.getCnt("count2", 0)}")
             cameraController?.startFocusAndMetering(action1) // ToDo: Action List로 수정
 
             imageCapture.takePicture(cameraExecutor,
                 object :  ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(imageC: ImageProxy) {
-                        println("CCCCCCCCAAAAAAAAAMMMMMMMMMMEEEEEEEERRRRRRRRAAAAAAAAA")
-
-                        println(cameraInfo?.exposureState?.exposureCompensationIndex)
+                        println("caminfo: ${cameraInfo?.exposureState?.exposureCompensationIndex}")
 
                         val imageRotation = imageC.imageInfo.rotationDegrees
                         // Pass Bitmap and rotation to the object detector helper for processing and detection
                         val bitmap = imageProxyToBitmap(imageC)
                         imageC.close()
+                        println("bitmap?: $bitmap")
 
                         objectDetectorHelper.detectSecond(bitmap!!, imageRotation)
                     }
@@ -378,6 +427,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     objectDetectorHelper.detectSecond ->
         objectDectorListener.onSecondResult()
      */
+
     override fun onSecondResult(
         image: Bitmap,
         results: MutableList<Detection>?,
@@ -387,20 +437,25 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         //var uri: Uri
         println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SECOND RESULTS>>>>>>>>>>>>>>>>")
         runOnUiThread {
+            println("results??? -> ${results?.size?:100}") // todo delete it later
             if (results != null && results.size > 0 ) {
-                if (imageCaptureDetectionSuccess == 0) {
+                println("get in results!!! $results")
+                if (MyEntryPoint.prefs.getCnt("count2", 0) == 0) {
                     Toast.makeText(this, "Hold on for a second", Toast.LENGTH_LONG).show()
                 }
                 val i = results[0]
                 if (i.categories[0].score > 0.96) {
-                    imageCaptureDetectionSuccess += 1
-
+                    MyEntryPoint.prefs.increaseOneCnt("count1")
+                    MyEntryPoint.prefs.increaseOneCnt("count2")
+                    println("@@@getcnt@@@ ${MyEntryPoint.prefs.getCnt("count2", 0)}")
                     //savePictureToMemory(image, i.boundingBox!!)
                     //savePicture to storage
                     val cropped: Bitmap = cutBbox(rotate(image, 90f), i.boundingBox)
                     val absolutePath = imageSaver(cropped)
 
-                    if (imageCaptureDetectionSuccess == 5){
+                    if (MyEntryPoint.prefs.getCnt("count2", 0) >= 5){
+                        println("come in 5 points")
+
                         absolutePath.let {
                             val resultIntent = Intent(this, ResultActivity::class.java)
                             resultIntent.putExtra("imagePath", it)
@@ -410,14 +465,15 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
                         cap2 = false
                         imageCaptureDetectionFail = 0
                         detect1Ready = false
-                        MyEntryPoint.prefs.setCnt(0)
-                        imageCaptureDetectionSuccess = 0
+                        MyEntryPoint.prefs.setCnt("count2", 0)
                         //carryOn(image, i.boundingBox!!)
+                        println("finish? finish!")
+                        finish()
                     }
                 } else {
                     imageCaptureDetectionFail += 1
                 }
-                if (imageCaptureDetectionSuccess < 5) cap2 = true
+                if (MyEntryPoint.prefs.getCnt("count2", 0) < 5) cap2 = true
                 if (imageCaptureDetectionFail > 5) {
                     Toast.makeText(this, "try again...", Toast.LENGTH_SHORT).show()
                     //refreshFragment(context)
@@ -471,11 +527,16 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         val height = bbox.height()
         println("WIDTH and HEIGHT $width $height")
         println("bcx, bcy, ${bbox.centerX()} ${bbox.centerY()}")
-        return Bitmap.createBitmap(bitmap,
-            kotlin.math.ceil((bbox.centerX() - 0.525 * width) * factorWidth).toInt(),
-            kotlin.math.ceil((bbox.centerY() - 0.525 * height)*factorHeight).toInt(),
-            kotlin.math.ceil(1.05*width*factorWidth).toInt(),
-            (height*factorHeight).toInt())
+
+        // setting x, y, w, h
+        var x = kotlin.math.ceil((bbox.centerX() - 0.525 * width) * factorWidth).toInt()
+        var y = kotlin.math.ceil((bbox.centerY() - 0.525 * height) * factorHeight).toInt()
+        val w = kotlin.math.ceil(1.05 * width * factorWidth).toInt()
+        val h = (height*factorHeight).toInt()
+        if (x < 0) x = 0
+        if (y < 0) y = 0
+
+        return Bitmap.createBitmap(bitmap, x, y, w, h)
     }
 
     private fun rotate(bitmap: Bitmap, degrees: Float): Bitmap {
@@ -486,7 +547,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
      private fun imageSaver(bitmap: Bitmap): String{
         val photoFile = File(
             getOutputDirectory(this),
-            "img$imageCaptureDetectionSuccess.png"
+            "img${MyEntryPoint.prefs.getCnt("count2", 0)}.png"
 //            SimpleDateFormat(
 //                FILENAME_FORMAT, Locale.KOREA
 //            ).format(System.currentTimeMillis()) + ".png"
@@ -545,7 +606,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
             bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
             val imageRotation = image.imageInfo.rotationDegrees
             //println("DETECTOR1 ----")
-            if (MyEntryPoint.prefs.getCnt() <= 8){
+            if (MyEntryPoint.prefs.getCnt("count1", 0) <= 8){
                 image.close()
                 objectDetectorHelper.detect(bitmapBuffer, imageRotation)
             } else {
@@ -563,9 +624,6 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         imageHeight: Int,
         imageWidth: Int
     ) {
-        //var uri: Uri
-        val cnt = MyEntryPoint.prefs.getCnt()
-
         runOnUiThread {
             // Pass necessary information to OverlayView for drawing on the canvas
             viewBinding.overlay.setResults(
@@ -576,30 +634,29 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
             if (results != null && results.size > 0 ) {
                 val i = results[0]
-                println(i.categories[0].score)
                 if (i.categories[0].score > 0.92) {
-                    if (cnt == 7) {
+                    if (MyEntryPoint.prefs.getCnt("count1", 0) >= 7) {
                         Toast.makeText(this, "Ready to Capture", Toast.LENGTH_SHORT).show()
                         detect1Ready = true
                         captureAndDetect()
                         // No more captureAndDetect!
-                        MyEntryPoint.prefs.setCnt(cnt + 1)
+                        MyEntryPoint.prefs.setCnt("count1", 0)
 // thread inside captureAndDetect
 // and this Main thread are not synced.
 // Below setCnt(0) will be effective before captureAndDetect() is over.
                         //ObjectDetectorHelper.clearObjectDetector()
-                    } else if (cnt < 7){
+                    } else if (MyEntryPoint.prefs.getCnt("count1", 0) < 7){
                         if (i.boundingBox.height() < 0.25*imageHeight){
-                            MyEntryPoint.prefs.setCnt(0)
-                            println("RESET CNT  1 ... $cnt")
+                            MyEntryPoint.prefs.setCnt("count1", 0)
+                            println("RESET CNT  1 ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                         else if  (i.boundingBox.height() > 0.7*imageHeight){
-                            MyEntryPoint.prefs.setCnt(0)
-                            println("RESET CNT  2 ... $cnt")
+                            MyEntryPoint.prefs.setCnt("count1", 0)
+                            println("RESET CNT  2 ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                         else {
-                            MyEntryPoint.prefs.setCnt(cnt+1)
-                            println("INCREMENT CNT ... $cnt")
+                            MyEntryPoint.prefs.increaseOneCnt("count1")
+                            println("INCREMENT CNT ... ${MyEntryPoint.prefs.getCnt("count1", 0)}")
                         }
                     } else {
                         /* Some frames will stream in
@@ -609,12 +666,11 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
                     }
                 } else {
-                    MyEntryPoint.prefs.setCnt(0)
+                    MyEntryPoint.prefs.setCnt("count1", 0)
                 }
-                println("CURRENT CNT $cnt")
-            //}
+                println("CURRENT CNT ${MyEntryPoint.prefs.getCnt("count1", 0)}")
             }
-            viewBinding.overlay.invalidate() // Todo: 이건 뭘까?
+            viewBinding.overlay.invalidate()
         }
     }
 

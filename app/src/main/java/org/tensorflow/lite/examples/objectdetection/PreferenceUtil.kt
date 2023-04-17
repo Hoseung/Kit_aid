@@ -15,12 +15,16 @@ class PreferenceUtil(context: Context) {
         prefs.edit().putString(key, str).apply()
     }
 
-    fun getCnt(): Int{
-        return prefs.getInt("cnt", 0)
+    fun getCnt(key:String, value:Int): Int{
+        return prefs.getInt(key, 0)
     }
 
-    fun setCnt(cnt: Int) {
-        prefs.edit().putInt("cnt", cnt).apply()
+    fun setCnt(key: String, value: Int) {
+        prefs.edit().putInt(key, value).apply()
+    }
+
+    fun increaseOneCnt(key:String) {
+        prefs.edit().putInt(key, getCnt(key, 0) + 1).apply()
     }
 
 }
