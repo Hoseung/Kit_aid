@@ -72,7 +72,6 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     //get() = viewBinding!!
 
     private var imageCaptureDetectionFail = 0
-
     private lateinit var objectDetectorHelper: ObjectDetectorHelper
     //private lateinit var regressionHelper: RegressionHelper
     private lateinit var bitmapBuffer: Bitmap
@@ -98,9 +97,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
 
         //Firebase storage setting
         auth = FirebaseAuth.getInstance()
-//        db = FirebaseFirestore.getInstance()
         storage = Firebase.storage("gs://kitaid.appspot.com/")
-        Log.d("FirebaseCompare", "!!!storage:$storage")
 
         val storageRef = storage.reference
         Log.d("FirebaseCompare2", "$storageRef")

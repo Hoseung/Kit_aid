@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:439118700164:android:8fbefa1cfaa886f9dd2cd1",
         "android_client_info": {
-          "package_name": "com.proteomtech.kitaid"
+          "package_name": "com.proteometech.kitaid"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "439118700164-dhhrmot1pjt22ihkvc86vj0mckhmsnlv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.proteomtech.kitaid",
+            "package_name": "com.proteometech.kitaid",
             "certificate_hash": "e1209daeb2def7887a3c5ee7db5bb49a0b6d772c"
           }
         },

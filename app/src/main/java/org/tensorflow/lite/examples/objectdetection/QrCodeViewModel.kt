@@ -44,9 +44,9 @@ class QrCodeViewModel(barcode: Barcode) {
                     if (e.action == MotionEvent.ACTION_DOWN && boundingRect.contains(e.getX().toInt(), e.getY().toInt())) {
                         val words = qrContent.split(" ")
                         println("234234234")
-                        if(words.size == 5 && words[0] == "Proteomtech"){
+                        if(words.size == 5 && words[0].lowercase() == "proteometech"){
                             MyEntryPoint.prefs.setString("prodName", words[1])
-                            MyEntryPoint.prefs.setString("lotNum", words[2])
+                            MyEntryPoint.prefs.setString("lotNum", words[2].replace("BIG", ""))
                             MyEntryPoint.prefs.setString("Date", words[3])
                             MyEntryPoint.prefs.setString("hash", words[4])
 
