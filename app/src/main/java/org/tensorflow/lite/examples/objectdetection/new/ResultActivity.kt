@@ -69,7 +69,7 @@ class ResultActivity : AppCompatActivity() {
 
         val imgDir = intent.getStringExtra("imagePath")!!
         var imgPath : String
-        //binding.resultImageView.setImageURI(uri)
+        val calibOn = MyEntryPoint.prefs.getString("calibOn", "error").toBoolean()
 
         setImageFromPath("$imgDir/img1.png", binding.resultImageView)
 
@@ -77,8 +77,20 @@ class ResultActivity : AppCompatActivity() {
         for (i in 1..5) {
             imgPath = "$imgDir/img${i}.png"
             val img = pathToBitmap(imgPath)!!
-            // 파일 삭제
-            answers.add(randomCroppedPredict(img))
+
+            // calibration
+            var resultValue = randomCroppedPredict(img) * 180f
+            var ans: Float
+
+            if (calibOn) {
+                if (resultValue < 0) {
+                    resultValue = 0F
+                }
+                ans = calibrateLot(resultValue)
+            } else {
+                ans = resultValue
+            }
+            answers.add(ans)
 
             val f = File(imgPath)
             f.delete()
@@ -87,24 +99,30 @@ class ResultActivity : AppCompatActivity() {
             it[2]
         }
 
-
+        println("answers: ${answers.sorted()}")
+        println("answer sorted: $answer")
 
         /*
-        Todo:
-         Calibration
-
-         Also Todo: 혈청 / 전혈 선택에 따른 보정
-         */
+        Todo: Calibration
+        Also Todo: 혈청 / 전혈 선택에 따른 보정
+        */
         Log.d("answer", "$answer")
-        answer = calibrateLot(answer  * 180f)
+//        answer = calibrateLot(answer  * 180f)
 
-        val answerStr = answer.let { it ->
-            if (it > 130) {
-                "> 130 mg/ml"
-            } else {
-                String.format("%.1fmg/ml", it)
+
+        var answerStr: String
+        if (calibOn) {
+            answerStr = answer.let { it ->
+                if (it > 130) {
+                    "> 130 mg/ml"
+                } else {
+                    String.format("%.1fmg/ml", it)
+                }
             }
+        } else {
+            answerStr = answer.toString()
         }
+
 
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr
@@ -147,7 +165,6 @@ class ResultActivity : AppCompatActivity() {
         )
         println("SURI $suri \n")
         println("SURI check $prodName $lotNum")
-        println("OG answer: $dAnswer")
 
         val uri = Uri.parse(suri)
         println("URI $uri")
@@ -174,10 +191,13 @@ class ResultActivity : AppCompatActivity() {
 
             lastCalibWriteStream.write(coefficients[i])
             lastCalibWriteStream.write("\n")
+            println(i.toString()+" coeffi: "+ coefficients[i].toDouble() * dAnswer.pow(i))
 
             sum += coefficients[i].toDouble() * dAnswer.pow(i)
         }
         lastCalibWriteStream.flush()
+        println("OG answer: $dAnswer")
+        println("final answer: "+sum)
         return sum.toFloat()
     }
 

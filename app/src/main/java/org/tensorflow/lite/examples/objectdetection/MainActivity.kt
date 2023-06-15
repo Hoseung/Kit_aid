@@ -18,6 +18,7 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -29,6 +30,8 @@ import androidx.core.content.ContextCompat
 import org.tensorflow.lite.examples.objectdetection.adapter.*
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
+import org.tensorflow.lite.examples.objectdetection.databinding.ActivitySettingBinding
+import org.tensorflow.lite.examples.objectdetection.databinding.ItemSettingBinding
 import java.io.BufferedReader
 import java.io.File
 import java.io.OutputStreamWriter
@@ -123,6 +126,13 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding.goToHomepage.setOnClickListener {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.proteometech.com/main"))
             startActivity(browserIntent)
+        }
+
+        // setting activity
+        MyEntryPoint.prefs.setString("calibOn", "true")
+        activityMainBinding.versionText.setOnClickListener{
+            val settingIntent = Intent(this, SettingActivity::class.java)
+            startActivity(settingIntent)
         }
     }
 
@@ -261,6 +271,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initView()
+
     }
 }
 
