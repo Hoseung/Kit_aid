@@ -7,7 +7,9 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
 import org.tensorflow.lite.examples.objectdetection.adapter.HistoryRepository
+import org.tensorflow.lite.examples.objectdetection.myFirebase.MyFirebase
 
 
 class MyEntryPoint : Application() {
@@ -16,32 +18,12 @@ class MyEntryPoint : Application() {
     val repository by lazy { HistoryRepository(database.historyDao()) }
     companion object {
         lateinit var prefs: PreferenceUtil
-        lateinit var auth: FirebaseAuth
-        lateinit var storage: FirebaseStorage
+        lateinit var myFirebase: MyFirebase
         var email: String? = null
-        fun checkAuth():Boolean{
-            val currentUser = auth.currentUser
-            return currentUser?.let{
-                email = currentUser.email
-                if (currentUser.isEmailVerified) {
-                    println("user email verified")
-                    true
-                } else {
-                    println("user email not verified")
-                    false
-                }
-            } ?: let {
-                false
-            }
-        }
+
         //lateinit var database: HistoryRoomDatabase
 
     }
-
-    // Using by lazy so the database and the repository are only created when they're needed
-    // rather than when the application starts
-    //val applicationScope = CoroutineScope(SupervisorJob())
-    //val database by lazy { HistoryRoomDatabase.getDatabase(this, applicationScope) }
 
     override fun onCreate() {
         prefs = PreferenceUtil(applicationContext)
@@ -60,12 +42,16 @@ class MyEntryPoint : Application() {
         prefs.setCnt("count1", 0)
         prefs.setCnt("count2", 0)
 
+
         // QR
         prefs.setString("removeQR", "false")
 
-        auth = Firebase.auth
-        //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
-        println("point22222222222")
+        // firebase
+        myFirebase = MyFirebase("gs://kitaid.appspot.com/", applicationContext)
+
+        // download
+        prefs.setString("downloadReady", "true")
+
 
     }
 }

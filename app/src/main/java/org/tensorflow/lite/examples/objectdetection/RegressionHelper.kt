@@ -8,6 +8,9 @@ import android.util.Log
 import androidx.activity.viewModels
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.DELEGATE_CPU
+import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.DELEGATE_GPU
+import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.DELEGATE_NNAPI
 import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
@@ -20,6 +23,7 @@ import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import java.io.File
+import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 //import org.tensorflow.lite.examples.objectdetection.MainActivity.Companion.getOutputDirectory
@@ -38,6 +42,7 @@ class RegressionHelper (
     private var inputPredictTargetWidth = 0
     private var inputPredictTargetHeight = 0
     private var outputPredictShape = intArrayOf()
+    private var regressionFile: File? = null
 
 //    private val modelsViewModel: ModelsViewModel by viewModels {
 //        ModelsViewModelFactory((this.context as MyEntryPoint).database.modelsDao())
@@ -75,21 +80,30 @@ class RegressionHelper (
         }
         //val modelPredict =
 
+        val modelDir = File(context.getExternalFilesDir("Models"), "")
+        modelDir.listFiles().forEach {
+            if (it.toString()
+                    .contains(MyEntryPoint.prefs.getString("prodName", "..."))
+            ) {
+                regressionFile = it
+            }
+        }
+
+
         try {
-            interpreterPredict = Interpreter(
-                // load a file from the asset folder.
-                FileUtil.loadMappedFile(
-                    context,
-                    "230329_regression_float16.tflite",
-                ), tfliteOption
+            val fileChannel = FileInputStream(regressionFile).channel
+            val byteBuffer = ByteBuffer.allocateDirect(
+                fileChannel.size().toInt()).order(ByteOrder.nativeOrder()
             )
+
+            fileChannel.read(byteBuffer)
+            fileChannel.close()
+            byteBuffer.rewind()
+
+            interpreterPredict = Interpreter(byteBuffer, tfliteOption)
             return true
 
         } catch (e: Exception) {
-            //regressionListener.onError(
-            //    "Regression failed to initialize. See error logs for " +
-            //            "details"
-            //)
             Log.e(TAG, "TFLite failed to load model with error: " + e.message)
             return false
         }

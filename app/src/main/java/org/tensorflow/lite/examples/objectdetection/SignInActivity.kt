@@ -50,7 +50,7 @@ class SignInActivity : AppCompatActivity() {
                 binding.signInPw1.text.clear()
                 binding.signInPw2.text.clear()
             } else {
-                MyEntryPoint.auth.createUserWithEmailAndPassword(email, pw1)
+                MyEntryPoint.myFirebase.auth.createUserWithEmailAndPassword(email, pw1)
                     .addOnCompleteListener(this) { task ->
                         binding.signInEmail.text.clear()
                         binding.signInPw1.text.clear()
@@ -59,7 +59,7 @@ class SignInActivity : AppCompatActivity() {
                         if (task.isSuccessful) {
                             // password must be at least 6
                             // send verifying email
-                            MyEntryPoint.auth.currentUser?.sendEmailVerification()
+                            MyEntryPoint.myFirebase.auth.currentUser?.sendEmailVerification()
                                 ?.addOnCompleteListener { sendTask ->
                                     if (sendTask.isSuccessful) {
                                         Toast.makeText(

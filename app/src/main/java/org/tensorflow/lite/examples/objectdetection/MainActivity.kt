@@ -18,20 +18,23 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.ProgressDialog.show
 import android.content.ClipData
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.ColorSpace.Model
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import org.tensorflow.lite.examples.objectdetection.adapter.*
-import org.tensorflow.lite.examples.objectdetection.databinding.ActivityCameraBinding
 import org.tensorflow.lite.examples.objectdetection.databinding.ActivityMainBinding
-import org.tensorflow.lite.examples.objectdetection.databinding.ActivitySettingBinding
-import org.tensorflow.lite.examples.objectdetection.databinding.ItemSettingBinding
+import org.tensorflow.lite.examples.objectdetection.databinding.DownloadProgressDialog2Binding
+import org.tensorflow.lite.examples.objectdetection.firebaseML.ModelLib
 import java.io.BufferedReader
 import java.io.File
 import java.io.OutputStreamWriter
@@ -45,22 +48,27 @@ import java.io.OutputStreamWriter
 class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
-//    private val modelsViewModel: ModelsViewModel by viewModels {
-//        ModelsViewModelFactory((application as MyEntryPoint).database.modelsDao())
-//           }
+    private var loading: Boolean = true
+    private var downloadReady: Boolean = false
+    private var localModelList: Array<String> = arrayOf<String>("", "", "", "") // D, BIgG, IgE, IgG
+    private var prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+    private var lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
+    private var downloadList: MutableList<String> = mutableListOf()
+    private val modelLib = ModelLib(this@MainActivity)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
 
+        // activate loadinglayout
+        activityMainBinding.loadingLayout.visibility = View.VISIBLE
+
+
         // copy asset calibration file to in-app repo ----------------------------------------------
         val modelInfo = File(applicationContext.filesDir, "model_info.dat")
-        var prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
-        var lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
         var inputFile = assets.open("${prodName}_00000.dat")
         var readStream: BufferedReader = inputFile.reader().buffered()
-
 
 
         // if modelInfo -> read prodName and lotNum
@@ -78,7 +86,6 @@ class MainActivity : AppCompatActivity() {
             val inputFile2 = File(
                 applicationContext.filesDir, "lastCalib.dat")
             readStream = inputFile2.reader().buffered()
-            println("point1111111111111")
             MyEntryPoint.prefs.setString("prodName", "$prodName")
             MyEntryPoint.prefs.setString("lotNum", "$lotNum")
         } else {
@@ -95,14 +102,7 @@ class MainActivity : AppCompatActivity() {
         writeStream.flush()
         MyEntryPoint.prefs.setString("CalibUri", "${outputFile.toURI()}")
         println("write comp!!! model file nothing...")
-        // -----------------------------------------------------------------------------------------
 
-        /*
-        Todo:
-        It's not desirable to request permission until it is absolutely needed (right before you
-        take pictures)
-        But... I don't want to mess up with Permission Fragment and its interaction with activities.
-         */
         if (allPermissionsGranted()) {
             //startCamera()
         } else {
@@ -153,14 +153,8 @@ class MainActivity : AppCompatActivity() {
 //        lotTextView.text = MyEntryPoint.prefs.getString("lotNum", "LOT NUMBER")
 
 
-        activityMainBinding.loginButton.setOnClickListener {
-//            if (idEditText.text.toString() == "user" && pwEditText.text.toString() == "1234") {
-                //loadLocalModels()
+        activityMainBinding.captureKit.setOnClickListener {
                 startActivity(Intent(this, CameraActivity::class.java))
-//            } else {
-//                Toast.makeText(this@LoginActivity, "아이디 또는 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT)
-//                    .show()
-//            }
         }
         activityMainBinding.scanQRButton.setOnClickListener {
             startActivity(Intent(this, QrActivity::class.java))
@@ -271,8 +265,212 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         initView()
+        loading = true
+        downloadList.clear()
+        downloadReady = false
+        modelLib.downloadCompCount = 0
+
+        // get firebase model list
+        MyEntryPoint.myFirebase.getTotalFileList()
+        Thread {
+            while (loading) {
+                if (MyEntryPoint.myFirebase.totalFileList != null) {
+                    println("getting Firebase file list...")
+                    MyEntryPoint.myFirebase.arrangeFileList()
+                    loading = false
+                }
+                Thread.sleep(100)
+            }
+        }.start()
+
+        // update variable
+        prodName = MyEntryPoint.prefs.getString("prodName", "AniCheck-bIgG")
+        lotNum = MyEntryPoint.prefs.getString("lotNum", "00000")
+
+        // get device file list
+        val modelDir = File(getExternalFilesDir("Models"), "")
+        val tfliteListFromDevice = modelDir.listFiles()
+
+        tfliteListFromDevice.forEach {
+            val fileSplit = it.toString().split("/")
+            val fileName = fileSplit[fileSplit.size - 1]
+
+            if (it.toString().contains("detection")) {
+                localModelList[0] = fileName
+            } else if (it.toString().contains("AniCheck-bIgG")) {
+                localModelList[1] = fileName
+            } else if (it.toString().contains("ImmuneCheck-IgE")) {
+                localModelList[2] = fileName
+            } else if (it.toString().contains("ImmuneCheck-IgG")) {
+                localModelList[3] = fileName
+            }
+        }
+
+        println("local file list:${localModelList.toList()}} + loading: $loading")
+
+        // compare local file to firebase storage file
+        Thread {
+            while (true) {
+                if (!loading) {
+                    println("start comparing local and cloud...")
+
+                    // if storage tf detection file is nothing -> call Jungyeon Kim ^^
+                    addToDownloadList(
+                        MyEntryPoint.myFirebase.tfliteListDetection,
+                        localModelList[0],
+                        "There is no AI model for kit detection. Please contact manager."
+                    )
+
+                    // check for regression file on server
+                    if (prodName.lowercase().contains("bigg")) {
+                        addToDownloadList(
+                            MyEntryPoint.myFirebase.tfliteListBIgG,
+                            localModelList[1],
+                            "There is no AI model for AniCheck-BIgG regression on server." +
+                                    " Please contact manager."
+                        )
+                    } else if (prodName.lowercase().contains("-ige")) {
+                        addToDownloadList(
+                            MyEntryPoint.myFirebase.tfliteListIgE,
+                            localModelList[2],
+                            "There is no AI model for ImmuneCheck-IgE " +
+                                    "regression on server. Please contact manager."
+                        )
+                    } else if (prodName.lowercase().contains("-igg")) {
+                        addToDownloadList(
+                            MyEntryPoint.myFirebase.tfliteListIgG,
+                            localModelList[3],
+                            "There is no AI model for ImmuneCheck-IgG " +
+                                    "regression on server. Please contact manager."
+                        )
+                    }
+                    println(prodName)
+                    println("download list: $downloadList")
+                    downloadReady = true
+                    break
+                }
+                Thread.sleep(1000)
+            }
+        }.start()
+
+
+        // Download files
+        Thread {
+            var fileSize = 0
+            while (true) {
+                if (downloadReady) {
+                    // calculate file size
+                    downloadList.forEach {
+                        if (it.contains("detection")) {
+                            fileSize += 8
+                        } else {
+                            fileSize += 45
+                        }
+                    }
+
+                    // break the loop. because it will not working eventually... ^o^
+                    if (!activityMainBinding.captureKit.isEnabled) break
+                    else {
+                        runOnUiThread{
+
+                            // disable progressbar layout
+                            activityMainBinding.loadingLayout.visibility = View.GONE
+
+                            if (downloadList.isNotEmpty()) {
+                                androidx.appcompat.app.AlertDialog.Builder(this).run {
+                                    setIcon(android.R.drawable.ic_dialog_info)
+                                    setTitle("New AI Update")
+                                    setMessage("We are planning to download an AI model. " +
+                                            "If you're not in a Wi-Fi environment, a significant amount of data may be consumed. " +
+                                            "Would you like to continue? \n\n * Size: $fileSize MB")
+                                    setNegativeButton("CANCEL", null)
+                                    setPositiveButton("OK", object: DialogInterface.OnClickListener{
+                                        override fun onClick(dialog: DialogInterface?, which: Int) {
+
+
+                                            // Alert Dialog when downloading...
+                                            val dialog2Binding = DownloadProgressDialog2Binding
+                                                .inflate(layoutInflater, null, false)
+
+                                            var downloadDialog = androidx.appcompat.app.AlertDialog.Builder(this@MainActivity)
+                                                .run{
+                                                    setView(dialog2Binding.root)
+                                                    setMessage("Downloading...")
+                                                    show()
+                                                }
+                                            downloadDialog.setCanceledOnTouchOutside(false)
+
+                                            // set progress dialog
+                                            downloadList.forEach {
+                                                modelLib.getFileFromStorage(
+                                                    it, MyEntryPoint.myFirebase.storageRef,
+                                                    downloadDialog,
+                                                    localModelList
+                                                )
+                                            }
+
+
+                                            // turn off dialog
+                                            Thread{
+                                                while(true) {
+                                                    if (modelLib.downloadCompCount == downloadList.size) {
+                                                        runOnUiThread{
+                                                            downloadDialog.dismiss()
+                                                        }
+                                                    }
+                                                    Thread.sleep(1000)
+                                                }
+                                            }.start()
+                                            dialog?.dismiss()
+                                        }
+                                    })
+                                    show()
+                                }
+                            }
+                        }
+                    }
+                    println("total file size: $fileSize")
+                    downloadReady = false
+                    break
+                }
+                Thread.sleep(1000)
+            }
+        }.start()
+
 
     }
+
+    private fun addToDownloadList(checkList:MutableList<String>, localFileName:String, message:String) {
+        if (checkList.isEmpty()) {
+            runOnUiThread{
+                androidx.appcompat.app.AlertDialog.Builder(this).run {
+                    setTitle("No model on server")
+                    setMessage(message)
+                    setPositiveButton("OK", null)
+                    show()
+                }
+
+                // disable capture kit button on main activity
+                activityMainBinding.captureKit.background = ContextCompat.getDrawable(
+                    this, R.drawable.rounded_rectangle_gray
+                )
+                activityMainBinding.captureKit.isEnabled = false
+            }
+        } else {
+            println("1) localfileName:$localFileName")
+            println("2) checklist: ${checkList[0]}")
+            if (localFileName == "" ||
+                localFileName != checkList[0]) {
+                downloadList.add(checkList[0])
+            }
+
+            runOnUiThread {
+                // enable capture kit button on main activity
+                activityMainBinding.captureKit.background = ContextCompat.getDrawable(
+                    this, R.drawable.rounded_rectangle_lightgreen
+                )
+                activityMainBinding.captureKit.isEnabled = true
+            }
+        }
+    }
 }
-
-

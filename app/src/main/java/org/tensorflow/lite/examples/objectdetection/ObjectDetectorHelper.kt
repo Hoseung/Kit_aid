@@ -20,6 +20,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tflite.client.TfLiteInitializationOptions
 import com.google.android.gms.tflite.gpu.support.TfLiteGpu
+import com.google.firebase.ml.custom.FirebaseCustomRemoteModel
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.Rot90Op
@@ -27,6 +28,7 @@ import org.tensorflow.lite.task.core.BaseOptions
 import org.tensorflow.lite.task.gms.vision.TfLiteVision
 import org.tensorflow.lite.task.gms.vision.detector.Detection
 import org.tensorflow.lite.task.gms.vision.detector.ObjectDetector
+import java.io.File
 
 class ObjectDetectorHelper(
     private var threshold: Float = 0.7f, // to show bounding box
@@ -38,7 +40,7 @@ class ObjectDetectorHelper(
 ) {
 
     private val TAG = "ObjectDetectionHelper"
-
+    private lateinit var detectionFilePath: String
     // For this example this needs to be a var so it can be reset on changes. If the ObjectDetector
     // will not change, a lazy val would be preferable.
     private var objectDetector: ObjectDetector? = null
@@ -94,11 +96,17 @@ class ObjectDetectorHelper(
 
         optionsBuilder.setBaseOptions(baseOptionsBuilder.build())
 
-        val modelName = "detection_kit.tflite"
+        // get device file list
+        val modelDir = File(context.getExternalFilesDir("Models"), "")
+        modelDir.listFiles().forEach {
+            if (it.toString().contains("detection")) {
+                detectionFilePath = it.toString()
+            }
+        }
 
         try {
             objectDetector =
-                ObjectDetector.createFromFileAndOptions(context, modelName, optionsBuilder.build())
+                ObjectDetector.createFromFileAndOptions(File(detectionFilePath), optionsBuilder.build())
         } catch (e: Exception) {
             objectDetectorListener.onError(
                 "Object detector failed to initialize. See error logs for details"
@@ -178,10 +186,10 @@ class ObjectDetectorHelper(
             imageWidth: Int
         )
         fun onSecondResult(
-        image: Bitmap,
-        results: MutableList<Detection>?,
-        imageHeight: Int,
-        imageWidth: Int
+            image: Bitmap,
+            results: MutableList<Detection>?,
+            imageHeight: Int,
+            imageWidth: Int
         )
 
     }

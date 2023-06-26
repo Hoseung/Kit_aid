@@ -1,52 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/app_background"
-    android:orientation="vertical"
-    tools:context=".MainActivity"
-    >
-
-    <TextView
-        android:id="@+id/version_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="version 1.4.0"
-        android:layout_gravity="right"
-        android:padding="10dp"
-        android:textColor="#66777575"
-        />
-
-    <ImageView
-        android:id="@+id/loginImageView"
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:contentDescription="@string/description_app_logo"
-        android:src="@drawable/main_image"
-        android:layout_marginTop="40dp"
-        android:layout_gravity="center"
-        />
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/loginLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:background="@drawable/rounded_rectangle_white"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@color/app_background"
+        android:orientation="vertical"
+        tools:context=".MainActivity"
+        >
 
         <TextView
+            android:id="@+id/version_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="version 2.0.0"
+            android:layout_gravity="right"
+            android:padding="10dp"
+            android:textColor="#66777575"
+            />
+
+        <ImageView
+            android:id="@+id/loginImageView"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:contentDescription="@string/description_app_logo"
+            android:src="@drawable/main_image"
+            android:layout_marginTop="40dp"
+            android:layout_gravity="center"
+            />
+
+        <LinearLayout
+            android:id="@+id/loginLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/current_kit_info"
-            android:textSize="24dp"
-            android:textColor="#767171"
-            android:textStyle="bold"
-            android:layout_marginTop="15dp"
-            android:gravity="center"/>
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/rounded_rectangle_white"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/current_kit_info"
+                android:textSize="24dp"
+                android:textColor="#767171"
+                android:textStyle="bold"
+                android:layout_marginTop="15dp"
+                android:gravity="center"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -121,55 +126,55 @@
 
         </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:src="@drawable/focus_ic"
-        android:background="@drawable/rounded_rectangle_lightgreen"
-        android:layout_marginTop="40dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp">
-    </ImageButton>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        >
-
         <ImageButton
-            android:id="@+id/examineHistoryButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/file_ic"
+            android:id="@+id/capture_kit"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:src="@drawable/focus_ic"
             android:background="@drawable/rounded_rectangle_lightgreen"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"/>
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp">
+        </ImageButton>
 
-        <Button
-            android:id="@+id/kitListButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:text="SELECT KIT"
-            android:background="@drawable/rounded_rectangle_lightgreen"
-            android:layout_marginRight="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            >
 
-        <ImageButton
-            android:id="@+id/scanQRButton"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:src="@drawable/qr_ic"
-            android:background="@drawable/rounded_rectangle_lightgreen"
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/examineHistoryButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/file_ic"
+                android:background="@drawable/rounded_rectangle_lightgreen"
+                android:layout_marginRight="5dp"
+                android:layout_weight="1"/>
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/kitListButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="SELECT KIT"
+                android:background="@drawable/rounded_rectangle_lightgreen"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"/>
+
+            <ImageButton
+                android:id="@+id/scanQRButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/qr_ic"
+                android:background="@drawable/rounded_rectangle_lightgreen"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
@@ -177,30 +182,51 @@
             android:layout_weight="1"
             />
 
-    <LinearLayout
-        android:id="@+id/loginBottomLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="#f0f3fa"
-        android:layout_marginBottom="10dp"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="20dp"
-            android:contentDescription="@string/description_information"
-            android:src="@drawable/info_icon" />
-
-        <TextView
-            android:id="@+id/goToHomepage"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/loginBottomLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="@string/label_info"
-            android:textColor="@color/black" />
+            android:layout_gravity="center_horizontal"
+            android:background="#f0f3fa"
+            android:layout_marginBottom="10dp"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="20dp"
+                android:contentDescription="@string/description_information"
+                android:src="@drawable/info_icon" />
+
+            <TextView
+                android:id="@+id/goToHomepage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@string/label_info"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <LinearLayout
+        android:id="@+id/loadingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="@color/black_overlay"
+        >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTint="@color/white"
+            android:indeterminate="true"/>
+
+    </LinearLayout>
+
+
+</FrameLayout>
+

@@ -19,7 +19,7 @@
     <string name="detection_model1">detection_kit.tflite</string>
     <string name="detection_model2">detection_box.tflite"</string>
     <string name="regression_model">regression_bovine.tflite"</string>
-    <string name="product_1">AniCheck-BIgG</string>
+    <string name="product_1">AniCheck-bIgG</string>
     <string name="product_2">ImmuneCheck-IgE</string>
     <string name="product_3">ImmuneCheck-IgG</string>
     <string name="back_button">Back</string>

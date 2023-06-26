@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Camera
 import android.net.Uri
+import android.os.Build
 //import android.graphics.Path
 //import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import kotlinx.coroutines.*
 import org.tensorflow.lite.examples.objectdetection.*
 import org.tensorflow.lite.examples.objectdetection.adapter.*
@@ -23,15 +25,20 @@ import org.tensorflow.lite.examples.objectdetection.databinding.ActivityResultBi
 import java.io.File
 import java.io.FileInputStream
 import java.io.OutputStreamWriter
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 class ResultActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private lateinit var regressionHelper: RegressionHelper
+    private var maxAntibody = 180f
     // ToDo: History
 
     //val applicationScope = CoroutineScope(SupervisorJob())
@@ -60,6 +67,7 @@ class ResultActivity : AppCompatActivity() {
         //database = HistoryRoomDatabase.getDatabase(this, applicationScope)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         // Run inference onResume, not OnCreate
@@ -79,7 +87,14 @@ class ResultActivity : AppCompatActivity() {
             val img = pathToBitmap(imgPath)!!
 
             // calibration
-            var resultValue = randomCroppedPredict(img) * 180f
+            val prodName = MyEntryPoint.prefs.getString("prodName", "...")
+            if (prodName.lowercase().contains("anicheck")) {
+                    maxAntibody = 180f
+            } else {
+                maxAntibody = 4500f
+            }
+
+            var resultValue = randomCroppedPredict(img) * maxAntibody
             var ans: Float
 
             if (calibOn) {
@@ -90,6 +105,9 @@ class ResultActivity : AppCompatActivity() {
             } else {
                 ans = resultValue
             }
+
+            // zero handling once more
+            if (ans < 0) ans = 0f
             answers.add(ans)
 
             val f = File(imgPath)
@@ -112,17 +130,23 @@ class ResultActivity : AppCompatActivity() {
 
         var answerStr: String
         if (calibOn) {
-            answerStr = answer.let { it ->
-                if (it > 130) {
-                    "> 130 mg/ml"
-                } else {
-                    String.format("%.1fmg/ml", it)
+            if (MyEntryPoint.prefs.getString("prodName", "00000") == "AniCheck-bIgG"){
+                answerStr = answer.let { it ->
+                    if (it > 130) {
+                        "> 130 mg/ml"
+                    } else {
+                        String.format("%.1fmg/ml", it)
+                    }
                 }
+            } else {
+                val roundOff = (answer * 100.0).roundToInt() / 100.0
+                answerStr = "${roundOff.toString()} mg/ml"
             }
-        } else {
-            answerStr = answer.toString()
-        }
 
+        } else {
+            val roundOff = (answer * 100.0).roundToInt() / 100.0
+            answerStr = "${roundOff.toString()} mg/ml"
+        }
 
         val myTextView = findViewById<TextView>(R.id.resultText)
         myTextView.text = answerStr
@@ -133,12 +157,16 @@ class ResultActivity : AppCompatActivity() {
 //        historyViewModel.insert(
 //            History(null, "Bovine", 2022003, "30mg/ml", "2022-10-10")
 //        )
+        val longNow = System.currentTimeMillis()
+        val tDate = Date(longNow)
+        val tDateFormat = SimpleDateFormat("yy-MM-dd kk:mm:ss")
+        val strDate = tDateFormat.format(tDate)
 
         val history = History(null,
             MyEntryPoint.prefs.getString("prodName", "NoProduct"),
             MyEntryPoint.prefs.getString("lotNum","0"),
             answerStr,
-            "Today!!"
+            strDate
         )
 
 //        GlobalScope.launch(Dispatchers.IO){

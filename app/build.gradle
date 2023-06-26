@@ -150,6 +150,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation 'com.firebaseui:firebase-ui-storage:8.0.1'
+    implementation 'com.google.firebase:firebase-ml-model-interpreter:22.0.3'
     implementation 'com.github.bumptech.glide:compiler:4.13.2'
 
 //    // Unit testing

@@ -34,10 +34,10 @@ class LoginActivity : AppCompatActivity() {
 
     private fun login(email:String, password:String, binding: ActivityLoginBinding) {
         if (email.length?:0 >0 || password.length?:0 >0){
-            MyEntryPoint.auth.signInWithEmailAndPassword(email, password)
+            MyEntryPoint.myFirebase.auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this){task ->
                     if (task.isSuccessful) {
-                        if (MyEntryPoint.checkAuth()) {
+                        if (MyEntryPoint.myFirebase.checkAuth()) {
                             // 로그인 성공
                             MyEntryPoint.email = email
                             Toast.makeText(baseContext,

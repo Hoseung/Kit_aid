@@ -77,7 +77,7 @@ class HistoryAdapter : RecyclerView.Adapter<HistoryAdapter.HistoryItemViewHolder
 
     // Use DiffUtil instead.
     fun setHistoryList(historyList: List<History>) {
-        this.historyList = historyList
+        this.historyList = historyList.reversed()
         notifyDataSetChanged()
     }
 

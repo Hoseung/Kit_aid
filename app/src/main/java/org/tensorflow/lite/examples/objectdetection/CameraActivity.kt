@@ -44,8 +44,6 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import org.tensorflow.lite.examples.objectdetection.*
-import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.auth
-import org.tensorflow.lite.examples.objectdetection.MyEntryPoint.Companion.storage
 import org.tensorflow.lite.examples.objectdetection.adapter.Models
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModel
 import org.tensorflow.lite.examples.objectdetection.adapter.ModelsViewModelFactory
@@ -95,11 +93,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         viewBinding = ActivityCameraBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        //Firebase storage setting
-        auth = FirebaseAuth.getInstance()
-        storage = Firebase.storage("gs://kitaid.appspot.com/")
-
-        val storageRef = storage.reference
+        val storageRef = MyEntryPoint.myFirebase.storageRef
         Log.d("FirebaseCompare2", "$storageRef")
         loadLocalModels(storageRef)
 
@@ -357,7 +351,9 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
     }
 
     override fun onError(error: String) {
-        Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+        runOnUiThread{
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onInitialized() {
@@ -402,7 +398,7 @@ class CameraActivity : AppCompatActivity(), ObjectDetectorHelper.DetectorListene
         for (i in 1..5){
             println("$i - captureAndDetect cnt1: ${MyEntryPoint.prefs.getCnt("count1", 0)}")
             println("   - captureAndDetect cnt2: ${MyEntryPoint.prefs.getCnt("count2", 0)}")
-            cameraController?.startFocusAndMetering(action1) // ToDo: Action List로 수정
+            cameraController?.startFocusAndMetering(action1)
 
             imageCapture.takePicture(cameraExecutor,
                 object :  ImageCapture.OnImageCapturedCallback() {
